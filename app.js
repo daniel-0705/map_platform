@@ -2,6 +2,8 @@ var express = require("express") // express 模組
 var app = express() // express 模組
 const mysql = require("./mysql_connection.js") // MySQL Initialization
 const crawler = require("./web_crawler.js") // 爬蟲檔案
+const dao_map = require("./dao/map.js") // dao_map.js檔
+
 
 var bodyParser = require("body-parser") // body-parser 模組
 var path = require("path") // path 模組

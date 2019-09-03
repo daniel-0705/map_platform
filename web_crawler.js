@@ -99,18 +99,18 @@ function add_taipet_city (address){
 };
 
 let core_geocode_function = async function(map_data,category_data,search){
-    let select_map_result = await dao_map.select ("map","address",map_data.address,map_data.address);
+    let select_map_result = await dao_map.select ("map","address",map_data.address);
 
         if(select_map_result.length > 0){
-
-            let update_map_result = await dao_map.update("map",map_data,map_data.name);
+            
+            let update_map_result = await dao_map.update("map","address",map_data.address,map_data,map_data.name);
 
             //因為已經先判斷地址有沒有了，所以這層直接判斷分類有沒有，再來決定要更新還是新增
 
             let select_category_result = await dao_map.select("map_category","category",category_data.category,category_data.address);
 
             if(select_category_result.length > 0){
-                let update_category_result = await dao_map.update("map_category",category_data,map_data.name);
+                let update_category_result = await dao_map.update("map_category","address",category_data.address,category_data,map_data.name);
             }else{
                 let insert_category_result = await dao_map.insert("map_category",category_data,map_data.name);
             }

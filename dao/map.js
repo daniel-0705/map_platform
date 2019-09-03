@@ -1,10 +1,35 @@
 const mysql=require("../mysql_connection.js");                       // MySQL Initialization
 
-let select_mysql = function(table_name,column_name,data,data2){ 
+let select_mysql = function(table_name,column_name,data){ 
     return new Promise(function(resolve, reject){
-        mysql.con.query(`select * from ${table_name} where ${column_name} ="${data}" and address = "${data2}"`,function (err,result) {
+
+        if(column_name == null){
+            mysql.con.query(`select * from ${table_name}`,function (err,result) {
+                if (err) {
+                    console.log(`${data} select ${table_name} table failed`);
+                    reject(err);
+                }else{
+                    resolve(result);
+                }
+            })
+        }else{
+            mysql.con.query(`select * from ${table_name} where ${column_name} ="${data}"`,function (err,result) {
+                if (err) {
+                    console.log(`${data.name} select ${table_name} table failed`);
+                    reject(err);
+                }else{
+                    resolve(result);
+                }
+            })
+        }
+    })
+};
+
+let select_2_conditions_mysql = function(table_name,column_name_1,data_1,column_name_2,data_2){ 
+    return new Promise(function(resolve, reject){
+        mysql.con.query(`select * from ${table_name} where ${column_name_1} ="${data_1}" and ${column_name_2} = "${data_2}"`,function (err,result) {
             if (err) {
-                console.log(`${data_detail} select ${table_name} table failed`);
+                console.log(`${data_1.name} select ${table_name} table failed`);
                 reject(err);
             }else{
                 resolve(result);
@@ -27,9 +52,9 @@ let insert_mysql = function(table_name,data,data_name){
     })
 };
 
-let update_mysql = function(table_name,data,data_name){ 
+let update_mysql = function(table_name,column_name,data_detail,data,data_name){ 
     return new Promise(function(resolve, reject){
-        mysql.con.query(`UPDATE ${table_name} SET ? where address ="${data.address}"`,data,function (err,result) {
+        mysql.con.query(`UPDATE ${table_name} SET ? where ${column_name} ="${data_detail}"`,data,function (err,result) {
             if (err) {
                 console.log(`${data_name} update ${table_name} table failed`);
                 reject(err);
@@ -41,13 +66,9 @@ let update_mysql = function(table_name,data,data_name){
     })
 };
 
-
-
-
-
-
 module.exports={
-	select:select_mysql,
+    select:select_mysql,
+    select_2:select_2_conditions_mysql,
     insert:insert_mysql,
     update:update_mysql
 };

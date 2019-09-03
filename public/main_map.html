@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">     
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">     
+    <meta name="viewport" content="width=device-width, initial-scale=1">    
+    <title>map</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkK5NajaFKNXkYT2WsdB96edSWRo5kYhY&callback=initMap" async defer></script>
+    <GoogleMap options={{styles: mapStyles}}></GoogleMap>
+    <script>
+
+      
+
+    
+
+
+      var map;
+     
+      function initMap() {
+          //new map
+          map = new google.maps.Map(document.getElementById('map'), {
+              center: {lat: 25.033499866, lng: 121.558997764},
+              zoom: 15,
+              options: {
+                clickableIcons: true
+              },
+              styles: [
+                {"elementType":"labels","stylers":[{"visibility":"off"}]},  //到時候要把這調成 off
+                {"featureType": "road","elementType": "labels","stylers":[{"visibility":"on"}]},
+                {"featureType": "transit.station","elementType": "labels","stylers":[{"visibility":"on"}]},
+                {"featureType": "transit.station.bus","elementType": "labels","stylers":[{"visibility":"on"}]},
+                {"featureType": "water","elementType": "labels","stylers":[{"visibility":"on"}]}
+              ]
+          });
+          
+
+
+          var xhr = new XMLHttpRequest();
+
+          xhr.open("GET", `/api/map`,true);
+          xhr.onreadystatechange=function() {
+            if (this.readyState == 4 && this.status == 200) {
+              let all_markers = JSON.parse(xhr.responseText);
+              console.log(all_markers);
+
+
+              // all_marker_data
+              for (let i = 0 ; i<all_markers.length ;i++){
+              
+                var marker = new google.maps.Marker({
+                      position:{lat: all_markers[i].latitude, lng: all_markers[i].longitude},
+                      map:map
+                  });
+                marker.content = `
+                      <h1>${all_markers[i].name}</h1>
+                      <p>${all_markers[i].information}</p>
+                      `;
+
+                var infoWindow = new google.maps.InfoWindow();
+                google.maps.event.addListener(marker, 'click', function () {
+                  infoWindow.setContent(this.content);
+                  infoWindow.open(this.getMap(), this);
+                });
+
+              }
+
+
+
+
+            }
+          }
+          xhr.send();
+
+
+
+
+      }
+
+    </script>
+
+</head>
+<body>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+          height: 100%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+
+
+    </style>
+    <body>
+      <div id="map"></div>
+      
+    
+
+</body>
+
+
+
+</html> 

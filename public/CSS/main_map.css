@@ -1,0 +1,34 @@
+html{
+    height: 100%;
+}
+
+body{
+    height: 100%;
+}
+
+.main{
+    height: 100%;
+}
+
+
+.search_and_edit_bar{
+    height: 100px;
+    background-color: rgb(233, 202, 129);
+}
+
+.public_map{
+    display: flex;
+    height: calc(100% - 250px);
+}
+
+
+.search_and_list{
+    width: 400px;
+    height: 100%;
+    background-color: rgb(230, 208, 157);
+}
+
+#map {
+    width: calc(100% - 400px);
+    height: 100%;
+}

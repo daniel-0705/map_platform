@@ -4,9 +4,14 @@
     <meta charset="UTF-8">     
     <meta http-equiv="X-UA-Compatible" content="IE=edge">     
     <meta name="viewport" content="width=device-width, initial-scale=1">    
-    <title>map</title>
+    <title>Explore</title>
+    <link rel="stylesheet" href="CSS/common.css" media="all">
+    <script src="js/common.js"></script>
+    <link rel="stylesheet" href="CSS/main_map.css" media="all">
+
+
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkK5NajaFKNXkYT2WsdB96edSWRo5kYhY&callback=initMap" async defer></script>
-    <GoogleMap options={{styles: mapStyles}}></GoogleMap>
+    
     <script>
 
       
@@ -25,7 +30,7 @@
                 clickableIcons: true
               },
               styles: [
-                {"elementType":"labels","stylers":[{"visibility":"off"}]},  //到時候要把這調成 off
+                {"elementType":"labels","stylers":[{"visibility":"on"}]},  //到時候要把這調成 off
                 {"featureType": "road","elementType": "labels","stylers":[{"visibility":"on"}]},
                 {"featureType": "transit.station","elementType": "labels","stylers":[{"visibility":"on"}]},
                 {"featureType": "transit.station.bus","elementType": "labels","stylers":[{"visibility":"on"}]},
@@ -80,23 +85,57 @@
 
 </head>
 <body>
-    <style>
-        /* Always set the map height explicitly to define the size of the div
-         * element that contains the map. */
-        #map {
-          height: 100%;
-        }
-        /* Optional: Makes the sample page fill the window. */
-        html, body {
-          height: 100%;
-          margin: 0;
-          padding: 0;
-        }
+  <div class = "main">
+    <nav>
+      <div>
+        <a href="/" >
+          <p class="Logo">mapBook</p>
+        </a>
+      </div>
+      <div>
+        <ul>
+            <li class="nav_item"><a href="/">About</a></li>
+            <li class="nav_item"><a href="/main_map.html">Explore</a></li>
+            <li class="nav_item" onclick="signin_or_profile()"><a>User</a></li>
+        </ul>
+      </div>
+    </nav>
 
+    <div class = "search_and_edit_bar">
 
-    </style>
-    <body>
-      <div id="map"></div>
+    </div>
+    
+    <div class = "public_map">
+
+      <div class= "search_and_list">
+        <div class = "search_list_bar">
+
+        </div>
+        <div class = "search_list_result">
+
+        </div>
+
+        <div class = "user_own_list">
+
+        </div>
+      </div>
+
+      <div id="map">
+      </div>
+
+    
+
+    </div>
+
+    <footer>
+        <div class="footer_bar">
+          <div class="copyright">
+              <p>© 2019. All rights reserved.</p>
+          </div>
+        </div>
+    </footer>
+  </div>
+      
       
     
 

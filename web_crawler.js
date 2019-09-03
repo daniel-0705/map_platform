@@ -244,9 +244,6 @@ let taipei_city_request = async function (url,category,api_name,api_address,api_
 
 
 
-
-
-
 var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
 
     // 政府資料開放平台 博物館

@@ -37,6 +37,10 @@ a{
 
 /* nav bar */
 
+.logo, .nav{
+  height: 60px;
+}
+
 nav{
   display: flex;
   width: 100%;
@@ -48,7 +52,7 @@ nav{
   display: flex;  
   width: 258px;
   height: 48px;
-  margin: 26px 48px 26px 60px;
+  margin: auto 48px auto 60px;
   font-size: 50px;
 }
 
@@ -56,13 +60,13 @@ nav > div >ul > li{
   display: inline-flex;
   align-items: center;
   margin-right: 10px;
-  height: 100px;
+  height: 60px;
   font-family: 'Noto Sans TC', sans-serif;
   font-size: 20px;
   font-weight: normal;
   font-style: normal;
   font-stretch: normal;
-  letter-spacing: 10px;
+  letter-spacing: 3px;
 } 
 
 .nav_item_bar{

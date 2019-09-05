@@ -12,23 +12,120 @@ body{
 
 
 .search_and_edit_bar{
-    height: 100px;
+    height: 60px;
     background-color: rgb(233, 202, 129);
 }
 
 .public_map{
     display: flex;
-    height: calc(100% - 250px);
-}
-
-
-.search_and_list{
-    width: 400px;
-    height: 100%;
-    background-color: rgb(230, 208, 157);
+    height: calc(100% - 170px);
+    position: relative;
 }
 
 #map {
-    width: calc(100% - 400px);
+    width: 100%;
     height: 100%;
+    transition: margin-left .5s;
 }
+
+
+/* slidebar */
+
+.search_and_list {
+    height: 100%;
+    width: 0px;
+    position: fixed;
+    position: absolute;
+    overflow-x: hidden;
+    transition: 0.5s;
+    background-color: rgb(230, 208, 157);
+}
+
+.search_list_bar{
+    height: 10%;
+    background-color: rgb(240, 230, 207);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#search,.lsit_result{
+    height:50%;
+}
+
+#search{
+    width:60%;
+}
+
+.search_list_result{
+    height: 45%;
+    background-color: rgb(248, 201, 92);
+}
+
+.user_own_list{
+    height: 45%;
+    background-color: rgb(255, 184, 19);
+}
+
+.user_list_name{
+    cursor:pointer;
+}
+
+
+/* list_input */
+
+.input_list_name {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgb(214, 214, 214,0.8);
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    text-align:center;
+}
+  
+.input_list_name .close_button {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.user_own_list_content{
+    overflow-y: auto;
+    height: calc(100% - 23px);;
+}
+
+
+/* a list */
+
+.a_list {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    position: absolute;
+    overflow-x: hidden;
+    transition: 0.1s;
+}
+
+.a_list_name{
+    height: 10%;
+    background-color: rgb(230, 230, 84);
+    display: flex;
+    justify-content: space-around;
+}
+
+.a_list_content{
+    height: 90%;
+    background-color: rgb(160, 160, 86);
+}
+
+/* .a_list_title {
+    border: none;
+    background: transparent;
+} */

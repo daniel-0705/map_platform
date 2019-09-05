@@ -14,11 +14,6 @@
     
     <script>
 
-      
-
-    
-
-
       var map;
      
       function initMap() {
@@ -27,7 +22,8 @@
               center: {lat: 25.033499866, lng: 121.558997764},
               zoom: 15,
               options: {
-                clickableIcons: true
+                clickableIcons: true,
+                mapTypeControl: false
               },
               styles: [
                 {"elementType":"labels","stylers":[{"visibility":"on"}]},  //到時候要把這調成 off
@@ -36,17 +32,17 @@
                 {"featureType": "transit.station.bus","elementType": "labels","stylers":[{"visibility":"on"}]},
                 {"featureType": "water","elementType": "labels","stylers":[{"visibility":"on"}]}
               ]
+              
           });
           
 
 
-          var xhr = new XMLHttpRequest();
-
+          let xhr = new XMLHttpRequest();
           xhr.open("GET", `/api/map`,true);
           xhr.onreadystatechange=function() {
             if (this.readyState == 4 && this.status == 200) {
               let all_markers = JSON.parse(xhr.responseText);
-              console.log(all_markers);
+              //console.log(all_markers);
 
 
               // all_marker_data
@@ -68,28 +64,220 @@
                 });
 
               }
-
-
-
-
             }
           }
           xhr.send();
-
-
-
-
       }
 
     </script>
+  <script>
 
+    function render_all_user_lists(){
+    let xhrt= new XMLHttpRequest();
+    xhrt.open("GET", "/api/user/map_list/result");  
+    xhrt.setRequestHeader('Content-Type', 'application/json');
+    xhrt.send();
+    xhrt.onreadystatechange=function() {
+      if (this.readyState == 4 && this.status == 200) {
+
+        if(xhrt.response == "error"){
+            alert("查無此使用者，請註冊");
+        }else{
+          let user_list_data = JSON.parse(xhrt.response);
+          for (let i = 0 ;i<user_list_data.length;i++){
+            //製作每一個 list 的內容 p
+            let new_list_name = document.createElement("p");
+            new_list_name.className = "user_list_name";
+            new_list_name.id = `${user_list_data[i].list_id}`;
+            new_list_name.setAttribute("onClick", "open_a_list(this)");
+            new_list_name.innerHTML = user_list_data[i].list_name;
+            let list_content = document.getElementsByClassName("user_own_list_content")[0];
+            list_content.appendChild(new_list_name);
+            
+          }
+        }
+          
+      }
+    }
+  }
+    
+    function open_slidebar() {
+      document.getElementById("search_and_list").style.width = "300px";
+      document.getElementById("map").style.marginLeft = "300px";
+    }
+
+    function close_slidebar() {
+      document.getElementById("search_and_list").style.width = "0";
+      document.getElementById("map").style.marginLeft= "0";
+    }
+
+    function open_list_input() {
+      if(localStorage.getItem("access_token")== undefined){
+        alert("! 欲使用此功能，請先登入");
+      }else{
+        document.getElementById("input_list_name").style.width = "100%";
+      }
+      
+    }
+
+    function close_list_input() {
+      document.getElementById("input_list_name").style.width = "0";
+    }
+
+    function reset_input(){
+      var inputs = document.querySelector('#list_name');
+      inputs.value="";
+      
+    }
+
+    function send_list_name(){
+      let insert_list ={
+        category : document.getElementsByName("category")[0].value,
+        list_name : document.getElementsByName("list_name")[0].value
+      }
+
+      if (insert_list.list_name == "" || insert_list.list_name == undefined){
+        alert("! 請輸入清單名稱");
+        return;
+      }
+
+      insert_list.access_token = localStorage.getItem("access_token");
+
+      let xhr = new XMLHttpRequest();
+      xhr.open("post", "/api/user/map_list");  
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      
+      let list_data = {
+        type:"create",
+        data:insert_list
+      }
+
+      xhr.send(JSON.stringify(list_data));
+
+      xhr.onreadystatechange=function() {
+        if (this.readyState == 4 && this.status == 200) {
+
+          if(xhr.response == "List name is duplicate."){
+              alert("! 清單名稱重複，請重新命名");
+          }else{
+            let user_list_data = JSON.parse(xhr.response);
+            console.log(user_list_data.error);
+
+            //製作每一個新的 list 的內容 p
+            let new_list_name = document.createElement("p");
+            new_list_name.className = "user_list_name";
+            new_list_name.innerHTML = user_list_data[0].list_name;
+            let list_content = document.getElementsByClassName("user_own_list_content")[0];
+            list_content.appendChild(new_list_name);
+          }
+            
+        }
+      }
+
+
+      close_list_input();
+      reset_input();
+    }
+
+    function open_a_list(e) {
+      let parent = document.getElementsByClassName("a_list_name")[0];
+      let child = document.getElementsByClassName("a_list_title")[0];
+      if(child != undefined){
+        parent.removeChild(child);
+      }
+      
+
+      close_slidebar();
+      document.getElementById("a_list").style.width = "300px";
+      document.getElementById("map").style.marginLeft = "300px";
+
+      let new_a_list_name = document.createElement("input");
+      new_a_list_name.id = e.id;
+      new_a_list_name.className = "a_list_title";
+      new_a_list_name.value = e.innerHTML;
+      new_a_list_name.readOnly = true;
+      
+      let a_list_name = document.getElementsByClassName("a_list_name")[0];
+      a_list_name.appendChild(new_a_list_name);
+
+    }
+
+    function close_a_list() {
+      document.getElementById("a_list").style.width = "0";
+      document.getElementById("map").style.marginLeft= "0";
+    }
+
+    function edit_a_list_name(){
+      let a_list_title = document.getElementsByClassName("a_list_title")[0];
+      a_list_title.readOnly = "";
+
+      a_list_title.addEventListener("keyup", function(event) {
+      // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+          event.preventDefault();
+          a_list_title.readOnly = true;
+
+          let update_list ={
+            list_id : a_list_title.id,
+            list_name : a_list_title.value,
+            access_token : localStorage.getItem("access_token")
+          }
+
+          let xhr = new XMLHttpRequest();
+
+          xhr.open("post", "/api/user/map_list");  
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          
+          let list_data = {
+            type:"update",
+            data:update_list
+          }
+          console.log(list_data)
+          xhr.send(JSON.stringify(list_data));
+
+          xhr.onreadystatechange=function() {
+            if (this.readyState == 4 && this.status == 200) {
+              if(xhr.response == "There is no user data."){
+                alert("! 查無此使用者，請註冊");
+              }else if(xhr.response == "List name is duplicate."){
+                alert("! 清單名稱重複，請重新命名");
+              }else{
+                let user_list_data = JSON.parse(xhr.response);
+                console.log(user_list_data);
+
+                let parent = document.getElementsByClassName("user_own_list_content")[0];
+
+                while (parent.hasChildNodes()) {
+                  parent.removeChild(parent.lastChild);
+                }
+
+                render_all_user_lists()
+              }
+                
+            }
+          }
+
+
+
+
+
+          
+        }
+      });
+    }
+
+
+
+  render_all_user_lists()
+
+  </script>
 </head>
 <body>
   <div class = "main">
     <nav>
       <div>
-        <a href="/" >
-          <p class="Logo">mapBook</p>
+        <a  >
+          <p id="logo" class="Logo">mapBook</p>
         </a>
       </div>
       <div>
@@ -102,21 +290,59 @@
     </nav>
 
     <div class = "search_and_edit_bar">
-
+        <button style="font-size:30px;cursor:pointer" onclick="open_slidebar()" >搜尋清單</button>
+        <button style="font-size:30px;cursor:pointer" onclick="close_slidebar()" >關閉清單</button>
+        <button style="font-size:30px;cursor:pointer" onclick="open_list_input()">新增清單</button>
+        <button style="font-size:30px;cursor:pointer" >刪除清單</button>
+        <button style="font-size:30px;cursor:pointer" onclick="close_a_list()">返回主頁 </button>
     </div>
     
+
+    <!-- 畫面外的介面開始 -->
+    <div id="input_list_name" class="input_list_name">
+      <a href="javascript:void(0)" class="close_button" onclick="close_list_input()">&times;</a>
+      <input type="radio" name="category" value="true" checked > 公開<br>
+      <input type="radio" name="category" value="false" > 私人<br>
+      <input type="text" id = "list_name" name="list_name" placeholder="請輸入清單名稱"><br>
+      <button type="submit" onclick="send_list_name()")>Submit</button>
+    </div>
+
+    <!-- 畫面外的介面結束 -->
+
     <div class = "public_map">
 
-      <div class= "search_and_list">
-        <div class = "search_list_bar">
-
+      <!-- 畫面外的介面開始  -->
+      <div id ="a_list" class="a_list">
+        <div id = "a_list_name" class="a_list_name">
+          <button style="font-size:10px;cursor:pointer" onclick="edit_a_list_name()">編輯名稱</button>
         </div>
+        <div class="a_list_content">
+  
+        </div>
+    
+      </div>
+      <!-- 畫面外的介面結束 -->
+
+
+      <div class= "search_and_list" id="search_and_list">
+        <div class = "search_list_bar">
+          <input id = "search" placeholder="Search list...">
+          <button class= "lsit_result" type ="button">搜尋</button>
+        </div>
+
         <div class = "search_list_result">
 
         </div>
+        
+
 
         <div class = "user_own_list">
+          <div class = "user_own_list_title">
+              <h1>my lists</h1>
+          </div>
+          <div class = "user_own_list_content" >
 
+          </div>
         </div>
       </div>
 
@@ -136,8 +362,16 @@
     </footer>
   </div>
       
-      
+
+    <script>
+      var logo = document.querySelector('#logo');
+        logo.addEventListener('click', function (e) {
+          console.log(e);
+          console.log(e.target)
+        console.log(e.target.id);
+      }, false);
     
+    </script>
 
 </body>
 

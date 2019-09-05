@@ -56,9 +56,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // just test outcome
-app.get("/", function (req, res) {
+app.get("/test", function (req, res) {
   res.send("OK");
 });
+
+// just test outcome
+app.post("/test", function (req, res) {
+  res.send("OK");
+});
+
 
 //currently for test
 app.get("/api/map",async function (req, res) {
@@ -189,6 +195,110 @@ app.post("/api/user/signin",async function(req,res){
 
 });
 
+//user insert update dalete list
+app.post("/api/user/map_list",async function(req,res){
+
+  if(req.header('Content-Type') != "application/json"){
+      var error = {
+          "error": "Invalid request body."
+      };
+      res.send(error);
+  }else{
+    let list_data = req.body;
+
+    console.log(list_data)
+    let select_user_result = await dao_map.select("user","access_token",list_data.data.access_token)
+    console.log(select_user_result)
+    if(select_user_result == 0){
+      var error = {
+        "error": "There is no user data."
+      };
+      res.send(error);
+      return;
+    }
+
+
+    if(list_data.type == "create"){
+        
+      let user_list_data = {
+        category : list_data.data.category,
+        user_name : select_user_result[0].name,
+        list_name : list_data.data.list_name,
+      }
+
+      console.log(user_list_data)
+
+      let select_user_insert_list = await dao_map.select("user_map_list","list_name",user_list_data.list_name);
+
+      if(select_user_insert_list.length >0){
+        var error = {
+          "error": "List name is duplicate."
+        };
+        res.send(error);
+        return;
+      }
+
+      let insert_user_list_data = await dao_map.insert("user_map_list",user_list_data,user_list_data.user_name);
+
+      let last_list_id = await dao_map.select_last_insert_id()
+
+      let select_user_last_list = await dao_map.select("user_map_list","list_id",last_list_id[0]["LAST_INSERT_ID()"]);
+
+      res.send(select_user_last_list);
+
+    }else if(list_data.type == "update"){
+      let user_list_data = {
+        user_name : select_user_result[0].name,
+        list_name : list_data.data.list_name
+      }
+
+      let select_user_insert_list = await dao_map.select("user_map_list","list_name",user_list_data.list_name);
+
+      if(select_user_insert_list.length >0){
+        var error = {
+          "error": "List name is duplicate."
+        };
+        res.send(error);
+        return;
+      }
+
+      let update_user_list_name = await dao_map.update("user_map_list","list_id",list_data.data.list_id,user_list_data,user_list_data.user_name)
+
+      res.send({success:"OK"});
+      
+    }
+    //else{
+
+    // }
+    
+
+
+
+
+     
+  }
+  
+});
+
+app.get("/api/user/map_list/result",async function(req,res){
+  if(req.header('Content-Type') != "application/json"){
+      var error = {
+          "error": "Invalid request body."
+      };
+      res.send(error);
+  }else{
+       
+    let select_all_list = await dao_map.select("user_map_list",null,"all lists");
+    res.send(select_all_list);
+  }
+
+});
+
+
 app.listen(3000, function () {
   console.log("Server is running in http://localhost:3000/")
 })
+
+
+
+

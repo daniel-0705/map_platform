@@ -141,8 +141,7 @@ app.post("/api/user/signin",async function(req,res){
     if(req.body.provider == "facebook"){
           var user_fb_token =req.body.access_token;
           var fb =`https://graph.facebook.com/v3.3/me?fields=email,name,picture.width(400).height(500)&access_token=${user_fb_token}`;
-          
-          // var fb = `https://graph.facebook.com/v3.3/me?access_token=${user_fb_token}&fields=name,email,picture%7Burl%7D&method=get&pretty=0&sdk=joey&suppress_http_code=1`;
+
           request({url: fb}, async function (error, response, body) {
             body = JSON.parse(body);
 
@@ -195,7 +194,7 @@ app.post("/api/user/signin",async function(req,res){
 
 });
 
-//user insert update dalete list
+//user insert update delete list
 app.post("/api/user/map_list",async function(req,res){
 
   if(req.header('Content-Type') != "application/json"){
@@ -264,31 +263,156 @@ app.post("/api/user/map_list",async function(req,res){
 
       let update_user_list_name = await dao_map.update("user_map_list","list_id",list_data.data.list_id,user_list_data,user_list_data.user_name)
 
-      res.send({success:"OK"});
+      res.send({success:"update OK"});
       
+    }else{
+      let user_list_data = {
+        user_name : select_user_result[0].name,
+        list_name : list_data.data.list_name
+      }
+
+      let select_user_insert_list = await dao_map.select("user_map_list","list_name",user_list_data.list_name);
+
+      if(select_user_insert_list.length == 0){
+        var error = {
+          "error": "List is not existing."
+        };
+        res.send(error);
+        return;
+      }
+
+      let delete_user_list_name = await dao_map.delete("user_map_list","list_id",list_data.data.list_id,user_list_data.user_name)
+
+      res.send({success:"delete OK"});
     }
-    //else{
 
-    // }
-    
-
-
-
-
-     
   }
   
 });
 
-app.get("/api/user/map_list/result",async function(req,res){
+//user insert update delete place in list
+app.post("/api/user/map_list/place",async function(req,res){
+
   if(req.header('Content-Type') != "application/json"){
       var error = {
           "error": "Invalid request body."
       };
       res.send(error);
   }else{
-       
-    let select_all_list = await dao_map.select("user_map_list",null,"all lists");
+    let list_data = req.body;
+
+    console.log(list_data);
+
+    let select_user_result = await dao_map.select("user","access_token",list_data.data.access_token)
+    if(select_user_result == 0){
+      var error = {
+        "error": "There is no user data."
+      };
+      res.send(error);
+      return;
+    }
+ 
+
+    if(list_data.type == "create"){
+        
+      let user_list_data = {
+        user_name : select_user_result[0].name,
+        list_name : list_data.data.list_name,
+        place_name :list_data.data.place_name,
+        longitude : list_data.data.longitude,
+        latitude : list_data.data.latitude
+      }
+
+      console.log(user_list_data)
+
+      let select_user_insert_place = await dao_map.select("user_map_place","place_name",user_list_data.list_name);
+
+      if(select_user_insert_place.length >0){
+        var error = {
+          "error": "place name is duplicate."
+        };
+        res.send(error);
+        return;
+      }
+
+      let insert_user_place_data = await dao_map.insert("user_map_place",user_list_data,user_list_data.user_name);
+
+      let last_place_id = await dao_map.select_last_insert_id()
+
+      let select_user_last_place = await dao_map.select("user_map_place","No",last_place_id[0]["LAST_INSERT_ID()"]);
+
+      res.send(select_user_last_place);
+
+    }else if(list_data.type == "select"){
+      let user_list_data = {
+        user_name : select_user_result[0].name,
+        list_name : list_data.data.list_name
+      }
+      console.log(user_list_data)
+      let select_user_list_place = await dao_map.select("user_map_place","list_name",user_list_data.list_name);
+
+      // if(select_user_list_place.length >0){
+      //   var error = {
+      //     "error": "List name is duplicate."
+      //   };
+      //   res.send(error);
+      //   return;
+      // }
+
+      // let update_user_list_name = await dao_map.update("user_map_list","list_id",list_data.data.list_id,user_list_data,user_list_data.user_name)
+
+      res.send(select_user_list_place);
+      
+    }
+    //else{
+    //   let user_list_data = {
+    //     user_name : select_user_result[0].name,
+    //     list_name : list_data.data.list_name
+    //   }
+
+    //   let select_user_insert_list = await dao_map.select("user_map_list","list_name",user_list_data.list_name);
+
+    //   if(select_user_insert_list.length == 0){
+    //     var error = {
+    //       "error": "List is not existing."
+    //     };
+    //     res.send(error);
+    //     return;
+    //   }
+
+    //   let delete_user_list_name = await dao_map.delete("user_map_list","list_id",list_data.data.list_id,user_list_data.user_name)
+
+    //   res.send({success:"delete OK"});
+    // }
+
+  }
+  
+});
+
+
+
+//all place in public map
+app.post("/api/user/map_list/result",async function(req,res){
+  if(req.header('Content-Type') != "application/json"){
+      var error = {
+          "error": "Invalid request body."
+      };
+      res.send(error);
+  }else{
+    let list_data = req.body;
+
+    console.log(list_data);
+
+    let select_user_result = await dao_map.select("user","access_token",list_data.data.access_token)
+    if(select_user_result == 0){
+      var error = {
+        "error": "There is no user data."
+      };
+      res.send(error);
+      return;
+    }
+
+    let select_all_list = await dao_map.select("user_map_list","user_name",select_user_result[0].name);
     res.send(select_all_list);
   }
 
@@ -302,3 +426,4 @@ app.listen(3000, function () {
 
 
 
+	

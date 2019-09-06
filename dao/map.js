@@ -79,10 +79,27 @@ let update_mysql = function(table_name,column_name,data_detail,data,data_name){
     })
 };
 
+let delete_mysql = function(table_name,column_name,data_detail,data_name){ 
+    return new Promise(function(resolve, reject){
+        mysql.con.query(`DELETE FROM ${table_name} where ${column_name} = "${data_detail}"`,function (err,result) {
+            if (err) {
+                console.log(`${data_name} delete ${table_name} table failed`);
+                reject(err);
+            }else{
+                console.log(`${data_name} delete ${table_name} table ok`);
+                resolve(`${data_name} delete ${table_name} table ok`);
+            }
+        })
+    })
+};
+
+
+
 module.exports={
     select:select_mysql,
     select_2:select_2_conditions_mysql,
     select_last_insert_id:select_last_insert_id_mysql,
     insert:insert_mysql,
-    update:update_mysql
+    update:update_mysql,
+    delete:delete_mysql
 };

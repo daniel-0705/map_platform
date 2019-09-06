@@ -60,6 +60,7 @@ body{
 .search_list_result{
     height: 45%;
     background-color: rgb(248, 201, 92);
+    overflow-y: auto;
 }
 
 .user_own_list{
@@ -98,7 +99,7 @@ body{
 
 .user_own_list_content{
     overflow-y: auto;
-    height: calc(100% - 23px);;
+    height: calc(100% - 23px);
 }
 
 
@@ -110,7 +111,7 @@ body{
     position: fixed;
     position: absolute;
     overflow-x: hidden;
-    transition: 0.1s;
+    transition: 0.5s;
 }
 
 .a_list_name{
@@ -123,6 +124,7 @@ body{
 .a_list_content{
     height: 90%;
     background-color: rgb(160, 160, 86);
+    overflow-y: auto;
 }
 
 /* .a_list_title {

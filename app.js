@@ -66,12 +66,48 @@ app.post("/test", function (req, res) {
 });
 
 
-//currently for test
-app.get("/api/map",async function (req, res) {
+//currently for test 地圖上所有的點 及使用者收藏的點
+app.post("/api/map",async function (req, res) {
 
-  let select_all_place = await dao_map.select("map",null,"all places");
 
-  res.send(select_all_place);
+  if(req.header('Content-Type') != "application/json"){
+    var error = {
+        "error": "Invalid request body."
+    };
+    res.send(error);
+  }else{
+
+    let list_data = req.body;
+
+    console.log(list_data)
+    
+    let select_all_place = await dao_map.select("map",null,"all places");
+
+    let select_user_result = await dao_map.select("user","access_token",list_data.data.access_token)
+    //console.log(select_user_result.length == 0)
+    
+    let data ={};
+  
+    if(select_user_result.length == 0){
+      data.places =select_all_place;
+      res.send(data);
+      //console.log(data)
+    }else{
+      
+      let select_all_user_place = await dao_map.select("user_map_place","user_name",select_user_result[0].name);
+      data.places =select_all_place;
+      data.user_places =select_all_user_place;
+      res.send(data);
+    }
+  
+    
+  }
+
+
+
+
+
+  
 
 });
 
@@ -319,14 +355,14 @@ app.post("/api/user/map_list/place",async function(req,res){
         user_name : select_user_result[0].name,
         list_name : list_data.data.list_name,
         place_name :list_data.data.place_name,
+        place_order :list_data.data.place_order,
         longitude : list_data.data.longitude,
         latitude : list_data.data.latitude
       }
 
       console.log(user_list_data)
-
-      let select_user_insert_place = await dao_map.select("user_map_place","place_name",user_list_data.list_name);
-
+      let select_user_insert_place = await dao_map.select_3("user_map_place","user_name",user_list_data.user_name,"place_name",user_list_data.place_name,"list_name",user_list_data.list_name);
+      console.log(select_user_insert_place)
       if(select_user_insert_place.length >0){
         var error = {
           "error": "place name is duplicate."
@@ -350,16 +386,6 @@ app.post("/api/user/map_list/place",async function(req,res){
       }
       console.log(user_list_data)
       let select_user_list_place = await dao_map.select("user_map_place","list_name",user_list_data.list_name);
-
-      // if(select_user_list_place.length >0){
-      //   var error = {
-      //     "error": "List name is duplicate."
-      //   };
-      //   res.send(error);
-      //   return;
-      // }
-
-      // let update_user_list_name = await dao_map.update("user_map_list","list_id",list_data.data.list_id,user_list_data,user_list_data.user_name)
 
       res.send(select_user_list_place);
       

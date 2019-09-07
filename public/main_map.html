@@ -8,14 +8,15 @@
     <link rel="stylesheet" href="CSS/common.css" media="all">
     <script src="js/common.js"></script>
     <link rel="stylesheet" href="CSS/main_map.css" media="all">
-
-
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkK5NajaFKNXkYT2WsdB96edSWRo5kYhY&callback=initMap" async defer></script>
     
-    <script>
 
+    <script>
+      //window.addEventListener("DOMContentLoaded", initMap);
+      //window.addEventListener("load", function(event){ initMap() }); 
       var map;
-     
+      var markers = []
+
       function initMap() {
           //new map
           map = new google.maps.Map(document.getElementById('map'), {
@@ -26,7 +27,7 @@
                 mapTypeControl: false
               },
               styles: [
-                {"elementType":"labels","stylers":[{"visibility":"on"}]},  //到時候要把這調成 off
+                {"elementType":"labels","stylers":[{"visibility":"off"}]},  //到時候要把這調成 off
                 {"featureType": "road","elementType": "labels","stylers":[{"visibility":"on"}]},
                 {"featureType": "transit.station","elementType": "labels","stylers":[{"visibility":"on"}]},
                 {"featureType": "transit.station.bus","elementType": "labels","stylers":[{"visibility":"on"}]},
@@ -35,49 +36,77 @@
               
           });
 
+
           let xhr = new XMLHttpRequest();
-          xhr.open("GET", `/api/map`,true);
+          xhr.open("post", `/api/map`);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+
+          let list_data = {
+            type:"select",
+            data:{access_token:localStorage.getItem("access_token")}
+          }
+          
+          xhr.send(JSON.stringify(list_data));
           xhr.onreadystatechange=function() {
             if (this.readyState == 4 && this.status == 200) {
               let all_markers = JSON.parse(xhr.responseText);
-              //console.log(all_markers);
+              console.log(all_markers);
 
               let infoWindow = new google.maps.InfoWindow();
               // all_marker_data
-              for (let i = 0 ; i<all_markers.length ;i++){
+              for (let i = 0 ; i<all_markers.places.length ;i++){
               
                 let marker = new google.maps.Marker({
-                  position:{lat: all_markers[i].latitude, lng: all_markers[i].longitude},
+                  position:{lat: Number(all_markers.places[i].latitude), lng: Number(all_markers.places[i].longitude)},
                   icon: {
-                    url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                    //scaledSize: new google.maps.Size(10, 10)  //調整大小
+                    url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                    scaledSize: new google.maps.Size(100, 100)  //調整大小
                   },
                   map:map
                 });
                 marker.content = `
-                      <h1>${all_markers[i].name}</h1>
-                      <p>${all_markers[i].information}</p>
-                      <buttom id =${all_markers[i].latitude}_${all_markers[i].longitude} style="cursor:pointer" onclick="select_list(this)">收藏</buttom>
-                      `;
+                  <h1 id =${i}>${all_markers.places[i].name}</h1>
+                  <p>${all_markers.places[i].information}</p>
+                  <buttom id =${all_markers.places[i].latitude}_${all_markers.places[i].longitude} style="cursor:pointer" onclick="select_list(this)">收藏</buttom>
+                `;
 
-                google.maps.event.addListener(marker, 'click', function () { 
-                  
+                google.maps.event.addListener(marker, 'click', function () {                   
                   infoWindow.setContent(this.content);
                   infoWindow.open(this.getMap(), this);
                 });
 
+                markers.push(marker)
               }
-              google.maps.event.addListener(map, 'click', function () { 
-                  console.log("da")
-                  infoWindow.close();
+              for (let i = 0 ; i<all_markers.user_places.length ;i++){
+              
+                let marker = new google.maps.Marker({
+                  position:{lat: Number(all_markers.user_places[i].latitude), lng: Number(all_markers.user_places[i].longitude)},
+                  map:map
                 });
+                marker.content = `
+                  <h1 id =${i}>${all_markers.user_places[i].name}</h1>
+                  <p>${all_markers.user_places[i].information}</p>
+                  <buttom id =${all_markers.user_places[i].latitude}_${all_markers.user_places[i].longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
+                `;
+
+                google.maps.event.addListener(marker, 'click', function () {                   
+                  infoWindow.setContent(this.content);
+                  infoWindow.open(this.getMap(), this);
+                });
+
+                markers[all_markers.user_places[i].place_order].setMap(null);
+              }
+
+              google.maps.event.addListener(map, 'click', function () { 
+                infoWindow.close();
+              });
             }
           }
-          xhr.send();
-
       }
+      
+      
 
-
+      //選擇收藏後會出現清單選項
       function select_list(e){
         e.removeAttribute("onclick")
         let select = document.createElement("select");
@@ -97,7 +126,6 @@
         }
       }
 
-
       function store_place_in_list(){
         let option = document.getElementById("list")
         let place_div = option.parentElement
@@ -110,6 +138,7 @@
           access_token : localStorage.getItem("access_token"),
           list_name : option.value.split("_")[1],
           place_name : place_div.children[0].innerHTML,
+          place_order :place_div.children[0].id,
           longitude : place_div.children[2].id.split("_")[1],
           latitude : place_div.children[2].id.split("_")[0]
         }
@@ -152,6 +181,38 @@
               
           }
         }
+
+        place_div.removeChild(option);               //移除選單
+
+        // place_div.children[2].innerHTML = "已收藏~~~~";    //顯示已收藏
+
+        // place_div.children[2].setAttribute("onclick","select_list(this)");   //功能回復
+
+        //新增收藏地點
+        let marker = new google.maps.Marker({
+          position:{lat: Number(place_div.children[2].id.split("_")[0]), lng: Number(place_div.children[2].id.split("_")[1])},
+          zIndex: 500,
+          map:map
+        });
+
+        marker.content = `
+              <h1 id=${place_div.children[0].id}>${place_div.children[0].innerHTML}</h1>
+              <p>${place_div.children[1].innerHTML}</p>
+              <buttom id =${place_div.children[2].id.split("_")[0]}_${place_div.children[2].id.split("_")[1]} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
+              `;
+
+        let infoWindow = new google.maps.InfoWindow();
+        google.maps.event.addListener(marker, 'click', function () {                   
+          infoWindow.setContent(this.content);
+          infoWindow.open(this.getMap(), this);
+        });
+
+        google.maps.event.addListener(map, 'click', function () { 
+          infoWindow.close();
+        });
+
+        console.log(markers);
+        markers[place_div.children[0].id].setMap(null);
       }
 
 
@@ -166,9 +227,10 @@
       
 
       let list_data ={
+        type :"select",
         data : {access_token:localStorage.getItem("access_token")}
       };
-      console.log(list_data)
+
       //localStorage.getItem("access_token")
       xhrt.send(JSON.stringify(list_data));
       xhrt.onreadystatechange=function() {
@@ -178,7 +240,7 @@
               alert("查無此使用者，請註冊");
           }else{
             let user_list_data = JSON.parse(xhrt.response);
-            console.log(user_list_data);
+            //console.log(user_list_data);
             for (let i = 0 ;i<user_list_data.length;i++){
               //製作每一個 list 的內容 p
               let new_list_name = document.createElement("p");
@@ -287,16 +349,6 @@
           parent_place.removeChild(parent_place.lastChild);
         }
 
-        // let parent_name = document.getElementsByClassName("a_list_name")[0];
-        // let child_name = document.getElementsByClassName("a_list_title")[0];
-        // if(child_name != undefined){
-        //   parent_name.removeChild(child_name);
-        // }
-
-
-
-        
-
         close_slidebar();
         document.getElementById("a_list").style.width = "300px";
         document.getElementById("map").style.marginLeft = "300px";
@@ -331,13 +383,11 @@
         xhr.onreadystatechange=function() {
           if (this.readyState == 4 && this.status == 200) {
 
-            if(xhr.response == "List name is duplicate."){
-                alert("! 清單名稱重複，請重新命名");
+            if(xhr.response == "place name is duplicate."){
+                alert("! 此地點已收藏");
             }else{
               let user_place_data = JSON.parse(xhr.response);
               console.log(user_place_data);
-
-              //let a_list_title = document.getElementsByClassName("a_list_content")[0]
 
               //製作新的 place 的內容 p
               for(let i =0; i<user_place_data.length ; i++){     
@@ -352,10 +402,6 @@
               
           }
         }
-
-
-
-
 
       }
 
@@ -503,7 +549,7 @@
     </div>
     
 
-    <!-- 畫面外的介面開始 -->
+    <!-- 畫面外的新增清單 -->
     <div id="input_list_name" class="input_list_name">
       <a href="javascript:void(0)" class="close_button" onclick="close_list_input()">&times;</a>
       <input type="radio" name="category" value="true" checked > 公開<br>
@@ -516,7 +562,7 @@
 
     <div class = "public_map">
 
-      <!-- 畫面外的介面開始  -->
+      <!-- 畫面外的單一清單介面  -->
       <div id ="a_list" class="a_list">
         <div id = "a_list_name" class="a_list_name">
           <button style="font-size:10px;cursor:pointer" onclick="edit_a_list_name()">編輯名稱</button>

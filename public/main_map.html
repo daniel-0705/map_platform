@@ -5,10 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">     
     <meta name="viewport" content="width=device-width, initial-scale=1">    
     <title>Explore</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkK5NajaFKNXkYT2WsdB96edSWRo5kYhY&callback=initMap" async defer></script>
     <link rel="stylesheet" href="CSS/common.css" media="all">
     <script src="js/common.js"></script>
     <link rel="stylesheet" href="CSS/main_map.css" media="all">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkK5NajaFKNXkYT2WsdB96edSWRo5kYhY&callback=initMap" async defer></script>
+
     
 
     <script>
@@ -50,7 +51,7 @@
           xhr.onreadystatechange=function() {
             if (this.readyState == 4 && this.status == 200) {
               let all_markers = JSON.parse(xhr.responseText);
-              console.log(all_markers);
+              //console.log(all_markers);
 
               let infoWindow = new google.maps.InfoWindow();
               // all_marker_data
@@ -67,7 +68,7 @@
                 marker.content = `
                   <h1 id =${i}>${all_markers.places[i].name}</h1>
                   <p>${all_markers.places[i].information}</p>
-                  <buttom id =${all_markers.places[i].latitude}_${all_markers.places[i].longitude} style="cursor:pointer" onclick="select_list(this)">收藏</buttom>
+                  <buttom class = "choice_list" id =${all_markers.places[i].latitude}_${all_markers.places[i].longitude} style="cursor:pointer" onclick="select_list(this)">收藏</buttom>
                 `;
 
                 google.maps.event.addListener(marker, 'click', function () {                   
@@ -78,18 +79,19 @@
                 markers.push(marker)
               }
               for (let i = 0 ; i<all_markers.user_places.length ;i++){
-              
+                
                 let marker = new google.maps.Marker({
                   position:{lat: Number(all_markers.user_places[i].latitude), lng: Number(all_markers.user_places[i].longitude)},
                   map:map
                 });
                 marker.content = `
-                  <h1 id =${i}>${all_markers.user_places[i].name}</h1>
+                  <h1 id =${i}>${all_markers.user_places[i].place_name}</h1>
                   <p>${all_markers.user_places[i].information}</p>
-                  <buttom id =${all_markers.user_places[i].latitude}_${all_markers.user_places[i].longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
+                  <buttom class = "choice_list" id =${all_markers.user_places[i].latitude}_${all_markers.user_places[i].longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
                 `;
 
                 google.maps.event.addListener(marker, 'click', function () {                   
+
                   infoWindow.setContent(this.content);
                   infoWindow.open(this.getMap(), this);
                 });
@@ -108,31 +110,54 @@
 
       //選擇收藏後會出現清單選項
       function select_list(e){
-        e.removeAttribute("onclick")
-        let select = document.createElement("select");
-        select.id = "list"
-        select.setAttribute("onchange","store_place_in_list()") ;
-        e.parentElement.appendChild(select);
-        let user_own_list_content = document.getElementsByClassName("user_own_list_content")[0];
+        
+        console.log(e);
+        console.log(e.parentElement);
+        
+        let parent_lists_div = document.createElement("div");
+        parent_lists_div.className= "lists";
+        e.parentElement.appendChild(parent_lists_div);
 
-        let option = document.createElement("option");
-        option.innerHTML= "請選擇清單"
-        select.appendChild(option);
-        for(let i =0;i<user_own_list_content.children.length;i++){
-          let option = document.createElement("option");
-          option.value = `${user_own_list_content.children[i].id}_${user_own_list_content.children[i].innerHTML}`;
-          option.innerHTML=user_own_list_content.children[i].innerHTML;
-          select.appendChild(option);
+        let list_content = document.getElementsByClassName("user_own_list_content")[0];
+        console.log(e.parentElement.parentElement)
+
+        for(let i =0;i<list_content.children.length;i++){
+          let list_p = document.createElement("div");
+          list_p.id = `${list_content.children[i].id}_${list_content.children[i].innerHTML}`;
+          list_p.innerHTML=list_content.children[i].innerHTML;
+          parent_lists_div.appendChild(list_p);
         }
+
+
+        
+        // e.removeAttribute("onclick")
+        // let select = document.createElement("select");
+        // select.id = "list";
+        // select.setAttribute("onchange","store_place_in_list()") ;
+        // e.parentElement.appendChild(select);
+        // let user_own_list_content = document.getElementsByClassName("user_own_list_content")[0];
+
+        // let option = document.createElement("option");
+        // option.innerHTML= "請選擇清單"
+        // select.appendChild(option);
+        // for(let i =0;i<user_own_list_content.children.length;i++){
+        //   let option = document.createElement("option");
+        //   option.value = `${user_own_list_content.children[i].id}_${user_own_list_content.children[i].innerHTML}`;
+        //   option.innerHTML=user_own_list_content.children[i].innerHTML;
+        //   select.appendChild(option);
+        // }
       }
 
       function store_place_in_list(){
+        console.log(markers[0])
         let option = document.getElementById("list")
         let place_div = option.parentElement
         console.log(option);
         console.log(option.value);
         console.log(place_div);
         console.log(place_div.children[2].id.split("_")[1]);
+        document.querySelectorAll("option")[2].style.backgroundColor = "red";
+        console.log(document.querySelectorAll("option")[2])
         
         let insert_place ={
           access_token : localStorage.getItem("access_token"),
@@ -140,7 +165,8 @@
           place_name : place_div.children[0].innerHTML,
           place_order :place_div.children[0].id,
           longitude : place_div.children[2].id.split("_")[1],
-          latitude : place_div.children[2].id.split("_")[0]
+          latitude : place_div.children[2].id.split("_")[0],
+          information :place_div.children[1].innerHTML
         }
 
         if(insert_place.list_name == undefined){
@@ -159,60 +185,66 @@
 
         xhr.onreadystatechange=function() {
           if (this.readyState == 4 && this.status == 200) {
-
-            if(xhr.response == "List name is duplicate."){
+            let user_place_data = JSON.parse(xhr.response);
+            if(user_place_data.error == "Place name is duplicate."){
                 alert("! 清單名稱重複，請重新命名");
             }else{
-              let user_place_data = JSON.parse(xhr.response);
+              
               console.log(user_place_data);
-
               let a_list_title = document.getElementsByClassName("a_list_title")[0]
 
-              //製作新的 place 的內容 p
-              if(a_list_title.value == user_place_data[0].list_name){      //判斷是否在當前的清單中
+
+
+              console.log(user_place_data.place_in_this_user )
+              //如果地標已在其他清單存在，就不用做新的地標
+              let infoWindow = new google.maps.InfoWindow();
+              if(user_place_data.place_in_this_user == true){
+                infoWindow.close();
+              }else{
+                //新增收藏地點
+                
+                let marker = new google.maps.Marker({
+                  position:{lat: Number(place_div.children[2].id.split("_")[0]), lng: Number(place_div.children[2].id.split("_")[1])},
+                  animation: google.maps.Animation.DROP,
+                  zIndex: 500,
+                  map:map
+                });
+
+                marker.content = `
+                      <h1 id=${place_div.children[0].id}>${place_div.children[0].innerHTML}</h1>
+                      <p>${place_div.children[1].innerHTML}</p>
+                      <buttom class = "choice_list" id =${place_div.children[2].id.split("_")[0]}_${place_div.children[2].id.split("_")[1]} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
+                      `;
+
+                
+                google.maps.event.addListener(marker, 'click', function () {                   
+                  infoWindow.setContent(this.content);
+                  infoWindow.open(this.getMap(), this);
+                });
+
+                infoWindow.close();
+                google.maps.event.addListener(map, 'click', function () { 
+                  infoWindow.close();
+                });
+              }
+
+                //製作新的 place 的內容 p
+                if(a_list_title.value == user_place_data.place_in_this_list[0].list_name){      //判斷是否在當前的清單中
                 let new_place_name = document.createElement("p");
                 new_place_name.className = "user_place_name";
-                new_place_name.innerHTML = user_place_data[0].place_name;
+                new_place_name.innerHTML = user_place_data.place_in_this_list[0].place_name;
                 //new_place_name.setAttribute("onClick", "open_a_list(this)");
                 let a_list_content = document.getElementsByClassName("a_list_content")[0];
                 a_list_content.appendChild(new_place_name);
               }
-            }
               
+            }
           }
         }
+        
+        markers[place_div.children[0].id].setMap(null); //把原本的地標 隱藏
 
-        place_div.removeChild(option);               //移除選單
-
-        // place_div.children[2].innerHTML = "已收藏~~~~";    //顯示已收藏
-
-        // place_div.children[2].setAttribute("onclick","select_list(this)");   //功能回復
-
-        //新增收藏地點
-        let marker = new google.maps.Marker({
-          position:{lat: Number(place_div.children[2].id.split("_")[0]), lng: Number(place_div.children[2].id.split("_")[1])},
-          zIndex: 500,
-          map:map
-        });
-
-        marker.content = `
-              <h1 id=${place_div.children[0].id}>${place_div.children[0].innerHTML}</h1>
-              <p>${place_div.children[1].innerHTML}</p>
-              <buttom id =${place_div.children[2].id.split("_")[0]}_${place_div.children[2].id.split("_")[1]} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
-              `;
-
-        let infoWindow = new google.maps.InfoWindow();
-        google.maps.event.addListener(marker, 'click', function () {                   
-          infoWindow.setContent(this.content);
-          infoWindow.open(this.getMap(), this);
-        });
-
-        google.maps.event.addListener(map, 'click', function () { 
-          infoWindow.close();
-        });
-
-        console.log(markers);
-        markers[place_div.children[0].id].setMap(null);
+        
       }
 
 
@@ -221,51 +253,65 @@
     <script>
 
       function render_all_user_lists(){
-      let xhrt= new XMLHttpRequest();
-      xhrt.open("post", "/api/user/map_list/result");  
-      xhrt.setRequestHeader('Content-Type', 'application/json');
-      
 
-      let list_data ={
-        type :"select",
-        data : {access_token:localStorage.getItem("access_token")}
-      };
+        console.log("開始");
+        let xhrt= new XMLHttpRequest();
+        xhrt.open("post", "/api/user/map_list/result");  
+        xhrt.setRequestHeader('Content-Type', 'application/json');
+        
 
-      //localStorage.getItem("access_token")
-      xhrt.send(JSON.stringify(list_data));
-      xhrt.onreadystatechange=function() {
-        if (this.readyState == 4 && this.status == 200) {
+        let list_data ={
+          type :"select",
+          data : {access_token:localStorage.getItem("access_token")}
+        };
 
-          if(xhrt.response == "error"){
-              alert("查無此使用者，請註冊");
-          }else{
-            let user_list_data = JSON.parse(xhrt.response);
-            //console.log(user_list_data);
-            for (let i = 0 ;i<user_list_data.length;i++){
-              //製作每一個 list 的內容 p
-              let new_list_name = document.createElement("p");
-              new_list_name.className = "user_list_name";
-              new_list_name.id = `${user_list_data[i].list_id}`;
-              new_list_name.setAttribute("onClick", "open_a_list(this)");
-              new_list_name.innerHTML = user_list_data[i].list_name;
-              let list_content = document.getElementsByClassName("user_own_list_content")[0];
-              list_content.appendChild(new_list_name);
-              
+        //localStorage.getItem("access_token")
+        xhrt.send(JSON.stringify(list_data));
+        xhrt.onreadystatechange=function() {
+          if (this.readyState == 4 && this.status == 200) {
+
+            if(xhrt.response == "error"){
+                alert("查無此使用者，請註冊");
+            }else{
+              let user_list_data = JSON.parse(xhrt.response);
+              console.log(user_list_data);
+              for (let i = 0 ;i<user_list_data.length;i++){
+                //製作每一個 list 的內容 p
+                let new_list_name = document.createElement("p");
+                new_list_name.className = "user_list_name";
+                new_list_name.id = `${user_list_data[i].list_id}`;
+                new_list_name.setAttribute("onClick", "open_a_list(this)");
+                new_list_name.innerHTML = user_list_data[i].list_name;
+                let list_content = document.getElementsByClassName("user_own_list_content")[0];
+                list_content.appendChild(new_list_name);
+                
+              }
             }
+              
           }
-            
         }
       }
-    }
       
       function open_slidebar() {
         document.getElementById("search_and_list").style.width = "300px";
         document.getElementById("map").style.marginLeft = "300px";
+
+        document.getElementById("a_public_list").style.width = "0";
+        document.getElementById("a_list").style.width = "0";
+
+        //為了使用者跳出公開單一清單頁面時，要把座標跟值隱藏調，所以再返回清單搜尋時要把值設回預設
+        user_markers.map(item=>{item.setMap(null)});
+        user_markers=[];
+        n=1;
+
       }
 
       function close_slidebar() {
         document.getElementById("search_and_list").style.width = "0";
+        document.getElementById("a_public_list").style.width = "0";
+        document.getElementById("a_list").style.width = "0";
         document.getElementById("map").style.marginLeft= "0";
+        
       }
 
       function open_list_input() {
@@ -288,17 +334,24 @@
       }
 
       function send_list_name(){
+
+
         let insert_list ={
-          category : document.getElementsByName("category")[0].value,
-          list_name : document.getElementsByName("list_name")[0].value
+          list_name : document.getElementsByName("list_name")[0].value,
+          access_token : localStorage.getItem("access_token")
         }
+
+        if(document.getElementsByName("category")[0].checked){
+          insert_list.category = document.getElementsByName("category")[0].value
+        }else{
+          insert_list.category = document.getElementsByName("category")[1].value
+        }
+
 
         if (insert_list.list_name == "" || insert_list.list_name == undefined){
           alert("! 請輸入清單名稱");
           return;
         }
-
-        insert_list.access_token = localStorage.getItem("access_token");
 
         let xhr = new XMLHttpRequest();
         xhr.open("post", "/api/user/map_list");  
@@ -313,11 +366,11 @@
 
         xhr.onreadystatechange=function() {
           if (this.readyState == 4 && this.status == 200) {
-
-            if(xhr.response == "List name is duplicate."){
-                alert("! 清單名稱重複，請重新命名");
+            let user_list_data = JSON.parse(xhr.response);
+            if(user_list_data.error){
+              alert(user_list_data.error);
             }else{
-              let user_list_data = JSON.parse(xhr.response);
+              
               console.log(user_list_data);
 
               //製作新的 list 的內容 p
@@ -338,11 +391,10 @@
       }
 
       function open_a_list(e) {
-        let parent_list = document.getElementsByClassName("a_list_name")[0];
-        let child_list = document.getElementsByClassName("a_list_title")[0];
-        if(child_list != undefined){
-          parent_list.removeChild(child_list);
-        }
+
+        let new_a_list_name = document.getElementsByClassName("a_list_title")[0];
+        new_a_list_name.value="";
+
         let parent_place = document.getElementsByClassName("a_list_content")[0];
         console.log(parent_place)
         while (parent_place.hasChildNodes()) {
@@ -350,18 +402,14 @@
         }
 
         close_slidebar();
+
         document.getElementById("a_list").style.width = "300px";
         document.getElementById("map").style.marginLeft = "300px";
-
-        let new_a_list_name = document.createElement("input");
+     
         new_a_list_name.id = e.id;
         new_a_list_name.className = "a_list_title";
         new_a_list_name.value = e.innerHTML;
         new_a_list_name.readOnly = true;
-        
-        let a_list_name = document.getElementsByClassName("a_list_name")[0];
-        a_list_name.appendChild(new_a_list_name);
-
 
         let select_place ={
           access_token : localStorage.getItem("access_token"),
@@ -403,11 +451,6 @@
           }
         }
 
-      }
-
-      function close_a_list() {
-        document.getElementById("a_list").style.width = "0";
-        document.getElementById("map").style.marginLeft= "0";
       }
 
       function edit_a_list_name(){
@@ -500,16 +543,15 @@
               let user_list_data = JSON.parse(xhr.response);
               console.log(user_list_data);
 
-
-
-              close_a_list();
+              close_slidebar();
               let parent = document.getElementsByClassName("user_own_list_content")[0];
 
               while (parent.hasChildNodes()) {
                 parent.removeChild(parent.lastChild);
               }
 
-              render_all_user_lists();
+              render_all_user_lists()
+              initMap();
             }
               
           }
@@ -517,9 +559,204 @@
 
       }
 
+      function search_other_list(e){
+
+        e.addEventListener("keyup", function(event) {
+        // Number 13 is the "Enter" key on the keyboard
+
+          if (event.keyCode === 13) {
+            event.preventDefault();
+            
+            let grandpa_list_result = document.getElementsByClassName("search_list_result")[0];
+
+            while (grandpa_list_result.hasChildNodes()) {
+              grandpa_list_result.removeChild(grandpa_list_result.lastChild);
+            }
+
+            let xhr = new XMLHttpRequest();
+
+            xhr.open("post", "/api/user/map_list/search");  
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            
+            let list_data = {
+              type:"search",
+              data:e.value
+            }
+            console.log(list_data)
+            xhr.send(JSON.stringify(list_data));
+
+            xhr.onreadystatechange=function() {
+              if (this.readyState == 4 && this.status == 200) {
+                if(xhr.response == "There is no user data."){
+                  alert("! 查無此使用者，請註冊");
+                }else{
+                  let user_list_data = JSON.parse(xhr.response);
+                  console.log(user_list_data);
+
+                  if(user_list_data.length == 0){
+                    let parent_list = document.createElement("p");
+                    parent_list.className = "no_public_list";
+                    parent_list.innerHTML = "查無清單，請換關鍵字搜尋"
+                    grandpa_list_result.appendChild(parent_list);
+
+                  }
+
+                  for (let i = 0 ;i<user_list_data.length;i++){
+                    //製作每一個 list 的內容 
+                    let parent_list = document.createElement("div");
+                    parent_list.className = "public_list_container";
+                    grandpa_list_result.appendChild(parent_list);
+
+                    let list_name = document.createElement("p");
+                    list_name.innerHTML = user_list_data[i].list_name;
+                    list_name.id =user_list_data[i].list_id;
+                    list_name.className = "public_list"
+                    list_name.setAttribute("onclick","show_and_open_public_list(this)")
+                    parent_list.appendChild(list_name);
+
+                    let list_owner = document.createElement("p");
+                    list_owner.innerHTML = user_list_data[i].user_name;
+                    parent_list.appendChild(list_owner);
+
+                    let list_copy_img = document.createElement("img");
+                    list_copy_img.className = "list_copy_img";
+                    list_copy_img.src = "/img/multiple-users-silhouette.png"
+                    parent_list.appendChild(list_copy_img);
+
+                    let list_copy_number = document.createElement("p");
+                    list_copy_number.innerHTML = user_list_data[i].copy_number;
+                    parent_list.appendChild(list_copy_number);
+           
+                  }
+                }             
+              }
+            }
+          }
+        });
+      }
+
+      let n 
+      let user_markers=[]
+      function show_and_open_public_list(e){
+
+        console.log(e);
+
+        close_slidebar();
+        document.getElementById("a_public_list").style.width = "300px";
+        document.getElementById("map").style.marginLeft = "300px";
+
+        if(n !=0){
+          
+          let select_one_list={
+            list_id:e.id,
+            list_name:e.innerHTML
+          }
+
+          let xhr = new XMLHttpRequest();
+          xhr.open("post", "/api/user/map_list/show");  
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          
+          let list_data = {
+            type:"select",
+            data:select_one_list
+          }
+
+          xhr.send(JSON.stringify(list_data));
+
+          xhr.onreadystatechange=function() {
+            if (this.readyState == 4 && this.status == 200) {
+              let user_place_data = JSON.parse(xhr.response);
+              if(user_place_data.error == "Place name is duplicate."){
+                  alert("! 清單名稱重複，請重新命名");
+              }else{
+                
+                console.log(user_place_data);
+
+                let a_public_list_name = document.getElementById("a_public_list_name");
+
+                let public_list_name = document.querySelector("#a_public_list_name >p");
+
+                public_list_name.innerHTML = e.innerHTML;
+                public_list_name.id =e.id;
+                public_list_name.setAttribute("onclick","show_and_open_public_list(this)")
+
+                let list_owner = document.querySelector("#a_public_list_name >p:nth-child(2)");
+                list_owner.innerHTML = user_place_data[0].user_name;
+
+                let list_copy_img = document.querySelector("#a_public_list_name > img");
+                list_copy_img.className = "list_copy_img";
+                list_copy_img.src = "/img/multiple-users-silhouette.png"
+
+                let list_copy_number = document.querySelector("#a_public_list_name >p:nth-child(4)");
+                list_copy_number.innerHTML = e.parentElement.children[3].innerHTML;
+
+
+                let parent_place = document.getElementsByClassName("a_list_content")[1];
+                while (parent_place.hasChildNodes()) {
+                  parent_place.removeChild(parent_place.lastChild);
+                }
+
+                //製作新的public place 的內容 p
+                for(let i =0; i<user_place_data.length ; i++){     
+                  let new_place_name = document.createElement("p");
+                  new_place_name.className = "user_place_name";
+                  new_place_name.innerHTML = user_place_data[i].place_name;
+                  //new_place_name.setAttribute("onClick", "open_a_list(this)");
+                  parent_place.appendChild(new_place_name);
+                }
+
+
+                let infoWindow = new google.maps.InfoWindow();
+                for(let i =0 ; i< user_place_data.length;i++){
+                  //顯示公開的使用者的收藏地點
+                  let marker = new google.maps.Marker({
+                    position:{lat: Number(user_place_data[i].latitude), lng: Number(user_place_data[i].longitude)},
+                    icon: {
+                    url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png",
+                    scaledSize: new google.maps.Size(100, 100)  //調整大小
+                    },
+                    animation: google.maps.Animation.DROP,
+                    zIndex: 500,
+                    map:map
+                  });
+
+                  marker.content = `
+                        <h1>${user_place_data[i].place_name}</h1>
+                        <p>${user_place_data[i].information}</p>
+                        `;
+
+                  user_markers.push(marker);
+                  
+                  google.maps.event.addListener(marker, 'click', function () {                   
+                    infoWindow.setContent(this.content);
+                    infoWindow.open(this.getMap(), this);
+                  });
+
+                  
+                  google.maps.event.addListener(map, 'click', function () { 
+                    infoWindow.close();
+                  });
+                }
+                
+              }
+            }
+          }
+
+          n=0;
+        }else{
+          
+          user_markers.map(item=>{item.setMap(null)});
+          user_markers=[];
+          n=1;
+        }
 
 
 
+
+
+      }
+
+ 
 
       render_all_user_lists()
 
@@ -565,6 +802,7 @@
       <!-- 畫面外的單一清單介面  -->
       <div id ="a_list" class="a_list">
         <div id = "a_list_name" class="a_list_name">
+          <input type="text" class="a_list_title" >
           <button style="font-size:10px;cursor:pointer" onclick="edit_a_list_name()">編輯名稱</button>
           <button style="font-size:10px;cursor:pointer" onclick="delete_a_list()">刪除清單</button>
         </div>
@@ -574,11 +812,28 @@
     
       </div>
       <!-- 畫面外的介面結束 -->
+      <!-- 畫面外的他人單一清單介面  -->
+      <div id ="a_public_list" class="a_list">
+          <div id = "a_public_list_name" class="a_list_name">
+            <p style="cursor:pointer" class="a_list_title" ></p>
+            <p></p>
+            <img>
+            <p></p>
+            <button style="font-size:10px;cursor:pointer" >複製</button>
+          </div>
+          <div class="a_list_content">
+    
+          </div>
+      
+        </div>
+        <!-- 畫面外的介面結束 -->
+
+
 
 
       <div class= "search_and_list" id="search_and_list">
         <div class = "search_list_bar">
-          <input id = "search" placeholder="Search list...">
+          <input  id = "search" placeholder="Search list..." onclick="search_other_list(this)">
           <button class= "lsit_result" type ="button">搜尋</button>
         </div>
 

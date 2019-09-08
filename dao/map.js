@@ -65,6 +65,18 @@ let select_last_insert_id_mysql = function(){
     })
 };
 
+let fuzzy_search = function (table_name,column_name,data,column_order){
+    return new Promise(function(resolve, reject){
+        mysql.con.query(`SELECT * FROM ${table_name} where category ="true" and ${column_name} LIKE "%${data}%" order by ${column_order}`,function (err,result) {
+            if (err) {
+                reject(err);
+            }else{
+                resolve(result);
+            }
+        })
+    })
+}
+
 let insert_mysql = function(table_name,data,data_name){ 
     return new Promise(function(resolve, reject){
         mysql.con.query(`insert into ${table_name} set ?`,data,function (err,result) {
@@ -114,6 +126,7 @@ module.exports={
     select_2:select_2_conditions_mysql,
     select_3:select_3_conditions_mysql,
     select_last_insert_id:select_last_insert_id_mysql,
+    fuzzy_select:fuzzy_search,
     insert:insert_mysql,
     update:update_mysql,
     delete:delete_mysql

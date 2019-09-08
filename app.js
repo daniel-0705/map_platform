@@ -259,6 +259,8 @@ app.post("/api/user/map_list",async function(req,res){
         category : list_data.data.category,
         user_name : select_user_result[0].name,
         list_name : list_data.data.list_name,
+        appear_list:"true",
+        copy_number:0
       }
 
       console.log(user_list_data)
@@ -267,7 +269,7 @@ app.post("/api/user/map_list",async function(req,res){
 
       if(select_user_insert_list.length >0){
         var error = {
-          "error": "List name is duplicate."
+          "error": "! 清單名稱重複，請重新命名"
         };
         res.send(error);
         return;
@@ -357,7 +359,8 @@ app.post("/api/user/map_list/place",async function(req,res){
         place_name :list_data.data.place_name,
         place_order :list_data.data.place_order,
         longitude : list_data.data.longitude,
-        latitude : list_data.data.latitude
+        latitude : list_data.data.latitude,
+        information :list_data.data.information
       }
 
       console.log(user_list_data)
@@ -365,11 +368,16 @@ app.post("/api/user/map_list/place",async function(req,res){
       console.log(select_user_insert_place)
       if(select_user_insert_place.length >0){
         var error = {
-          "error": "place name is duplicate."
+          "error": "Place name is duplicate."
         };
         res.send(error);
         return;
       }
+
+      let check_place_is_exist = await dao_map.select_2("user_map_place","user_name",user_list_data.user_name,"place_name",user_list_data.place_name)
+      console.log("確認存在與否")
+      console.log(check_place_is_exist)
+
 
       let insert_user_place_data = await dao_map.insert("user_map_place",user_list_data,user_list_data.user_name);
 
@@ -377,7 +385,23 @@ app.post("/api/user/map_list/place",async function(req,res){
 
       let select_user_last_place = await dao_map.select("user_map_place","No",last_place_id[0]["LAST_INSERT_ID()"]);
 
-      res.send(select_user_last_place);
+      
+      
+
+      
+      let data={
+        place_in_this_list:select_user_last_place,
+      }
+
+
+      if (check_place_is_exist.length > 0){
+        data.place_in_this_user = true;
+      }else{
+        data.place_in_this_user = false;
+      }
+      console.log(data)
+      res.send(data);
+
 
     }else if(list_data.type == "select"){
       let user_list_data = {
@@ -439,10 +463,60 @@ app.post("/api/user/map_list/result",async function(req,res){
     }
 
     let select_all_list = await dao_map.select("user_map_list","user_name",select_user_result[0].name);
+    console.log(select_all_list)
     res.send(select_all_list);
   }
 
 });
+
+//search other lists in public map
+app.post("/api/user/map_list/search",async function(req,res){
+  if(req.header('Content-Type') != "application/json"){
+      var error = {
+          "error": "Invalid request body."
+      };
+      res.send(error);
+  }else{
+
+    //使用者搜尋他人清單，不用登入
+
+    let list_data = req.body;
+
+    console.log(list_data);
+
+    let fuzzy_select_list = await dao_map.fuzzy_select("user_map_list","list_name",list_data.data,"copy_number");
+
+    res.send(fuzzy_select_list);
+  }
+
+});
+
+//show places of one user and one list result 
+app.post("/api/user/map_list/show",async function(req,res){
+  if(req.header('Content-Type') != "application/json"){
+      var error = {
+          "error": "Invalid request body."
+      };
+      res.send(error);
+  }else{
+
+    //使用者搜尋他人清單，不用登入
+
+    let list_data = req.body;
+
+    //console.log(list_data);
+
+    let find_list_user = await dao_map.select_2("user_map_list","list_id",list_data.data.list_id,"list_name",list_data.data.list_name)
+
+    //console.log(find_list_user)
+
+    let one_list_result = await dao_map.select_2("user_map_place","user_name",find_list_user[0].user_name,"list_name",list_data.data.list_name)
+
+    res.send(one_list_result);
+  }
+
+});
+
 
 
 app.listen(3000, function () {

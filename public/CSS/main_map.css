@@ -103,11 +103,12 @@ body{
 }
 
 
-/* a list */
+/* a list  and a public list  */
 
 .a_list {
     height: 100%;
     width: 0;
+    z-index: 1;
     position: fixed;
     position: absolute;
     overflow-x: hidden;
@@ -131,3 +132,41 @@ body{
     border: none;
     background: transparent;
 } */
+
+
+/* infowindow */
+
+.choice_list{
+    position: relative;
+}
+
+.lists{
+    position: absolute;
+    background-color: white;
+    top:0px;
+    z-index: 1000000 !important;
+    /* overflow-y: auto;
+    height: 50%; */
+}
+
+.gm-style .gm-style-iw-c .gm-style .gm-style-iw{
+    overflow: visible !important;
+}
+
+
+
+/* search_public_list */
+
+.public_list_container{
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.list_copy_img{
+    height: 30px;
+}
+
+.public_list{
+    cursor:pointer
+}
+

@@ -67,7 +67,7 @@ let select_last_insert_id_mysql = function(){
 
 let fuzzy_search = function (table_name,column_name,data,column_order){
     return new Promise(function(resolve, reject){
-        mysql.con.query(`SELECT * FROM ${table_name} where category ="true" and ${column_name} LIKE "%${data}%" order by ${column_order}`,function (err,result) {
+        mysql.con.query(`SELECT * FROM ${table_name} where category ="true" and ${column_name} LIKE "%${data}%" order by ${column_order} desc`,function (err,result) {
             if (err) {
                 reject(err);
             }else{

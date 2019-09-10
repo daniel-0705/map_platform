@@ -456,65 +456,6 @@
 
       }
 
-      function edit_a_list_name(){
-        let a_list_title = document.getElementsByClassName("a_list_title")[0];
-        a_list_title.readOnly = "";
-
-        a_list_title.addEventListener("keyup", function(event) {
-        // Number 13 is the "Enter" key on the keyboard
-          if (event.keyCode === 13) {
-            event.preventDefault();
-            a_list_title.readOnly = true;
-
-            let update_list ={
-              list_id : a_list_title.id,
-              list_name : a_list_title.value,
-              access_token : localStorage.getItem("access_token")
-            }
-
-            let xhr = new XMLHttpRequest();
-
-            xhr.open("post", "/api/user/map_list");  
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            
-            let list_data = {
-              type:"update",
-              data:update_list
-            }
-            console.log(list_data)
-            xhr.send(JSON.stringify(list_data));
-
-            xhr.onreadystatechange=function() {
-              if (this.readyState == 4 && this.status == 200) {
-                if(xhr.response == "There is no user data."){
-                  alert("! 查無此使用者，請註冊");
-                }else if(xhr.response == "List name is duplicate."){
-                  alert("! 清單名稱重複，請重新命名");
-                }else{
-                  let user_list_data = JSON.parse(xhr.response);
-                  console.log(user_list_data);
-
-                  let parent = document.getElementsByClassName("user_own_list_content")[0];
-
-                  while (parent.hasChildNodes()) {
-                    parent.removeChild(parent.lastChild);
-                  }
-
-                  render_user_all_lists()
-                }
-                  
-              }
-            }
-
-
-
-
-
-            
-          }
-        });
-      }
-
       function delete_a_list(){
         let parent = document.getElementsByClassName("a_list_name")[0];
         let child = document.getElementsByClassName("a_list_title")[0];
@@ -562,82 +503,7 @@
 
       }
 
-      function search_other_list(e){
-
-        e.addEventListener("keyup", function(event) {
-        // Number 13 is the "Enter" key on the keyboard
-
-          if (event.keyCode === 13) {
-            event.preventDefault();
-            
-            let grandpa_list_result = document.getElementsByClassName("search_list_result")[0];
-
-            while (grandpa_list_result.hasChildNodes()) {
-              grandpa_list_result.removeChild(grandpa_list_result.lastChild);
-            }
-
-            let xhr = new XMLHttpRequest();
-
-            xhr.open("post", "/api/user/map_list/search/list");  
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            
-            let list_data = {
-              type:"search",
-              data:e.value
-            }
-            console.log(list_data)
-            xhr.send(JSON.stringify(list_data));
-
-            xhr.onreadystatechange=function() {
-              if (this.readyState == 4 && this.status == 200) {
-                if(xhr.response == "There is no user data."){
-                  alert("! 查無此使用者，請註冊");
-                }else{
-                  let user_list_data = JSON.parse(xhr.response);
-                  console.log(user_list_data);
-
-                  if(user_list_data.length == 0){
-                    let parent_list = document.createElement("p");
-                    parent_list.className = "no_public_list";
-                    parent_list.innerHTML = "查無清單，請換關鍵字搜尋"
-                    grandpa_list_result.appendChild(parent_list);
-
-                  }
-
-                  for (let i = 0 ;i<user_list_data.length;i++){
-                    //製作每一個 list 的內容 
-                    let parent_list = document.createElement("div");
-                    parent_list.className = "public_list_container";
-                    grandpa_list_result.appendChild(parent_list);
-
-                    let list_name = document.createElement("p");
-                    list_name.innerHTML = user_list_data[i].list_name;
-                    list_name.id =user_list_data[i].list_id;
-                    list_name.className = "public_list"
-                    list_name.setAttribute("onclick","show_and_open_public_list(this)")
-                    parent_list.appendChild(list_name);
-
-                    let list_owner = document.createElement("p");
-                    list_owner.innerHTML = user_list_data[i].user_name;
-                    parent_list.appendChild(list_owner);
-
-                    let list_copy_img = document.createElement("img");
-                    list_copy_img.className = "list_copy_img";
-                    list_copy_img.src = "/img/multiple-users-silhouette.png"
-                    parent_list.appendChild(list_copy_img);
-
-                    let list_copy_number = document.createElement("p");
-                    list_copy_number.innerHTML = user_list_data[i].copy_number;
-                    parent_list.appendChild(list_copy_number);
-           
-                  }
-                }             
-              }
-            }
-          }
-        });
-      }
-
+      
       let switch_for_public_list_map 
       let user_markers=[]
       function show_and_open_public_list(e){
@@ -866,7 +732,7 @@
       <!-- 畫面外的單一清單介面  -->
       <div id ="a_list" class="a_list">
         <div id = "a_list_name" class="a_list_name">
-          <input type="text" class="a_list_title" >
+          <input type="text" spellcheck="false" class="a_list_title" >
           <button style="font-size:10px;cursor:pointer" onclick="edit_a_list_name()">編輯名稱</button>
           <button style="font-size:10px;cursor:pointer" onclick="delete_a_list()">刪除清單</button>
         </div>
@@ -897,7 +763,7 @@
 
       <div class= "search_and_list" id="search_and_list">
         <div class = "search_list_bar">
-          <input  id = "search" placeholder="Search list..." onclick="search_other_list(this)">
+          <input  id = "search" placeholder="Search list..." >
           <button class= "lsit_result" type ="button">搜尋</button>
         </div>
 
@@ -942,6 +808,130 @@
         send_list_name();
       }
     });
+
+    let search_public_list_name = document.getElementById("search");
+    search_public_list_name.addEventListener("keyup", function(event) {
+    // Number 13 is the "Enter" key on the keyboard
+      console.log(search_public_list_name)
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        
+        let grandpa_list_result = document.getElementsByClassName("search_list_result")[0];
+
+        while (grandpa_list_result.hasChildNodes()) {
+          grandpa_list_result.removeChild(grandpa_list_result.lastChild);
+        }
+
+        let xhr = new XMLHttpRequest();
+
+        xhr.open("post", "/api/user/map_list/search/list");  
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        let list_data = {
+          type:"search",
+          data:search_public_list_name.value
+        }
+        console.log(list_data)
+        xhr.send(JSON.stringify(list_data));
+
+        xhr.onreadystatechange=function() {
+          if (this.readyState == 4 && this.status == 200) {
+            if(xhr.response == "There is no user data."){
+              alert("! 查無此使用者，請註冊");
+            }else{
+              let user_list_data = JSON.parse(xhr.response);
+              console.log(user_list_data);
+
+              if(user_list_data.length == 0){
+                let parent_list = document.createElement("p");
+                parent_list.className = "no_public_list";
+                parent_list.innerHTML = "查無清單，請換關鍵字搜尋"
+                grandpa_list_result.appendChild(parent_list);
+
+              }
+
+              for (let i = 0 ;i<user_list_data.length;i++){
+                //製作每一個 list 的內容 
+                let parent_list = document.createElement("div");
+                parent_list.className = "public_list_container";
+                grandpa_list_result.appendChild(parent_list);
+
+                let list_name = document.createElement("p");
+                list_name.innerHTML = user_list_data[i].list_name;
+                list_name.id =user_list_data[i].list_id;
+                list_name.className = "public_list"
+                list_name.setAttribute("onclick","show_and_open_public_list(this)")
+                parent_list.appendChild(list_name);
+
+                let list_owner = document.createElement("p");
+                list_owner.innerHTML = user_list_data[i].user_name;
+                parent_list.appendChild(list_owner);
+
+                let list_copy_img = document.createElement("img");
+                list_copy_img.className = "list_copy_img";
+                list_copy_img.src = "/img/multiple-users-silhouette.png"
+                parent_list.appendChild(list_copy_img);
+
+                let list_copy_number = document.createElement("p");
+                list_copy_number.innerHTML = user_list_data[i].copy_number;
+                parent_list.appendChild(list_copy_number);
+      
+              }
+            }             
+          }
+        }
+      }
+    });
+
+    let a_list_title = document.getElementsByClassName("a_list_title")[0];
+    function edit_a_list_name(){
+      a_list_title.readOnly = "";
+    }
+    a_list_title.addEventListener("keyup", function(event) {
+      // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+          event.preventDefault();
+          a_list_title.readOnly = true;
+
+          let update_list ={
+            list_id : a_list_title.id,
+            list_name : a_list_title.value,
+            access_token : localStorage.getItem("access_token")
+          }
+
+          let xhr = new XMLHttpRequest();
+
+          xhr.open("post", "/api/user/map_list");  
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          
+          let list_data = {
+            type:"update",
+            data:update_list
+          }
+          console.log(list_data)
+          xhr.send(JSON.stringify(list_data));
+
+          xhr.onreadystatechange=function() {
+            if (this.readyState == 4 && this.status == 200) {
+              let user_list_data = JSON.parse(xhr.response);
+              if(user_list_data.error){
+                alert(user_list_data.error);
+              }else{
+                console.log(user_list_data);
+
+                let parent = document.getElementsByClassName("user_own_list_content")[0];
+
+                while (parent.hasChildNodes()) {
+                  parent.removeChild(parent.lastChild);
+                }
+
+                render_user_all_lists()
+              }
+                
+            }
+          }
+        }
+      });
 
 
   

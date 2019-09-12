@@ -262,10 +262,9 @@ app.post("/api/user/map_list",async function(req,res){
         appear_list:"true",
         copy_number:0
       }
-
       console.log(user_list_data)
 
-      let select_user_insert_list = await dao_map.select("user_map_list","list_name",user_list_data.list_name);
+      let select_user_insert_list = await dao_map.select_2("user_map_list","list_name",user_list_data.list_name,"user_name",user_list_data.user_name);
 
       if(select_user_insert_list.length >0){
         var error = {
@@ -328,7 +327,7 @@ app.post("/api/user/map_list",async function(req,res){
   
 });
 
-//user insert update delete place in list
+//user insert delete place in list
 app.post("/api/user/map_list/place",async function(req,res){
 
   if(req.header('Content-Type') != "application/json"){
@@ -349,7 +348,6 @@ app.post("/api/user/map_list/place",async function(req,res){
       res.send(error);
       return;
     }
- 
 
     if(list_data.type == "create"){
         
@@ -362,13 +360,12 @@ app.post("/api/user/map_list/place",async function(req,res){
         latitude : list_data.data.latitude,
         information :list_data.data.information
       }
-
       console.log(user_list_data)
       let select_user_insert_place = await dao_map.select_3("user_map_place","user_name",user_list_data.user_name,"place_name",user_list_data.place_name,"list_name",user_list_data.list_name);
       console.log(select_user_insert_place)
       if(select_user_insert_place.length >0){
         var error = {
-          "error": "Place name is duplicate."
+          "error": "此地點已收藏"
         };
         res.send(error);
         return;
@@ -385,10 +382,6 @@ app.post("/api/user/map_list/place",async function(req,res){
 
       let select_user_last_place = await dao_map.select("user_map_place","No",last_place_id[0]["LAST_INSERT_ID()"]);
 
-      
-      
-
-      
       let data={
         place_in_this_list:select_user_last_place,
       }
@@ -413,27 +406,22 @@ app.post("/api/user/map_list/place",async function(req,res){
 
       res.send(select_user_list_place);
       
+    }else{
+
+      console.log(list_data);
+
+      let user_list_data = {
+        user_name : select_user_result[0].name,
+        list_name : list_data.data.list_name,
+        place_name : list_data.data.place_name
+      }
+
+      console.log(user_list_data);
+
+      let delete_user_list_name = await dao_map.delete_3("user_map_place","user_name",user_list_data.user_name,"list_name",user_list_data.list_name,"place_name",user_list_data.place_name)
+
+      res.send({success:"delete OK"});
     }
-    //else{
-    //   let user_list_data = {
-    //     user_name : select_user_result[0].name,
-    //     list_name : list_data.data.list_name
-    //   }
-
-    //   let select_user_insert_list = await dao_map.select("user_map_list","list_name",user_list_data.list_name);
-
-    //   if(select_user_insert_list.length == 0){
-    //     var error = {
-    //       "error": "List is not existing."
-    //     };
-    //     res.send(error);
-    //     return;
-    //   }
-
-    //   let delete_user_list_name = await dao_map.delete("user_map_list","list_id",list_data.data.list_id,user_list_data.user_name)
-
-    //   res.send({success:"delete OK"});
-    // }
 
   }
   
@@ -460,8 +448,25 @@ app.post("/api/user/map_list/result",async function(req,res){
       return;
     }
 
-    let select_all_list = await dao_map.select("user_map_list","user_name",select_user_result[0].name);
+    let select_place_in_list = await dao_map.select_2("user_map_place","user_name",select_user_result[0].name,"place_name",list_data.data.place_name);
+
+    console.log(select_place_in_list);
+
+    let select_all_list = await dao_map.select_order_by("user_map_list","user_name",select_user_result[0].name,"list_id");
+
+    for (let i =0 ; i <select_place_in_list.length ; i++ ){
+      for (let j =0 ; j <select_all_list.length ; j++ ){
+
+        if(select_place_in_list[i].list_name == select_all_list[j].list_name){
+          select_all_list[j].check_place_is_exist = "true"
+        }else{
+          select_all_list[j].check_place_is_exist = "false"
+        }
+      }
+    }
+
     console.log(select_all_list)
+
     res.send(select_all_list);
   }
 

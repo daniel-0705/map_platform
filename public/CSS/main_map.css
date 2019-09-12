@@ -79,7 +79,7 @@ body{
     height: 100%;
     width: 0;
     position: fixed;
-    z-index: 2;
+    z-index: 10;
     top: 0;
     left: 0;
     background-color: rgb(214, 214, 214,0.8);
@@ -108,7 +108,7 @@ body{
 .a_list {
     height: 100%;
     width: 0;
-    z-index: 1;
+    z-index: 2;
     position: fixed;
     position: absolute;
     overflow-x: hidden;
@@ -128,29 +128,16 @@ body{
     overflow-y: auto;
 }
 
+.a_list_content >p ,.a_public_list_content>p{
+    cursor:pointer;
+}
+
+
+
 /* .a_list_title {
     border: none;
     background: transparent;
 } */
-
-
-/* infowindow */
-
-.choice_list{
-    position: relative;
-}
-
-.lists{
-    position: absolute;
-    background-color: white;
-    top:0px;
-    z-index: 1000000 !important;
-    /* overflow-y: auto;
-    height: 50%; */
-}
-
-
-
 
 
 /* search_public_list */
@@ -170,8 +157,41 @@ body{
 
 
 
-/* p */
+/* a place slidebar */
 
-p{
-    cursor:pointer
+.a_place {
+    height: 100%;
+    width: 0px;
+    position: fixed;
+    position: absolute;
+    overflow-x: hidden;
+    transition: 0.5s;
+    background-color: rgb(230, 208, 157);
+    z-index: 3;
+}
+
+.a_place_name{
+    height: 10%;
+    background-color: rgb(173, 145, 80);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+
+.a_place_content{
+    height: 90%;
+    background-color: rgb(151, 134, 95);
+    overflow-y: auto;
+}
+
+.a_public_list_content{
+    height: 90%;
+    background-color: rgb(151, 134, 95);
+    overflow-y: auto;
+}
+
+.list_cotainer{
+    display: flex;
+    justify-content: space-around;
 }

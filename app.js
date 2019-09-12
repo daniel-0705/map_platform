@@ -259,6 +259,7 @@ app.post("/api/user/map_list",async function(req,res){
         category : list_data.data.category,
         user_name : select_user_result[0].name,
         list_name : list_data.data.list_name,
+        list_icon : list_data.data.list_icon,
         appear_list:"true",
         copy_number:0
       }
@@ -276,11 +277,7 @@ app.post("/api/user/map_list",async function(req,res){
 
       let insert_user_list_data = await dao_map.insert("user_map_list",user_list_data,user_list_data.user_name);
 
-      let last_list_id = await dao_map.select_last_insert_id()
-
-      let select_user_last_list = await dao_map.select("user_map_list","list_id",last_list_id[0]["LAST_INSERT_ID()"]);
-
-      res.send(select_user_last_list);
+      res.send({success:"insert list OK"});
 
     }else if(list_data.type == "update"){
       let user_list_data = {
@@ -359,10 +356,14 @@ app.post("/api/user/map_list/place",async function(req,res){
         longitude : list_data.data.longitude,
         latitude : list_data.data.latitude,
         information :list_data.data.information
-      }
+      };
+
       console.log(user_list_data)
+      
       let select_user_insert_place = await dao_map.select_3("user_map_place","user_name",user_list_data.user_name,"place_name",user_list_data.place_name,"list_name",user_list_data.list_name);
+      
       console.log(select_user_insert_place)
+      
       if(select_user_insert_place.length >0){
         var error = {
           "error": "此地點已收藏"
@@ -371,10 +372,10 @@ app.post("/api/user/map_list/place",async function(req,res){
         return;
       }
 
-      let check_place_is_exist = await dao_map.select_2("user_map_place","user_name",user_list_data.user_name,"place_name",user_list_data.place_name)
-      console.log("確認存在與否")
-      console.log(check_place_is_exist)
+      let select_list_icon = await dao_map.select_2("user_map_list","user_name",user_list_data.user_name,"list_name",user_list_data.list_name)
 
+      console.log(select_list_icon);
+      user_list_data.list_icon = select_list_icon[0].list_icon;
 
       let insert_user_place_data = await dao_map.insert("user_map_place",user_list_data,user_list_data.user_name);
 
@@ -386,14 +387,8 @@ app.post("/api/user/map_list/place",async function(req,res){
         place_in_this_list:select_user_last_place,
       }
 
-
-      if (check_place_is_exist.length > 0){
-        data.place_in_this_user = true;
-      }else{
-        data.place_in_this_user = false;
-      }
-      console.log(data)
-      res.send(data);
+      console.log(select_user_last_place)
+      res.send(select_user_last_place);
 
 
     }else if(list_data.type == "select"){
@@ -420,7 +415,15 @@ app.post("/api/user/map_list/place",async function(req,res){
 
       let delete_user_list_name = await dao_map.delete_3("user_map_place","user_name",user_list_data.user_name,"list_name",user_list_data.list_name,"place_name",user_list_data.place_name)
 
-      res.send({success:"delete OK"});
+      let check_place_is_exist = await dao_map.select_2("user_map_place","user_name",user_list_data.user_name,"place_name",user_list_data.place_name)
+      console.log("確認存在與否")
+      console.log(check_place_is_exist)
+
+
+      res.send({
+        success:"delete OK",
+        check_place_is_exist:check_place_is_exist.length
+      });
     }
 
   }
@@ -459,8 +462,6 @@ app.post("/api/user/map_list/result",async function(req,res){
 
         if(select_place_in_list[i].list_name == select_all_list[j].list_name){
           select_all_list[j].check_place_is_exist = "true"
-        }else{
-          select_all_list[j].check_place_is_exist = "false"
         }
       }
     }

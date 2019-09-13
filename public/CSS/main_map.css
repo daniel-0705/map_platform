@@ -88,7 +88,6 @@ body{
     display: inline-block;
     width: 60px;
     height: 34px;
-    z-index: 10;
   }
   
   .switch input { 

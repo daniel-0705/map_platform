@@ -15,7 +15,7 @@ let select_mysql = function(table_name,column_name,data){
         }else{
             mysql.con.query(`select * from ${table_name} where ${column_name} ="${data}"`,function (err,result) {
                 if (err) {
-                    console.log(`${data.name} select ${table_name} table failed`);
+                    console.log(`${data} select ${table_name} table failed`);
                     reject(err);
                 }else{
                     resolve(result);
@@ -29,7 +29,7 @@ let select_2_conditions_mysql = function(table_name,column_name_1,data_1,column_
     return new Promise(function(resolve, reject){
         mysql.con.query(`select * from ${table_name} where ${column_name_1} ="${data_1}" and ${column_name_2} = "${data_2}"`,function (err,result) {
             if (err) {
-                console.log(`${data_1.name} select ${table_name} table failed`);
+                console.log(`${data_1} select ${table_name} table failed`);
                 reject(err);
             }else{
                 resolve(result);
@@ -42,7 +42,7 @@ let select_3_conditions_mysql = function(table_name,column_name_1,data_1,column_
     return new Promise(function(resolve, reject){
         mysql.con.query(`select * from ${table_name} where ${column_name_1} ="${data_1}" and ${column_name_2} = "${data_2}" and ${column_name_3} = "${data_3}"`,function (err,result) {
             if (err) {
-                console.log(`${data_1.name} select ${table_name} table failed`);
+                console.log(`${data_1} select ${table_name} table failed`);
                 reject(err);
             }else{
                 resolve(result);
@@ -67,7 +67,7 @@ let select_order_by_mysql = function(table_name,column_name,data,column_order){
     return new Promise(function(resolve, reject){
         mysql.con.query(`select * from ${table_name} where ${column_name} ="${data}" order by ${column_order}`,function (err,result) {
             if (err) {
-                console.log(`${data.name} select ${table_name} table failed`);
+                console.log(`${data} select ${table_name} table failed`);
                 reject(err);
             }else{
                 resolve(result);
@@ -82,6 +82,7 @@ let fuzzy_search = function (table_name,column_name,data,column_order){
     return new Promise(function(resolve, reject){
         mysql.con.query(`SELECT * FROM ${table_name} where category ="true" and ${column_name} LIKE "%${data}%" order by ${column_order} desc`,function (err,result) {
             if (err) {
+                console.log(`${data} select ${table_name} table failed`);
                 reject(err);
             }else{
                 resolve(result);

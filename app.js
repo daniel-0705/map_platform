@@ -66,7 +66,7 @@ app.post("/test", function (req, res) {
 });
 
 
-//currently for test 地圖上所有的點 及使用者收藏的點
+//地圖上所有的點 及使用者收藏的點
 app.post("/api/map",async function (req, res) {
 
 
@@ -99,16 +99,7 @@ app.post("/api/map",async function (req, res) {
       data.user_places =select_all_user_place;
       res.send(data);
     }
-  
-    
   }
-
-
-
-
-
-  
-
 });
 
 //user input the user data from sigh_up.html and send here
@@ -280,26 +271,45 @@ app.post("/api/user/map_list",async function(req,res){
       res.send({success:"insert list OK"});
 
     }else if(list_data.type == "update"){
+
       let user_list_data = {
+        list_id : list_data.data.list_id,
+        category : list_data.data.category,
         user_name : select_user_result[0].name,
-        list_name : list_data.data.list_name
+        list_icon : list_data.data.list_icon
       }
+      
+      if(list_data.data.list_name != undefined){
+        user_list_data.list_name = list_data.data.list_name
+        let select_user_insert_list = await dao_map.select_2("user_map_list","list_name",user_list_data.list_name,"user_name",user_list_data.user_name);
 
-      let select_user_insert_list = await dao_map.select("user_map_list","list_name",user_list_data.list_name);
-
-      if(select_user_insert_list.length >0){
-        var error = {
-          "error": "List name is duplicate."
-        };
-        res.send(error);
-        return;
+        if(select_user_insert_list.length >0){
+          var error = {
+            "error": "! 清單名稱重複，請重新命名"
+          };
+          res.send(error);
+          return;
+        }
       }
-
-      let update_user_list_name = await dao_map.update("user_map_list","list_id",list_data.data.list_id,user_list_data,user_list_data.user_name)
+      
+      console.log(user_list_data)
+      let update_user_list_name = await dao_map.update("user_map_list","list_id",user_list_data.list_id,user_list_data,user_list_data.user_name)
 
       res.send({success:"update OK"});
       
-    }else{
+    }else if(list_data.type == "update_appear"){
+
+      let user_list_data = {
+        list_id : list_data.data.list_id,
+        user_name : select_user_result[0].name,
+        appear_list :`${list_data.data.appear_list}`
+      }
+      console.log(user_list_data);
+
+      let update_user_list = await dao_map.update("user_map_list","list_id",user_list_data.list_id,user_list_data,user_list_data.user_name);
+      res.send({success:"update appear OK"});
+    }
+    else{
       let user_list_data = {
         user_name : select_user_result[0].name,
         list_name : list_data.data.list_name
@@ -372,10 +382,12 @@ app.post("/api/user/map_list/place",async function(req,res){
         return;
       }
 
-      let select_list_icon = await dao_map.select_2("user_map_list","user_name",user_list_data.user_name,"list_name",user_list_data.list_name)
+      let select_list_icon_and_appear = await dao_map.select_2("user_map_list","user_name",user_list_data.user_name,"list_name",user_list_data.list_name)
 
-      console.log(select_list_icon);
-      user_list_data.list_icon = select_list_icon[0].list_icon;
+      console.log(select_list_icon_and_appear);
+
+      user_list_data.list_icon = select_list_icon_and_appear[0].list_icon;
+      user_list_data.appear_list = select_list_icon_and_appear[0].appear_list;
 
       let insert_user_place_data = await dao_map.insert("user_map_place",user_list_data,user_list_data.user_name);
 
@@ -430,7 +442,7 @@ app.post("/api/user/map_list/place",async function(req,res){
   
 });
 
-//all place in public map
+//send user all lists in public map
 app.post("/api/user/map_list/result",async function(req,res){
   if(req.header('Content-Type') != "application/json"){
       var error = {
@@ -473,7 +485,7 @@ app.post("/api/user/map_list/result",async function(req,res){
 
 });
 
-//search other lists in public map
+//search other public lists in map
 app.post("/api/user/map_list/search/list",async function(req,res){
   if(req.header('Content-Type') != "application/json"){
       var error = {
@@ -495,7 +507,7 @@ app.post("/api/user/map_list/search/list",async function(req,res){
 
 });
 
-//show places of one user and one list result 
+// 顯示其他使用者的一個清單裡的所有地點 show places of one user and one list result 
 app.post("/api/user/map_list/show/list",async function(req,res){
   if(req.header('Content-Type') != "application/json"){
       var error = {
@@ -551,10 +563,13 @@ app.post("/api/user/map_list/copy",async function(req,res){
       return;
     }
 
+    let select_public_list_result = await dao_map.select("user_map_list","list_id",list_data.data.list_id)
+    
     let insert_copy_list = {
       category : "true",
       user_name : select_user_result[0].name,
       list_name : list_data.data.list_name+"(複製)",
+      list_icon : select_public_list_result[0].list_icon,
       appear_list : "true",
       copy_number : 0
     }
@@ -583,6 +598,8 @@ app.post("/api/user/map_list/copy",async function(req,res){
       let insert_copy_places = {
         user_name : select_user_result[0].name,
         list_name : list_data.data.list_name+"(複製)",
+        list_icon : select_place_in_copy_list[i].list_icon,
+        appear_list : select_place_in_copy_list[i].appear_list,
         place_name : select_place_in_copy_list[i].place_name,
         place_order : select_place_in_copy_list[i].place_order,
         longitude : select_place_in_copy_list[i].longitude,

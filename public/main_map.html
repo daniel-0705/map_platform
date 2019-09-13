@@ -41,8 +41,346 @@
               ]
               
           });
+          render_map_and_user_all_place();
+      }
+      
+      
 
-          let xhr = new XMLHttpRequest();
+      //選擇收藏後會出現清單選項
+      function select_list(e){
+        
+        e.removeAttribute("onclick");
+        // close_slidebar();
+
+        document.getElementById("a_place").style.width = "300px";
+        document.getElementById("map").style.marginLeft = "300px";
+
+        delete_child_element("a_place_content");
+
+        let xhrt= new XMLHttpRequest();
+        xhrt.open("post", "/api/user/map_list/result");  
+        xhrt.setRequestHeader('Content-Type', 'application/json');
+        
+        let list_data ={
+          type :"select",
+          data : {
+            access_token:localStorage.getItem("access_token"),
+            place_name : marker_content.name
+          }
+        };
+
+        xhrt.send(JSON.stringify(list_data));
+        xhrt.onreadystatechange=function() {
+          if (this.readyState == 4 && this.status == 200) {
+            let user_list_data = JSON.parse(xhrt.response);
+            if(user_list_data.error){
+                alert(user_list_data.error);
+            }else{
+              console.log(user_list_data);
+              for (let i = 0 ;i<user_list_data.length;i++){
+                //製作每一個 list 的內容 p
+                let a_place_content = document.getElementsByClassName("a_place_content")[0]
+                let list_cotainer = document.createElement("div");
+                list_cotainer.className = "list_cotainer"
+                a_place_content.appendChild(list_cotainer);
+
+                let collection_button = document.createElement("button");
+                if(user_list_data[i].check_place_is_exist == "true"){
+                  collection_button.innerHTML = "移除";
+                }else{
+                  collection_button.innerHTML = "收藏";
+                }
+                collection_button.setAttribute("onClick", "store_place_in_list(this)");
+                list_cotainer.appendChild(collection_button);
+
+                let list_icon = document.createElement("img");
+                list_icon.src = `http://maps.google.com/mapfiles/ms/icons/${user_list_data[i].list_icon}.png`
+                list_cotainer.appendChild(list_icon);
+
+               
+                let new_list_name = document.createElement("p");
+                new_list_name.className = "user_list";
+                new_list_name.id = `${user_list_data[i].list_id}`;
+                //new_list_name.setAttribute("onClick", "open_a_list(this)");
+                new_list_name.innerHTML = user_list_data[i].list_name;
+                list_cotainer.appendChild(new_list_name);
+                
+              }
+            } 
+          }
+        }
+      }
+
+      function store_place_in_list(e){
+        // console.log(e)
+        // console.log(marker_content)
+
+        let a_place_name = document.getElementById("a_place_name")
+
+        let place_data ={
+          access_token : localStorage.getItem("access_token"),
+          list_name : e.parentElement.children[2].innerHTML,
+          place_name : marker_content.name,
+          place_order : marker_content.place_order,
+          longitude : marker_content.longitude,
+          latitude : marker_content.latitude,
+          information : marker_content.information
+        }
+
+        console.log(place_data)
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("post", "/api/user/map_list/place");  
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        if(e.innerHTML == "收藏"){
+          let list_data = {
+            type:"create",
+            data:place_data
+          }
+          xhr.send(JSON.stringify(list_data));
+
+
+          xhr.onreadystatechange=function() {
+            if (this.readyState == 4 && this.status == 200) {
+              let user_place_data = JSON.parse(xhr.response);
+              if(user_place_data.error){
+                alert(user_place_data.error);
+              }else{  
+                console.log(user_place_data);
+                //新增收藏地點
+                let marker = new google.maps.Marker({
+                  position:{lat: place_data.latitude, lng: place_data.longitude},
+                  icon: {
+                    url: `http://maps.google.com/mapfiles/ms/icons/${user_place_data[0].list_icon}.png`
+                  },
+                  animation: google.maps.Animation.DROP,
+                  //zIndex: 500,
+                  map:map
+                });
+                
+                let user_place_index = user_markers.length
+
+                marker.content = `
+                  <h1 id=${place_data.place_order}>${place_data.place_name}</h1>
+                  <p id = ${user_place_index}>${place_data.information}</p>
+                  <buttom class = "choice_list" id =${place_data.latitude}_${place_data.longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
+                  `;
+                let infoWindow = new google.maps.InfoWindow();
+
+                let a_place_title = document.getElementsByClassName("a_place_title")[0];
+                e.id = user_place_index;
+
+                oms.addMarker(marker);
+                google.maps.event.addListener(marker, 'spider_click', function (e) { 
+                  //收藏地點的 slidebar 即時顯示 點擊地標上的地名
+                  let a_place_title = document.getElementsByClassName("a_place_title")[0];
+                  a_place_title.innerHTML = place_data.place_name;
+   
+                  //將點擊的地標資訊傳到外面的參數中
+                  marker_content.name = place_data.place_name;
+                  marker_content.place_order = place_data.place_order;
+                  marker_content.user_place_order = user_place_index,
+                  marker_content.latitude = place_data.latitude;
+                  marker_content.longitude = place_data.longitude;
+                  marker_content.information = place_data.information;
+                  
+                  console.log(marker_content)
+                  infoWindow.setContent(this.content);
+                  infoWindow.open(this.getMap(), this);
+
+                  close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
+                });
+
+                infoWindow.close();
+                google.maps.event.addListener(map, 'click', function () { 
+                  infoWindow.close();
+
+                  close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
+                });
+
+                //使用者按下收藏後，會顯現收藏的清單名稱及內容
+                let new_a_list_name = document.getElementsByClassName("a_list_title")[0];
+                new_a_list_name.innerHTML=user_place_data[0].list_name;
+                delete_child_element("a_list_content");
+                render_a_list_all_place_name(place_data);
+                
+
+                user_markers.push(marker);
+                markers[marker_content.place_order].setMap(null); //把原本的地標 隱藏
+
+              }
+            }
+          }
+          e.innerHTML = "移除";
+        }else{
+          let list_data = {
+            type:"delete",
+            data:place_data
+          }
+          xhr.send(JSON.stringify(list_data));
+
+          xhr.onreadystatechange=function() {
+            if (this.readyState == 4 && this.status == 200) {
+              let user_place_data = JSON.parse(xhr.response);
+              if(user_place_data.error){
+                alert(user_place_data.error);
+              }else{
+                console.log(user_place_data);
+                console.log(place_data)
+                if(user_place_data.check_place_is_exist == 0){
+                  markers[marker_content.place_order].setMap(map); //把原本的地標 調回來
+                }
+
+                //區別移除的點是當下存的還是之前存的
+                if (e.id == ""){
+                  console.log("先前存的的地點")
+                  user_markers[marker_content.user_place_order].setMap(null); //把使用者先前存的的地標隱藏
+                  //使用者按下移除後，會顯現收藏的清單名稱及內容
+                  delete_child_element("a_list_content");
+                  render_a_list_all_place_name(place_data);
+
+                  infoWindow.close();  //做完動作後要把地標視窗關掉
+                }else{
+                  console.log("當下存的地點")
+                  user_markers[e.id].setMap(null); //把使用者當下存的地標隱藏
+
+                  //使用者按下移除後，會顯現收藏的清單名稱及內容
+                  delete_child_element("a_list_content");
+                  render_a_list_all_place_name(place_data);
+
+                  infoWindow.close(); //做完動作後要把地標視窗關掉
+                }
+              }
+            }
+          }
+          e.innerHTML = "收藏";
+        }
+      }
+
+
+
+    </script>
+    <script>
+
+      function delete_child_element(parent_element){
+        let parent_place = document.getElementsByClassName(parent_element)[0];
+        console.log(parent_place)
+        while (parent_place.hasChildNodes()) {
+          parent_place.removeChild(parent_place.lastChild);
+        }
+      }
+
+      function render_user_all_lists_name(){
+
+        let xhrt= new XMLHttpRequest();
+        xhrt.open("post", "/api/user/map_list/result");  
+        xhrt.setRequestHeader('Content-Type', 'application/json');
+        
+
+        let list_data ={
+          type :"select",
+          data : {access_token:localStorage.getItem("access_token")}
+        };
+
+        //localStorage.getItem("access_token")
+        xhrt.send(JSON.stringify(list_data));
+        xhrt.onreadystatechange=function() {
+          if (this.readyState == 4 && this.status == 200) {
+
+            if(xhrt.response == "error"){
+                alert("查無此使用者，請註冊");
+            }else{
+              let user_list_data = JSON.parse(xhrt.response);
+              console.log(user_list_data);
+              for (let i = 0 ;i<user_list_data.length;i++){
+                //製作每一個 list 的內容 img p
+                let user_own_list_content = document.getElementsByClassName("user_own_list_content")[0];
+                let user_every_list_container = document.createElement("div");
+                user_every_list_container.className = "user_every_list_container";
+                user_own_list_content.appendChild(user_every_list_container);
+
+                let user_list_icon = document.createElement("img");
+                user_list_icon.className = "user_list_icon";
+                user_list_icon.src = `http://maps.google.com/mapfiles/ms/icons/${user_list_data[i].list_icon}.png`
+                user_every_list_container.appendChild(user_list_icon);
+
+                let user_list_name = document.createElement("p");
+                user_list_name.className = "user_list_name";
+                user_list_name.id = `${user_list_data[i].list_id}`;
+                user_list_name.setAttribute("onClick", "open_a_list(this)");
+                user_list_name.innerHTML = user_list_data[i].list_name;
+                user_every_list_container.appendChild(user_list_name);
+
+                let label = document.createElement("label");
+                label.className = "switch";
+                user_every_list_container.appendChild(label);
+
+                let input = document.createElement("input");
+                input.type = "checkbox";
+                if(user_list_data[i].appear_list == "true"){
+                  input.checked = true;
+                }
+                input.setAttribute("onclick","appear_list_or_not(this)")
+                label.appendChild(input);
+
+                let span = document.createElement("span");
+                span.className = "slider round";
+                label.appendChild(span);
+
+
+                
+                
+              }
+            }
+              
+          }
+        }
+      }
+      
+      function render_a_list_all_place_name(list){
+
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("post", "/api/user/map_list/place");  
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        let list_data = {
+          type:"select",
+          data:list
+        }
+
+        xhr.send(JSON.stringify(list_data));
+
+        xhr.onreadystatechange=function() {
+          if (this.readyState == 4 && this.status == 200) {
+            let user_place_data = JSON.parse(xhr.response);
+            if(user_place_data.error){
+                alert(user_place_data.error);
+            }else{
+              console.log(user_place_data);
+
+              //製作新的 place 的內容 p
+              for(let i =0; i<user_place_data.length ; i++){     
+                let new_place_name = document.createElement("p");
+                new_place_name.className = "user_place_name";
+                new_place_name.id = user_place_data[i].longitude+"_"+user_place_data[i].latitude
+                new_place_name.innerHTML = user_place_data[i].place_name;
+                new_place_name.setAttribute("onClick", "change_center_to_place(this)");
+                let a_list_content = document.getElementsByClassName("a_list_content")[0];
+                a_list_content.appendChild(new_place_name);
+              }
+              console.log("顯示地點列表完成")
+            }
+              
+          }
+        }
+
+      }
+
+      function render_map_and_user_all_place(){
+
+        let xhr = new XMLHttpRequest();
           xhr.open("post", `/api/map`);
           xhr.setRequestHeader('Content-Type', 'application/json');
 
@@ -155,303 +493,6 @@
             }
           }
       }
-      
-      
-
-      //選擇收藏後會出現清單選項
-      function select_list(e){
-        
-        e.removeAttribute("onclick");
-        // close_slidebar();
-
-        document.getElementById("a_place").style.width = "300px";
-        document.getElementById("map").style.marginLeft = "300px";
-
-        delete_child_element("a_place_content");
-
-        let xhrt= new XMLHttpRequest();
-        xhrt.open("post", "/api/user/map_list/result");  
-        xhrt.setRequestHeader('Content-Type', 'application/json');
-        
-        let list_data ={
-          type :"select",
-          data : {
-            access_token:localStorage.getItem("access_token"),
-            place_name : marker_content.name
-          }
-        };
-
-        xhrt.send(JSON.stringify(list_data));
-        xhrt.onreadystatechange=function() {
-          if (this.readyState == 4 && this.status == 200) {
-            let user_list_data = JSON.parse(xhrt.response);
-            if(user_list_data.error){
-                alert(user_list_data.error);
-            }else{
-              console.log(user_list_data);
-              for (let i = 0 ;i<user_list_data.length;i++){
-                //製作每一個 list 的內容 p
-                let a_place_content = document.getElementsByClassName("a_place_content")[0]
-                let list_cotainer = document.createElement("div");
-                list_cotainer.className = "list_cotainer"
-                a_place_content.appendChild(list_cotainer);
-
-                let collection_button = document.createElement("button");
-                if(user_list_data[i].check_place_is_exist == "true"){
-                  collection_button.innerHTML = "移除";
-                }else{
-                  collection_button.innerHTML = "收藏";
-                }
-                collection_button.setAttribute("onClick", "store_place_in_list(this)");
-                list_cotainer.appendChild(collection_button);
-
-                let list_icon = document.createElement("img");
-                list_icon.src = `http://maps.google.com/mapfiles/ms/icons/${user_list_data[i].list_icon}.png`
-                list_cotainer.appendChild(list_icon);
-
-
-                let new_list_name = document.createElement("p");
-                new_list_name.className = "user_list";
-                new_list_name.id = `${user_list_data[i].list_id}`;
-                //new_list_name.setAttribute("onClick", "open_a_list(this)");
-                new_list_name.innerHTML = user_list_data[i].list_name;
-                list_cotainer.appendChild(new_list_name);
-                
-              }
-            } 
-          }
-        }
-      }
-
-      function store_place_in_list(e){
-        console.log(e)
-        console.log(marker_content)
-
-        let a_place_name = document.getElementById("a_place_name")
-
-        let place_data ={
-          access_token : localStorage.getItem("access_token"),
-          list_name : e.parentElement.children[2].innerHTML,
-          place_name : marker_content.name,
-          place_order : marker_content.place_order,
-          longitude : marker_content.longitude,
-          latitude : marker_content.latitude,
-          information : marker_content.information
-        }
-
-        console.log(place_data)
-
-        let xhr = new XMLHttpRequest();
-        xhr.open("post", "/api/user/map_list/place");  
-        xhr.setRequestHeader('Content-Type', 'application/json');
-
-        if(e.innerHTML == "收藏"){
-          let list_data = {
-            type:"create",
-            data:place_data
-          }
-          xhr.send(JSON.stringify(list_data));
-
-
-          xhr.onreadystatechange=function() {
-            if (this.readyState == 4 && this.status == 200) {
-              let user_place_data = JSON.parse(xhr.response);
-              if(user_place_data.error){
-                alert(user_place_data.error);
-              }else{  
-                console.log(user_place_data);
-                console.log(user_place_data.place_in_this_list);
-                //新增收藏地點
-                let marker = new google.maps.Marker({
-                  position:{lat: place_data.latitude, lng: place_data.longitude},
-                  icon: {
-                    url: `http://maps.google.com/mapfiles/ms/icons/${user_place_data[0].list_icon}.png`
-                  },
-                  animation: google.maps.Animation.DROP,
-                  //zIndex: 500,
-                  map:map
-                });
-
-                let user_place_index = user_markers.length
-
-                marker.content = `
-                  <h1 id=${place_data.place_order}>${place_data.place_name}</h1>
-                  <p id = ${user_place_index}>${place_data.information}</p>
-                  <buttom class = "choice_list" id =${place_data.latitude}_${place_data.longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
-                  `;
-                let infoWindow = new google.maps.InfoWindow();
-
-                let a_place_title = document.getElementsByClassName("a_place_title")[0];
-                e.id = user_place_index;
-
-                oms.addMarker(marker);
-                google.maps.event.addListener(marker, 'spider_click', function (e) { 
-                  //收藏地點的 slidebar 即時顯示 點擊地標上的地名
-                  let a_place_title = document.getElementsByClassName("a_place_title")[0];
-                  a_place_title.innerHTML = place_data.place_name;
-                  console.log(e)
-                  console.log(oms.getMarkers())
-                  console.log(marker)
-                  //將點擊的地標資訊傳到外面的參數中
-                  marker_content.name = place_data.place_name;
-                  marker_content.place_order = place_data.place_order;
-                  marker_content.user_place_order = user_place_index,
-                  marker_content.latitude = place_data.latitude;
-                  marker_content.longitude = place_data.longitude;
-                  marker_content.information = place_data.information;
-                  
-                  console.log(marker_content)
-                  infoWindow.setContent(this.content);
-                  infoWindow.open(this.getMap(), this);
-
-                  close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
-                });
-                console.log(marker_content);
-
-                infoWindow.close();
-                google.maps.event.addListener(map, 'click', function () { 
-                  infoWindow.close();
-
-                  close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
-                });
-
-                //使用者按下收藏後，會顯現收藏的清單名稱及內容
-                let new_a_list_name = document.getElementsByClassName("a_list_title")[0];
-                new_a_list_name.value=user_place_data[0].list_name;
-                delete_child_element("a_list_content");
-                render_a_list_all_place(place_data);
-
-
-                user_markers.push(marker);
-                markers[marker_content.place_order].setMap(null); //把原本的地標 隱藏
-
-              }
-            }
-          }
-          e.innerHTML = "移除";
-        }else{
-          let list_data = {
-            type:"delete",
-            data:place_data
-          }
-          xhr.send(JSON.stringify(list_data));
-
-          xhr.onreadystatechange=function() {
-            if (this.readyState == 4 && this.status == 200) {
-              let user_place_data = JSON.parse(xhr.response);
-              if(user_place_data.error){
-                alert(user_place_data.error);
-              }else{
-                console.log(user_place_data);
-
-                if(user_place_data.check_place_is_exist == 0){
-                  markers[marker_content.place_order].setMap(map); //把原本的地標 調回來
-                }
-
-                if (e.id == ""){
-                  user_markers[marker_content.user_place_order].setMap(null); //把使用者先前存的的地標隱藏
-                }else{
-                  user_markers[e.id].setMap(null); //把使用者當下存的地標隱藏
-                }
-                
-              }
-            }
-          }
-          e.innerHTML = "收藏";
-        }
-      }
-
-
-
-    </script>
-    <script>
-
-      function delete_child_element(parent_element){
-        let parent_place = document.getElementsByClassName(parent_element)[0];
-        console.log(parent_place)
-        while (parent_place.hasChildNodes()) {
-          parent_place.removeChild(parent_place.lastChild);
-        }
-      }
-
-      function render_user_all_lists(){
-
-        let xhrt= new XMLHttpRequest();
-        xhrt.open("post", "/api/user/map_list/result");  
-        xhrt.setRequestHeader('Content-Type', 'application/json');
-        
-
-        let list_data ={
-          type :"select",
-          data : {access_token:localStorage.getItem("access_token")}
-        };
-
-        //localStorage.getItem("access_token")
-        xhrt.send(JSON.stringify(list_data));
-        xhrt.onreadystatechange=function() {
-          if (this.readyState == 4 && this.status == 200) {
-
-            if(xhrt.response == "error"){
-                alert("查無此使用者，請註冊");
-            }else{
-              let user_list_data = JSON.parse(xhrt.response);
-              console.log(user_list_data);
-              for (let i = 0 ;i<user_list_data.length;i++){
-                //製作每一個 list 的內容 p
-                let new_list_name = document.createElement("p");
-                new_list_name.className = "user_list_name";
-                new_list_name.id = `${user_list_data[i].list_id}`;
-                new_list_name.setAttribute("onClick", "open_a_list(this)");
-                new_list_name.innerHTML = user_list_data[i].list_name;
-                let list_content = document.getElementsByClassName("user_own_list_content")[0];
-                list_content.appendChild(new_list_name);
-                
-              }
-            }
-              
-          }
-        }
-      }
-      
-      function render_a_list_all_place(list){
-
-
-        let xhr = new XMLHttpRequest();
-        xhr.open("post", "/api/user/map_list/place");  
-        xhr.setRequestHeader('Content-Type', 'application/json');
-
-        let list_data = {
-          type:"select",
-          data:list
-        }
-
-        xhr.send(JSON.stringify(list_data));
-
-        xhr.onreadystatechange=function() {
-          if (this.readyState == 4 && this.status == 200) {
-            let user_place_data = JSON.parse(xhr.response);
-            if(user_place_data.error){
-                alert(user_place_data.error);
-            }else{
-              console.log(user_place_data);
-
-              //製作新的 place 的內容 p
-              for(let i =0; i<user_place_data.length ; i++){     
-                let new_place_name = document.createElement("p");
-                new_place_name.className = "user_place_name";
-                new_place_name.id = user_place_data[i].longitude+"_"+user_place_data[i].latitude
-                new_place_name.innerHTML = user_place_data[i].place_name;
-                new_place_name.setAttribute("onClick", "change_center_to_place(this)");
-                let a_list_content = document.getElementsByClassName("a_list_content")[0];
-                a_list_content.appendChild(new_place_name);
-              }
-            }
-              
-          }
-        }
-
-      }
-
 
       function open_slidebar() {
 
@@ -485,8 +526,19 @@
         
       }
 
-      function close_list_input() {
+      function open_list_edit(e) {
+        if(localStorage.getItem("access_token")== undefined){
+          alert("! 欲使用此功能，請先登入");
+        }else{
+          document.getElementById("edit_list_name").style.width = "100%";
+          document.getElementById("list_name_edit").value = e.parentElement.children[1].innerHTML;
+        }
+        
+      }
+
+      function close_list_input_and_edit() {
         document.getElementById("input_list_name").style.width = "0";
+        document.getElementById("edit_list_name").style.width = "0";
       }
 
       function close_a_place_slidebar(){
@@ -542,8 +594,8 @@
               console.log(user_list_data);
               
               delete_child_element("user_own_list_content")
-              render_user_all_lists();
-              close_list_input();
+              render_user_all_lists_name();
+              close_list_input_and_edit();
               reset_input();
             }
               
@@ -551,10 +603,69 @@
         }
       }
 
-      function open_a_list(e) {
+      function send_edit_list_name(){
 
+        let list_name_edit = document.getElementById("list_name_edit")
+
+        let update_list ={
+          list_id : document.getElementsByClassName("a_list_title")[0].id,
+          category : document.querySelector('input[name="edit_category"]:checked').value,
+          list_icon : document.querySelector('input[name="edit_pattern"]:checked').value,
+          access_token : localStorage.getItem("access_token")
+        }
+
+        if(document.getElementsByClassName("a_list_title")[0].innerHTML != document.getElementsByName("list_name_edit")[0].value){
+          update_list.list_name=document.getElementsByName("list_name_edit")[0].value;
+        }
+        console.log(document.getElementsByName("list_name_edit")[0].value)
+        if (document.getElementsByName("list_name_edit")[0].value == ""){
+          alert("! 請輸入清單名稱");
+          return;
+        }
+
+        let xhr = new XMLHttpRequest();
+
+        xhr.open("post", "/api/user/map_list");  
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        let list_data = {
+          type:"update",
+          data:update_list
+        }
+        console.log(list_data)
+        xhr.send(JSON.stringify(list_data));
+
+        xhr.onreadystatechange=function() {
+          if (this.readyState == 4 && this.status == 200) {
+            let user_list_data = JSON.parse(xhr.response);
+            if(user_list_data.error){
+              alert(user_list_data.error);
+            }else{
+              console.log(user_list_data);
+              delete_child_element("user_own_list_content");
+              render_user_all_lists_name();
+              close_list_input_and_edit();
+
+              markers.map(item=>{item.setMap(null)})//同下下
+              markers=[]; //因為下一步要重新顯示 ，所以 markers 要先清空，才不會重複算
+              user_markers.map(item=>{item.setMap(null)}); //不先 null 掉的話，顯示時會被刪除的點依舊存在
+              user_markers = []; //同上上
+              render_map_and_user_all_place();
+
+              //最後改完名字要同步顯示
+              document.getElementsByClassName("a_list_title")[0].innerHTML = document.getElementsByName("list_name_edit")[0].value
+              
+            }
+              
+          }
+        }
+      }
+
+      function open_a_list(e) {
+        console.log(e)
+        
         let new_a_list_name = document.getElementsByClassName("a_list_title")[0];
-        new_a_list_name.value="";
+        new_a_list_name.innerHTML="";
 
         delete_child_element("a_list_content");
 
@@ -565,8 +676,10 @@
      
         new_a_list_name.id = e.id;
         new_a_list_name.className = "a_list_title";
-        new_a_list_name.value = e.innerHTML;
-        new_a_list_name.readOnly = true;
+        new_a_list_name.innerHTML = e.innerHTML;
+
+        let user_a_list_icon = document.getElementsByClassName("user_a_list_icon")[0];
+        user_a_list_icon.src = e.parentElement.children[0].src;
 
         let select_place ={
           access_token : localStorage.getItem("access_token"),
@@ -574,18 +687,18 @@
         }
         console.log(select_place);
 
-        render_a_list_all_place(select_place);
+        render_a_list_all_place_name(select_place);
 
       }
 
-  
       function delete_a_list(){
         let a_list_title = document.getElementsByClassName("a_list_title")[0];
-        a_list_title.innerHTML = "";
+        console.log(a_list_title)
+        console.log(a_list_title.innerHTML)
         
         let delete_list ={
           list_id : a_list_title.id,
-          list_name : a_list_title.value,
+          list_name : a_list_title.innerHTML,
           access_token : localStorage.getItem("access_token")
         }
 
@@ -603,26 +716,69 @@
         
         xhr.onreadystatechange=function() {
           if (this.readyState == 4 && this.status == 200) {
-            if(xhr.response == "There is no user data."){
-              alert("! 查無此使用者，請註冊");
+            let user_list_data = JSON.parse(xhr.response);
+            if(user_list_data.error){
+              alert(user_list_data.error);
             }else{
-              let user_list_data = JSON.parse(xhr.response);
+              
               console.log(user_list_data);
 
               close_slidebar();
 
               delete_child_element("user_own_list_content");
-              markers=[]; //因為下一步要重新啟動 initMap ，所以 markers 要先清空，才不會重複算
-              user_markers = []; //同上
-              initMap();
-              render_user_all_lists()
+              markers.map(item=>{item.setMap(null)})//同下下
+              markers=[]; //因為下一步要重新顯示 ，所以 markers 要先清空，才不會重複算
+              user_markers.map(item=>{item.setMap(null)}); //不先 null 掉的話，顯示時會被刪除的點依舊存在
+              user_markers = []; //同上上
+              render_map_and_user_all_place();
+              render_user_all_lists_name();
+
             } 
           }
         }
 
       }
 
-      
+      function appear_list_or_not(e){
+
+        let list_name = e.parentElement.parentElement.children[1].innerHTML;
+        let list_id = e.parentElement.parentElement.children[1].id;
+
+        let update_list ={
+          list_id : list_id,
+          appear_list : e.checked,
+          access_token : localStorage.getItem("access_token")
+        }
+
+        let xhr = new XMLHttpRequest();
+
+        xhr.open("post", "/api/user/map_list");  
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        let list_data = {
+          type:"update_appear",
+          data:update_list
+        }
+        console.log(list_data)
+        xhr.send(JSON.stringify(list_data));
+
+        xhr.onreadystatechange=function() {
+          if (this.readyState == 4 && this.status == 200) {
+            let user_list_data = JSON.parse(xhr.response);
+            if(user_list_data.error){
+              alert(user_list_data.error);
+            }else{
+              console.log(user_list_data);
+              
+            }
+              
+          }
+        }
+
+
+
+      }
+
       let switch_for_public_list_map;
       let user_public_list_markers=[];
       function show_and_open_public_list(e){
@@ -776,17 +932,10 @@
             }else{
              
               console.log(user_place_data);
-              alert("複製成功")
-
-              //製作新的 place 的內容 p
-              // for(let i =0; i<user_place_data.length ; i++){     
-              //   let new_place_name = document.createElement("p");
-              //   new_place_name.className = "user_place_name";
-              //   new_place_name.innerHTML = user_place_data[i].place_name;
-              //   //new_place_name.setAttribute("onClick", "open_a_list(this)");
-              //   let a_list_content = document.getElementsByClassName("a_list_content")[0];
-              //   a_list_content.appendChild(new_place_name);
-              // }
+              alert("複製成功");
+              delete_child_element("user_own_list_content");
+              render_user_all_lists_name();
+ 
             }
               
           }
@@ -800,7 +949,7 @@
       }
  
 
-      render_user_all_lists()
+      render_user_all_lists_name();
 
     </script>
 </head>
@@ -830,7 +979,7 @@
 
     <!-- 畫面外的新增清單 -->
     <div id="input_list_name" class="input_list_name">
-      <a href="javascript:void(0)" class="close_button" onclick="close_list_input()">&times;</a>
+      <a href="javascript:void(0)" class="close_button" onclick="close_list_input_and_edit()">&times;</a>
       <input type="radio" name="category" value="true" checked > 公開<br>
       <input type="radio" name="category" value="false"> 私人<br>
       <input type="text" id = "list_name" name="list_name" placeholder="請輸入清單名稱"><br>
@@ -855,17 +1004,49 @@
       </div>
       <button type="submit" onclick="send_list_name()")>Submit</button>
     </div>
-
     <!-- 畫面外的介面結束 -->
+
+    <!-- 畫面外的編輯清單 -->
+    <div id="edit_list_name" class="edit_list_name">
+      <a href="javascript:void(0)" class="close_button" onclick="close_list_input_and_edit()">&times;</a>
+      <input type="radio" name="edit_category" value="true" checked > 公開<br>
+      <input type="radio" name="edit_category" value="false"> 私人<br>
+      <input type="text" id = "list_name_edit" name="list_name_edit" placeholder="請輸入清單名稱"><br>
+      <div>
+        <p>清單地標樣式選擇</p>
+        <input type="radio" id = "edit_reset" name="edit_pattern" value="red-dot" checked ><img src ="http://maps.google.com/mapfiles/ms/icons/red-dot.png">
+        <input type="radio" name="edit_pattern" value="red" ><img src ="http://maps.google.com/mapfiles/ms/icons/red.png">
+        <input type="radio" name="edit_pattern" value="yellow-dot" ><img src ="http://maps.google.com/mapfiles/ms/icons/yellow-dot.png">
+        <input type="radio" name="edit_pattern" value="yellow" ><img src ="http://maps.google.com/mapfiles/ms/icons/yellow.png"><br>
+        <input type="radio" name="edit_pattern" value="blue-dot" ><img src ="http://maps.google.com/mapfiles/ms/icons/blue-dot.png">
+        <input type="radio" name="edit_pattern" value="blue" ><img src ="http://maps.google.com/mapfiles/ms/icons/blue.png">
+        <input type="radio" name="edit_pattern" value="green-dot" ><img src ="http://maps.google.com/mapfiles/ms/icons/green-dot.png">
+        <input type="radio" name="edit_pattern" value="green" ><img src ="http://maps.google.com/mapfiles/ms/icons/green.png"><br>
+        <input type="radio" name="edit_pattern" value="ltblue-dot" ><img src ="http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png">
+        <input type="radio" name="edit_pattern" value="lightblue" ><img src ="http://maps.google.com/mapfiles/ms/icons/lightblue.png">
+        <input type="radio" name="edit_pattern" value="orange-dot" ><img src ="http://maps.google.com/mapfiles/ms/icons/orange-dot.png">
+        <input type="radio" name="edit_pattern" value="orange" ><img src ="http://maps.google.com/mapfiles/ms/icons/orange.png"><br>
+        <input type="radio" name="edit_pattern" value="pink-dot" ><img src ="http://maps.google.com/mapfiles/ms/icons/pink-dot.png">
+        <input type="radio" name="edit_pattern" value="pink" ><img src ="http://maps.google.com/mapfiles/ms/icons/pink.png">
+        <input type="radio" name="edit_pattern" value="purple-dot" ><img src ="http://maps.google.com/mapfiles/ms/icons/purple-dot.png">
+        <input type="radio" name="edit_pattern" value="purple" ><img src ="http://maps.google.com/mapfiles/ms/icons/purple.png">
+      </div>
+      <button type="submit" onclick="send_edit_list_name()")>Submit</button>
+    </div>
+    <!-- 畫面外的介面結束 -->
+
+
+
 
     <div class = "public_map">
 
       <!-- 畫面外的使用者單一清單介面  -->
       <div id ="a_list" class="a_list">
         <div id = "a_list_name" class="a_list_name">
-          <input type="text" spellcheck="false" class="a_list_title" >
-          <button style="font-size:10px;cursor:pointer" onclick="edit_a_list_name()">編輯名稱</button>
-          <button style="font-size:10px;cursor:pointer" onclick="delete_a_list()">刪除清單</button>
+          <img class="user_a_list_icon">
+          <p class="a_list_title" ></p>
+          <button style="font-size:10px;cursor:pointer" onclick="open_list_edit(this)">編輯</button>
+          <button style="font-size:10px;cursor:pointer" onclick="delete_a_list()">刪除</button>
         </div>
         <div class="a_list_content">
   
@@ -1021,61 +1202,10 @@
       }
     });
 
-    let a_list_title = document.getElementsByClassName("a_list_title")[0];
-    function edit_a_list_name(){
-      a_list_title.readOnly = "";
-    }
-    a_list_title.addEventListener("keyup", function(event) {
-      // Number 13 is the "Enter" key on the keyboard
-        if (event.keyCode === 13) {
-          event.preventDefault();
-          a_list_title.readOnly = true;
-
-          let update_list ={
-            list_id : a_list_title.id,
-            list_name : a_list_title.value,
-            access_token : localStorage.getItem("access_token")
-          }
-
-          let xhr = new XMLHttpRequest();
-
-          xhr.open("post", "/api/user/map_list");  
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          
-          let list_data = {
-            type:"update",
-            data:update_list
-          }
-          console.log(list_data)
-          xhr.send(JSON.stringify(list_data));
-
-          xhr.onreadystatechange=function() {
-            if (this.readyState == 4 && this.status == 200) {
-              let user_list_data = JSON.parse(xhr.response);
-              if(user_list_data.error){
-                alert(user_list_data.error);
-              }else{
-                console.log(user_list_data);
-
-                delete_child_element("user_own_list_content");
-
-                render_user_all_lists()
-              }
-                
-            }
-          }
-        }
-      });
-
-    let google_map = document.getElementById("map");
-    google_map.addEventListener("click", function(event) {
-    // Number 13 is the "Enter" key on the keyboard
-    //document.getElementById("a_place").style.width = "0";
 
 
-    });
 
-
+  
 
   
   </script>

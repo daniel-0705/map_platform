@@ -273,7 +273,7 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                             url:data[i].website
                         };
 
-                        map_list.address = full_to_half　(map_list.address);
+                        map_list.address = full_to_half(map_list.address);
                         map_list.address = number_change_words(map_list.address);
                         map_list.address = add_taipet_city(map_list.address);
                         if(!map_list.address.includes("區")){

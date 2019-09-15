@@ -78,9 +78,9 @@ let select_order_by_mysql = function(table_name,column_name,data,column_order){
 
 
 
-let fuzzy_search = function (table_name,column_name,data,column_order){
+let fuzzy_search = function (table_name,column_name,data,column_order,limit_number){
     return new Promise(function(resolve, reject){
-        mysql.con.query(`SELECT * FROM ${table_name} where category ="true" and ${column_name} LIKE "%${data}%" order by ${column_order} desc`,function (err,result) {
+        mysql.con.query(`SELECT * FROM ${table_name} where category ="true" and ${column_name} LIKE "%${data}%" order by ${column_order} desc limit ${limit_number}`,function (err,result) {
             if (err) {
                 console.log(`${data} select ${table_name} table failed`);
                 reject(err);

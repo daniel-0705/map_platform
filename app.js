@@ -308,8 +308,7 @@ app.post("/api/user/map_list",async function(req,res){
 
       let update_user_list = await dao_map.update("user_map_list","list_id",user_list_data.list_id,user_list_data,user_list_data.user_name);
       res.send({success:"update appear OK"});
-    }
-    else{
+    }else{
       let user_list_data = {
         user_name : select_user_result[0].name,
         list_name : list_data.data.list_name
@@ -494,15 +493,51 @@ app.post("/api/user/map_list/search/list",async function(req,res){
       res.send(error);
   }else{
 
+    function removeDuplicates(array, key) {
+      let lookup = {};
+      let result = [];
+      for(let i=0; i<array.length; i++) {
+          if(!lookup[array[i][key]]){
+              lookup[array[i][key]] = true;
+              result.push(array[i]);
+          }
+      }
+      return result;
+    }
+
     //使用者搜尋他人清單，不用登入
 
-    let list_data = req.body;
+    let search_word = req.body.data;
 
-    console.log(list_data);
+    let final_result = [];
 
-    let fuzzy_select_list = await dao_map.fuzzy_select("user_map_list","list_name",list_data.data,"copy_number");
+    let search_list_result = [];
 
-    res.send(fuzzy_select_list);
+    //迴圈尋資料庫
+    for (let i = 0; i<search_word.length; i++){
+      //一開始用搜尋字串下去找
+      let fuzzy_select_list = await dao_map.fuzzy_select("user_map_list","list_name",search_word,"copy_number",10);
+      fuzzy_select_list.map(item =>{search_list_result.push(item)});
+      //從字串中刪除最後一個字開始找
+      let positive_word = search_word.slice(0, -i-1);
+      let positive_fuzzy_select_list = await dao_map.fuzzy_select("user_map_list","list_name",positive_word,"copy_number",10);
+      positive_fuzzy_select_list.map(item =>{search_list_result.push(item)});
+      //從字串中刪除第一個字開始找
+      let negative_word = search_word.substring(i+1);
+      let negative_fuzzy_select_list = await dao_map.fuzzy_select("user_map_list","list_name",negative_word,"copy_number",10);
+      negative_fuzzy_select_list.map(item =>{search_list_result.push(item)});
+      //將重複的結果剃除
+      final_result = removeDuplicates(search_list_result, 'list_id');
+      console.log(i);
+      //當最後結果超過特定數字就停止迴圈
+      if(final_result.length>5){
+        break;
+      }
+    } 
+
+
+
+    res.send(final_result);
   }
 
 });
@@ -520,15 +555,24 @@ app.post("/api/user/map_list/show/list",async function(req,res){
 
     let list_data = req.body;
 
-    //console.log(list_data);
+    console.log(list_data);
 
     let find_list_user = await dao_map.select_2("user_map_list","list_id",list_data.data.list_id,"list_name",list_data.data.list_name)
 
-    //console.log(find_list_user)
+    if(find_list_user.length == 0){
+      var error = {
+        "error": "該清單已被刪除，無法顯示，請再重新搜尋"
+      };
+      res.send(error);
+      return;
+    }
+
+    console.log(find_list_user)
 
     let one_list_result = await dao_map.select_2("user_map_place","user_name",find_list_user[0].user_name,"list_name",list_data.data.list_name)
 
-    res.send(one_list_result);
+    console.log(one_list_result)
+    res.send({user_list:find_list_user,user_list_place:one_list_result});
   }
 
 });
@@ -644,6 +688,13 @@ app.listen(3000, function () {
 })
 
 
+// let a =["博物館","公園","住宿"]
+// let A ='"博物館""公園""住宿"'
 
 
-	
+
+
+// console.log(a)
+// console.log(b)
+// console.log(c)
+// console.log(d)

@@ -161,12 +161,13 @@ let core_geocode_function = async function(map_data,category_data,search){
         }
 }
 
-let puppeteer_for_geocode_function = async function  (category,data,api_information,api_url,search){
+let puppeteer_for_geocode_function = async function  (category,place_icon,data,api_information,api_url,search){
     for (let i = 0; i<data.name.length;i++){
 
         let map_list={
             name:data.name[i],
-            address:data.address[i]
+            address:data.address[i],
+            place_icon:place_icon
         };
 
         map_list.address = full_to_half　(map_list.address);
@@ -196,7 +197,7 @@ let puppeteer_for_geocode_function = async function  (category,data,api_informat
 };
 
 
-let taipei_city_request = async function (url,category,api_name,api_address,api_information,api_url,search){
+let taipei_city_request = async function (url,category,place_icon,api_name,api_address,api_information,api_url,search){
     request({
         url:url,
         method:"GET"
@@ -212,7 +213,8 @@ let taipei_city_request = async function (url,category,api_name,api_address,api_
 
                     let map_list={
                         name:data[i][api_name],
-                        address:data[i][api_address]
+                        address:data[i][api_address],
+                        place_icon:place_icon
                     };
                     
                     map_list.address = full_to_half　(map_list.address);
@@ -266,6 +268,7 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         let map_list={
                             name:data[i].name,
                             address:data[i].cityName.replace(/\s/g, "")+data[i].address, //去掉空格
+                            place_icon:"museum",
                             information:data[i].ticketPrice,
                             url:data[i].website
                         };
@@ -309,7 +312,8 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
     
                     let map_list={
                         name:data[i].venues_name,
-                        address:data[i].address.replace(/\s/g, "").slice(3) //去掉空格
+                        address:data[i].address.replace(/\s/g, "").slice(3), //去掉空格
+                        place_icon:"museum_art",
                     };
     
                     map_list.address = full_to_half　(map_list.address);
@@ -351,6 +355,7 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                     let map_list={
                         name:data[i].case_name,
                         address:data[i].belong_city_name.replace(/\s/g, "")+data[i].belong_address,//去掉空格
+                        place_icon:"ruins",
                         information:data[i].building_brief
                     };
 
@@ -375,31 +380,31 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
     });
 
     //台北市資料大平台 環保旅店
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=adef2044-760f-40bd-8e13-a7fda6d011de","環保旅店","名稱","地址",null,null,"name")
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=adef2044-760f-40bd-8e13-a7fda6d011de","環保旅店","lodging","名稱","地址",null,null,"name");
 
     //台北市資料大平台 臺北市電動機車充電地址及充電格位
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=c2b666e0-f848-4609-90cb-5e416435b93a","臺北市電動機車充電地址","單位","地址",null,null,"name")
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=c2b666e0-f848-4609-90cb-5e416435b93a","臺北市電動機車充電地址","charging","單位","地址",null,null,"name");
 
     //台北市資料大平台 臺北市社區資源回收站資訊
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=0ab06b17-3ac0-4a7b-9e64-66ef69bba697","臺北市社區資源回收站資訊","回收站名稱","地址",null,null,"address")
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=0ab06b17-3ac0-4a7b-9e64-66ef69bba697","臺北市社區資源回收站資訊","recycle","回收站名稱","地址",null,null,"address");
 
     //台北市資料大平台 臺北市環境教育機構
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=9d6b643e-5d71-46e7-8368-eb0aaf907171","臺北市環境教育機構","機構名稱","機構地址",null,"機關網址","name")
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=9d6b643e-5d71-46e7-8368-eb0aaf907171","臺北市環境教育機構","education","機構名稱","機構地址",null,"機關網址","name");
 
     //台北市資料大平台 臺北市廢棄物處理場
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=13ac57a2-f4a1-4e9b-9372-9ce1c7f85df0","臺北市廢棄物處理場","Chinese_name","addr",null,null,"name")
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=13ac57a2-f4a1-4e9b-9372-9ce1c7f85df0","臺北市廢棄物處理場","other","Chinese_name","addr",null,null,"name");
 
     //台北市資料大平台 臺北市拖吊場
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=24045907-b7c3-4351-b0b8-b93a54b55367","臺北市拖吊場","拖吊保管場名稱","地址",null,null,"name")
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=24045907-b7c3-4351-b0b8-b93a54b55367","臺北市拖吊場","other","拖吊保管場名稱","地址",null,null,"name");
 
     //台北市資料大平台 臺北市各區公所聯絡資訊
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=a0484907-e5ce-4d5b-ac4a-42c1e7684326","臺北市各區公所聯絡資訊","name","address",null,null,"name")
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=a0484907-e5ce-4d5b-ac4a-42c1e7684326","臺北市各區公所聯絡資訊","government","name","address",null,null,"name");
 
     //台北市資料大平台 臺北市休閒農場
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=2bbc419c-d774-4bcf-812b-b87b6fd15abb","臺北市休閒農場","農場名稱","地址","農場主要特色簡介",null,"name")
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=2bbc419c-d774-4bcf-812b-b87b6fd15abb","臺北市休閒農場","farm","農場名稱","地址","農場主要特色簡介",null,"name");
 
     //台北市資料大平台 臺北市各區運動中心
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=e7c46724-3517-4ce5-844f-5a4404897b7d","臺北市各區運動中心","name","addr",null,null,"name")
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=e7c46724-3517-4ce5-844f-5a4404897b7d","臺北市各區運動中心","sport","name","addr",null,null,"name");
 
     //台北市資料大平台 臺北市合法電子遊戲場業者清冊
     request({
@@ -418,6 +423,7 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                     let map_list={
                         name:data[i]["公司/商業名稱"],
                         address:"臺北市"+data[i]["行政區"]+data[i]["營業場所地址"],
+                        place_icon:"game",
                         information:data[i]["備註"]
                     };
                     map_list.address = full_to_half　(map_list.address);
@@ -473,7 +479,7 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
             }
        })
     
-       await puppeteer_for_geocode_function ("臺北市郵局",result,null,null,"name");
+       await puppeteer_for_geocode_function ("臺北市郵局","postal",result,null,null,"name");
        
        await browser.close();
     })();
@@ -510,15 +516,12 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
             }
         })
 
-        await puppeteer_for_geocode_function ("十二區健康服務中心",result,null,null,"name");
+        await puppeteer_for_geocode_function ("十二區健康服務中心","therapy",result,null,null,"name");
         
         await browser.close();
     })();
 
 
-
-
 });
-
 
 

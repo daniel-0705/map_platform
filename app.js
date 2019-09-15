@@ -309,9 +309,22 @@ app.post("/api/user/map_list",async function(req,res){
       }
       console.log(user_list_data);
 
+      //更新清單的顯示資料
       let update_user_list = await dao_map.update("user_map_list","list_id",user_list_data.list_id,user_list_data,user_list_data.user_name);
-
+      //將該清單的地點全部抓出來
       let select_user_update_place = await dao_map.select_2("user_map_place","list_name",user_list_data.list_name,"user_name",user_list_data.user_name);
+
+      //尋找該清單的地點是否存在在其他清單中，並且要是 true 的狀態
+      for(let i = 0 ; i< select_user_update_place.length ; i++){
+
+        let select_place_is_exist_other_list = await dao_map.select_3("user_map_place","place_name",select_user_update_place[i].place_name,"user_name",user_list_data.user_name,"appear_list","true");
+
+        select_user_update_place[i].place_is_exist = select_place_is_exist_other_list.length;
+
+      }
+
+      console.log(select_user_update_place);
+
 
       res.send({success:`update ${select_user_update_place[0].appear_list}`,data:select_user_update_place});
     }else{
@@ -320,6 +333,7 @@ app.post("/api/user/map_list",async function(req,res){
         list_name : list_data.data.list_name
       }
 
+      //先找出清單是否真的存在
       let select_user_delete_list = await dao_map.select("user_map_list","list_name",user_list_data.list_name);
 
       if(select_user_delete_list.length == 0){
@@ -329,9 +343,24 @@ app.post("/api/user/map_list",async function(req,res){
         res.send(error);
         return;
       }
+
+      //先將要刪除的清單所收藏的地點先找出來
       let select_user_delete_place = await dao_map.select_2("user_map_place","list_name",user_list_data.list_name,"user_name",user_list_data.user_name);
 
-      
+      //尋找該清單的地點是否存在在其他清單中，並且要是 true 的狀態
+      for(let i = 0 ; i< select_user_delete_place.length ; i++){
+
+        let select_place_is_exist_other_list = await dao_map.select_3("user_map_place","place_name",select_user_delete_place[i].place_name,"user_name",user_list_data.user_name,"appear_list","true");
+
+        //排除自己
+        if(select_user_delete_place[i].appear_list == "true"){
+          select_user_delete_place[i].place_is_exist = select_place_is_exist_other_list.length-1;
+        }
+        
+
+      }
+
+
 
       let delete_user_list_name = await dao_map.delete("user_map_list","list_id",list_data.data.list_id,user_list_data.user_name)
 

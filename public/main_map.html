@@ -469,11 +469,12 @@
                 markers[all_markers.user_places[i].place_order].setMap(null); //將相對應的公用地點 隱藏
                 user_markers.push(marker);
 
-
+                //如果是隱藏的清單要隱藏，並讓公用地點回復原狀
                 if(all_markers.user_places[i].appear_list == "false"){
                   user_markers.map(item=>{
                     if(item.list == all_markers.user_places[i].list_name){
                       item.setMap(null);
+                      markers[all_markers.user_places[i].place_order].setMap(map);
                     }
                   });
                 }
@@ -790,7 +791,11 @@
                 }
               });
               for(let i = 0 ; i< user_list_data.data.length ; i++){
-                markers[user_list_data.data[i].place_order].setMap(map);
+                // ==0 代表沒有其他點了，所以可以顯示
+                if(user_list_data.data[i].place_is_exist == 0){
+                  markers[user_list_data.data[i].place_order].setMap(map);
+                }
+               
               }
 
 
@@ -849,7 +854,11 @@
                   }
                 });
                 for(let i = 0 ; i< user_list_data.data.length ; i++){
-                  markers[user_list_data.data[i].place_order].setMap(map);
+                  // ==0 代表沒有其他點了，所以可以顯示
+                  if(user_list_data.data[i].place_is_exist == 0){
+                    markers[user_list_data.data[i].place_order].setMap(map);
+                  }
+                  
                 }
               }else{
                 user_markers.map(item=>{

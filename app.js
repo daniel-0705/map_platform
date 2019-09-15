@@ -292,41 +292,50 @@ app.post("/api/user/map_list",async function(req,res){
         }
       }
       
-      console.log(user_list_data)
-      let update_user_list_name = await dao_map.update("user_map_list","list_id",user_list_data.list_id,user_list_data,user_list_data.user_name)
+      console.log(user_list_data);
+      let update_user_list_name = await dao_map.update("user_map_list","list_id",user_list_data.list_id,user_list_data,user_list_data.user_name);
 
-      res.send({success:"update OK"});
+      let select_update_list = await dao_map.select_2("user_map_list","list_id",user_list_data.list_id,"user_name",user_list_data.user_name);
+      console.log(select_update_list);
+      res.send({success:"update OK",data:select_update_list});
       
     }else if(list_data.type == "update_appear"){
 
       let user_list_data = {
         list_id : list_data.data.list_id,
+        list_name : list_data.data.list_name,
         user_name : select_user_result[0].name,
         appear_list :`${list_data.data.appear_list}`
       }
       console.log(user_list_data);
 
       let update_user_list = await dao_map.update("user_map_list","list_id",user_list_data.list_id,user_list_data,user_list_data.user_name);
-      res.send({success:"update appear OK"});
+
+      let select_user_update_place = await dao_map.select_2("user_map_place","list_name",user_list_data.list_name,"user_name",user_list_data.user_name);
+
+      res.send({success:`update ${select_user_update_place[0].appear_list}`,data:select_user_update_place});
     }else{
       let user_list_data = {
         user_name : select_user_result[0].name,
         list_name : list_data.data.list_name
       }
 
-      let select_user_insert_list = await dao_map.select("user_map_list","list_name",user_list_data.list_name);
+      let select_user_delete_list = await dao_map.select("user_map_list","list_name",user_list_data.list_name);
 
-      if(select_user_insert_list.length == 0){
+      if(select_user_delete_list.length == 0){
         var error = {
           "error": "List is not existing."
         };
         res.send(error);
         return;
       }
+      let select_user_delete_place = await dao_map.select_2("user_map_place","list_name",user_list_data.list_name,"user_name",user_list_data.user_name);
+
+      
 
       let delete_user_list_name = await dao_map.delete("user_map_list","list_id",list_data.data.list_id,user_list_data.user_name)
 
-      res.send({success:"delete OK"});
+      res.send({success:"delete OK",data:select_user_delete_place});
     }
 
   }
@@ -688,13 +697,3 @@ app.listen(3000, function () {
 })
 
 
-// let a =["博物館","公園","住宿"]
-// let A ='"博物館""公園""住宿"'
-
-
-
-
-// console.log(a)
-// console.log(b)
-// console.log(c)
-// console.log(d)

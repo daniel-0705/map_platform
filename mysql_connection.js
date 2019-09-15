@@ -5,7 +5,7 @@ var connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "94720705",
-    database: "my_map",
+    database: "mapbook",
     multipleStatements: true
 });
 

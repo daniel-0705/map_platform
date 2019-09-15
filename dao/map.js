@@ -119,6 +119,8 @@ let update_mysql = function(table_name,column_name,data_detail,data,data_name){
     })
 };
 
+
+
 let delete_mysql = function(table_name,column_name,data_detail,data_name){ 
     return new Promise(function(resolve, reject){
         mysql.con.query(`DELETE FROM ${table_name} where ${column_name} = "${data_detail}"`,function (err,result) {

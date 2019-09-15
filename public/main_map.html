@@ -62,24 +62,30 @@
 
       //選擇收藏後會出現清單選項
       function select_list(e){
+
+        if(localStorage.getItem("access_token")== undefined){
+          alert("! 欲使用此功能，請先登入");
+        }else{
+          e.removeAttribute("onclick");
+          // close_slidebar();
+
+          document.getElementById("a_place").style.width = "300px";
+          document.getElementById("map").style.marginLeft = "300px";
+
+          delete_child_element("a_place_content");
+
+          let list_data ={
+            type :"select",
+            data : {
+              access_token:localStorage.getItem("access_token"),
+              place_name : marker_content.name
+            }
+          };
+
+          render_collection_list_or_not(list_data);
+        }
         
-        e.removeAttribute("onclick");
-        // close_slidebar();
-
-        document.getElementById("a_place").style.width = "300px";
-        document.getElementById("map").style.marginLeft = "300px";
-
-        delete_child_element("a_place_content");
-
-        let list_data ={
-          type :"select",
-          data : {
-            access_token:localStorage.getItem("access_token"),
-            place_name : marker_content.name
-          }
-        };
-
-        render_collection_list_or_not(list_data)
+        
       }
 
       function store_place_in_list(e){

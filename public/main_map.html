@@ -49,7 +49,7 @@
         google.maps.event.addListener(map, 'zoom_changed', function() {
           zoom = map.getZoom();
           console.log(zoom);
-
+//這邊要要include才對= =
           for (let i = 0; i<markers.length; i++){
             markers[i].setVisible(false);
             if (zoom > 12) {
@@ -78,20 +78,9 @@
                 markers[i].setVisible(true);
               }
             }
-
-
           }
-          // Update May 2017
-          //   You can now use setVisible() on a marker instead of
-          //   setting the map to a null value.
-          // if (zoom <= 3) {
-          //     marker.setMap(null);
-          // } else {
-          //     marker.setMap(map);
-          // }
         });
       }
-      
       
 
       //選擇收藏後會出現清單選項
@@ -465,73 +454,7 @@
               }
 
               render_user_all_place (all_markers.user_places);
-              // for (let i = 0 ; i<all_markers.user_places.length ;i++){
-                
-              //   let marker = new google.maps.Marker({
-              //     position:{lat: Number(all_markers.user_places[i].latitude), lng: Number(all_markers.user_places[i].longitude)},
-              //     icon: {
-              //       url: `/img/${all_markers.user_places[i].list_icon}.png`
-              //       //scaledSize: new google.maps.Size(50, 50)  //調整大小
-              //     },
-              //     map:map
-              //   });
-              //   marker.content = `
-              //     <h1 id =${all_markers.user_places[i].place_order}>${all_markers.user_places[i].place_name}</h1>
-              //     <p id = ${i}>${all_markers.user_places[i].information}</p>
-              //     <buttom class = "choice_list" id =${all_markers.user_places[i].latitude}_${all_markers.user_places[i].longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
-              //   `;
-                
-              //   //定義每個地標屬於的清單
-              //   marker.list = all_markers.user_places[i].list_name
-
-              //   oms.addMarker(marker);
-              //   google.maps.event.addListener(marker, 'spider_click', function () {                   
-              //     //收藏地點的 slidebar 即時顯示 點擊地標上的地名
-              //     let a_place_title = document.getElementsByClassName("a_place_title")[0];
-              //     a_place_title.innerHTML = all_markers.user_places[i].place_name;
-
-                  
-              //     //將點擊的地標資訊傳到外面的參數中
-              //     marker_content.name = all_markers.user_places[i].place_name;
-              //     marker_content.place_order = all_markers.user_places[i].place_order;
-              //     marker_content.user_place_order = i,
-              //     marker_content.latitude = all_markers.user_places[i].latitude;
-              //     marker_content.longitude = all_markers.user_places[i].longitude;
-              //     marker_content.information = all_markers.user_places[i].information;
-
-              //     console.log(marker_content);
-              //     console.log(marker);
-              //     console.log(marker.icon);
-              //     console.log(marker.icon.url);
-              //     console.log(marker.list);
-
-
-              //     infoWindow.setContent(this.content);
-              //     infoWindow.open(this.getMap(), this);
-
-              //     close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
-              //   });
-              //   markers[all_markers.user_places[i].place_order].setMap(null); //將相對應的公用地點 隱藏
-              //   user_markers.push(marker);
-
-              //   //如果是隱藏的清單要隱藏，並讓公用地點回復原狀
-              //   if(all_markers.user_places[i].appear_list == "false"){
-              //     user_markers.map(item=>{
-              //       if(item.list == all_markers.user_places[i].list_name){
-              //         item.setMap(null);
-              //         markers[all_markers.user_places[i].place_order].setMap(map);
-              //       }
-              //     });
-              //   }
-                
-              // }
-
-
-              // google.maps.event.addListener(map, 'click', function () { 
-              //   infoWindow.close();
-
-              //   close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
-              // });
+              
             }
           }
       }
@@ -625,7 +548,6 @@
             console.log(marker.icon.url);
             console.log(marker.list);
 
-
             infoWindow.setContent(this.content);
             infoWindow.open(this.getMap(), this);
 
@@ -646,7 +568,6 @@
           
         }
 
-
         google.maps.event.addListener(map, 'click', function () { 
           infoWindow.close();
 
@@ -656,7 +577,6 @@
 
         
       }
-
 
       function open_slidebar() {
 
@@ -1179,21 +1099,7 @@
               alert("複製成功");
               delete_child_element("user_own_list_content");
               render_user_all_lists_name();
-
-              // markers.map(item=>{item.setMap(null)})//同下下
-              // markers=[]; //因為下一步要重新顯示 ，所以 markers 要先清空，才不會重複算
-              // user_markers.map(item=>{item.setMap(null)}); //不先 null 掉的話，顯示時會被刪除的點依舊存在
-              // user_markers = []; //同上上
-              //render_map_and_user_all_place();
-
-
               render_user_all_place (user_place_data.data);
-
-              // // let mapObject = new google.maps.Map(document.getElementById("map"), _mapOptions);
-              // //console.log(mapObject.getZoom())
-              // zoom = map.getZoom()
-              // console.log(map.getZoom())
-              // //map.getZoom() = mapObject.getZoom();
 
             }
               
@@ -1204,10 +1110,10 @@
 
       function change_center_to_place(e){
         console.log(e)
+        map.setZoom(17)
         map.panTo({lat: Number(e.id.split("_")[1]), lng: Number(e.id.split("_")[0])});
       }
  
-
       render_user_all_lists_name();
 
     </script>
@@ -1220,6 +1126,44 @@
           <p id="logo" class="Logo">mapBook</p>
         </a>
       </div>
+      <div class = "search_container">
+        <div class = "search_place_input">
+          <input id = "search_place" type="text" placeholder="搜尋">
+          <select>
+            <option>地名</option>
+            <option>地址</option>
+          </select>
+          <select>
+            <option>行政區</option>
+            <option>北投區</option>
+            <option>士林區</option>
+            <option>松山區</option>
+            <option>中山區</option>
+            <option>內湖區</option>
+            <option>大同區</option>
+            <option>萬華區</option>
+            <option>信義區</option>
+            <option>中正區</option>
+            <option>南港區</option>
+            <option>大安區</option>
+            <option>文山區</option>
+          </select>
+          <select>
+            <option>分類</option>
+            <option>博物館</option>
+            <option>藝文館所</option>
+            <option>郵局</option>
+            <option>文化資產</option>
+            <option>環保旅店</option>
+          </select>
+          <button>搜尋</button>
+          <div class = "search_place_result" id = "search_place_result">
+      
+          </div>
+        </div>
+        
+      </div>
+
       <div>
         <ul>
             <li class="nav_item"><a href="/">About</a></li>
@@ -1338,8 +1282,6 @@
         </div>
       </div>
       <!-- 畫面外的介面結束 -->
-
-
 
 
       <div class= "search_and_list" id="search_and_list">
@@ -1462,79 +1404,94 @@
         }
       }
     });
-    //即時顯示搜尋結果
-    // search_public_list_name.addEventListener("input", function(event) {
-    // // Number 13 is the "Enter" key on the keyboard
-    //   console.log(search_public_list_name)
-      
-    //   event.preventDefault();
-      
-    //   delete_child_element("search_list_result");
-    //   let grandpa_list_result = document.getElementsByClassName("search_list_result")[0];
-
-    //   let xhr = new XMLHttpRequest();
-
-    //   xhr.open("post", "/api/user/map_list/search/list");  
-    //   xhr.setRequestHeader('Content-Type', 'application/json');
-      
-    //   let list_data = {
-    //     type:"search",
-    //     data:search_public_list_name.value
-    //   }
-    //   console.log(list_data)
-    //   xhr.send(JSON.stringify(list_data));
-
-    //   xhr.onreadystatechange=function() {
-    //     if (this.readyState == 4 && this.status == 200) {
-    //       if(xhr.response == "There is no user data."){
-    //         alert("! 查無此使用者，請註冊");
-    //       }else{
-    //         let user_list_data = JSON.parse(xhr.response);
-    //         console.log(user_list_data);
-
-    //         if(user_list_data.length == 0){
-    //           let parent_list = document.createElement("p");
-    //           parent_list.className = "no_public_list";
-    //           parent_list.innerHTML = "查無清單，請換關鍵字搜尋"
-    //           grandpa_list_result.appendChild(parent_list);
-
-    //         }
-
-    //         for (let i = 0 ;i<user_list_data.length;i++){
-    //           //製作每一個 list 的內容 
-    //           let parent_list = document.createElement("div");
-    //           parent_list.className = "public_list_container";
-    //           grandpa_list_result.appendChild(parent_list);
-
-    //           let list_name = document.createElement("p");
-    //           list_name.innerHTML = user_list_data[i].list_name;
-    //           list_name.id =user_list_data[i].list_id;
-    //           list_name.className = "public_list"
-    //           list_name.setAttribute("onclick","show_and_open_public_list(this)")
-    //           parent_list.appendChild(list_name);
-
-    //           let list_owner = document.createElement("p");
-    //           list_owner.innerHTML = user_list_data[i].user_name;
-    //           parent_list.appendChild(list_owner);
-
-    //           let list_copy_img = document.createElement("img");
-    //           list_copy_img.className = "list_copy_img";
-    //           list_copy_img.src = "/img/multiple-users-silhouette.png"
-    //           parent_list.appendChild(list_copy_img);
-
-    //           let list_copy_number = document.createElement("p");
-    //           list_copy_number.innerHTML = user_list_data[i].copy_number;
-    //           parent_list.appendChild(list_copy_number);
     
-    //         }
-    //       }             
-    //     }
-    //   }
+    let search_place = document.getElementById("search_place");
+    search_place.addEventListener("keyup", function(event) {
+    // Number 13 is the "Enter" key on the keyboard
+      //console.log(search_place)
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        
+        delete_child_element("search_place_result");
+        let grandpa_place_result = document.getElementsByClassName("search_place_result")[0];
+
+        let xhr = new XMLHttpRequest();
+
+        xhr.open("post", "/api/user/map_list/search/place");  
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        let place_data = {
+          type:"search",
+          data:search_place.value
+        }
+        console.log(place_data)
+        xhr.send(JSON.stringify(place_data));
+
+        xhr.onreadystatechange=function() {
+          if (this.readyState == 4 && this.status == 200) {
+            if(xhr.response == "There is no user data."){
+              alert("! 查無此使用者，請註冊");
+            }else{
+              let place_data = JSON.parse(xhr.response);
+              console.log(place_data);
+              console.log(grandpa_place_result);
+              grandpa_place_result.removeAttribute("style");
+
+              if(place_data.length == 0){
+                let parent_place = document.createElement("p");
+                parent_place.className = "no_place_list";
+                parent_place.innerHTML = "查無清單，請換關鍵字搜尋"
+                grandpa_place_result.appendChild(parent_place);
+              }
+
+              for (let i = 0 ;i<place_data.length;i++){
+                //製作每一個 place 的內容 
+                let parent_place = document.createElement("div");
+                parent_place.className = "place_container";
+                parent_place.setAttribute("onclick","change_center_to_place(this.children[1])")
+                grandpa_place_result.appendChild(parent_place);
+
+                let place_img = document.createElement("img");
+                place_img.className = "place_img";
+                place_img.src = "/img/place_search.png"
+                parent_place.appendChild(place_img);
+
+                let place_name = document.createElement("p");
+                place_name.innerHTML = place_data[i].name;
+                place_name.id =place_data[i].longitude + "_" + place_data[i].latitude;
+                place_name.className = "public_place";
+                //place_name.setAttribute("onclick","change_center_to_place(this)");
+                parent_place.appendChild(place_name);
+
+                let place_address = document.createElement("p");
+                place_address.innerHTML = place_data[i].address;
+                parent_place.appendChild(place_address);
+
+                // let list_copy_number = document.createElement("p");
+                // list_copy_number.innerHTML = place_data[i].copy_number;
+                // parent_place.appendChild(list_copy_number);
       
-    // });
-
-
-
+              }
+            }             
+          }
+        }
+      }
+    });
+    // let search_place_result = document.getElementsByClassName("search_place_result")[0];
+    // document.addEventListener("click",function(event){
+    //   console.log("uhedo")
+    //   console.log(search_place_result)
+    //   //let search_place_result = document.getElementsByClassName("search_place_result")[0];
+    //   //search_place_result.style.display = "none";
+    //   //search_place_result.setAttribute("display","none")
+    // })
+    var search_place_result = document.getElementById('search_place_result');
+    document.onclick = function(e){
+        if(e.target.id !== 'search_place_result'){
+        search_place_result.style.display = 'none';
+        //search_place_result.setAttribute("display","none") ;
+        }
+    };
   
 
   

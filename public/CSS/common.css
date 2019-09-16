@@ -50,9 +50,9 @@ nav{
 
 .Logo{
   display: flex;  
-  width: 258px;
+  width: 200px;
   height: 48px;
-  margin: auto 48px auto 60px;
+  margin: auto 48px auto 48px;
   font-size: 50px;
 }
 

@@ -248,7 +248,7 @@ body{
 }
 
 .public_list{
-    cursor:pointer
+    cursor:pointer;
 }
 
 
@@ -290,4 +290,26 @@ body{
 .list_cotainer{
     display: flex;
     justify-content: space-around;
+}
+
+
+
+/* search place */
+
+.search_place_input{
+    display: flex;
+    position: relative;
+}
+
+.search_place_result{
+    background-color: white;
+    z-index: 10;
+    position: absolute;
+    top:23px;
+    /* display: none; */
+}
+
+.place_container{
+    display: flex;
+    cursor:pointer;
 }

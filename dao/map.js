@@ -77,7 +77,6 @@ let select_order_by_mysql = function(table_name,column_name,data,column_order){
 };
 
 
-
 let fuzzy_search = function (table_name,column_name,data,column_order,limit_number){
     return new Promise(function(resolve, reject){
         mysql.con.query(`SELECT * FROM ${table_name} where category ="true" and ${column_name} LIKE "%${data}%" order by ${column_order} desc limit ${limit_number}`,function (err,result) {
@@ -90,6 +89,22 @@ let fuzzy_search = function (table_name,column_name,data,column_order,limit_numb
         })
     })
 }
+
+let fuzzy_search_place = function (table_name,column_name,data,limit_number){
+    return new Promise(function(resolve, reject){
+        mysql.con.query(`SELECT * FROM ${table_name} where ${column_name} LIKE "%${data}%" limit ${limit_number}`,function (err,result) {
+            if (err) {
+                console.log(`${data} select ${table_name} table failed`);
+                reject(err);
+            }else{
+                resolve(result);
+            }
+        })
+    })
+}
+
+
+
 
 let insert_mysql = function(table_name,data,data_name){ 
     return new Promise(function(resolve, reject){
@@ -174,6 +189,7 @@ module.exports={
     select_last_insert_id:select_last_insert_id_mysql,
     select_order_by:select_order_by_mysql,
     fuzzy_select:fuzzy_search,
+    fuzzy_search_place:fuzzy_search_place,
     insert:insert_mysql,
     update:update_mysql,
     update_3:update_3_conditions_mysql,

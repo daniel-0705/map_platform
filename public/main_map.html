@@ -22,40 +22,74 @@
       var markers = [];           //map 上所有公開的地點
       var marker_content = {};    //將點擊到的地標資訊存在這裡
       var user_markers = [];      //使用者自己所有的地點
+      var zoom;                   //設定 zoom 的全域變數
+      var infoWindow;             //設定 infoWindow 的全域變數
 
       function initMap() {
         //new map
         map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: 25.033499866, lng: 121.558997764},
-            zoom:15,
-            options: {
-              clickableIcons: true,
-              mapTypeControl: false
-            },
-            styles: [
-              {"elementType":"labels","stylers":[{"visibility":"off"}]},  //到時候要把這調成 off
-              {"featureType": "road","elementType": "labels","stylers":[{"visibility":"on"}]},
-              {"featureType": "transit.station","elementType": "labels","stylers":[{"visibility":"on"}]},
-              {"featureType": "transit.station.bus","elementType": "labels","stylers":[{"visibility":"on"}]},
-              {"featureType": "water","elementType": "labels","stylers":[{"visibility":"on"}]}
-            ]
+          center: {lat: 25.033499866, lng: 121.558997764},
+          zoom:12,
+          options: {
+            clickableIcons: true,
+            mapTypeControl: false
+          },
+          styles: [
+            {"elementType":"labels","stylers":[{"visibility":"off"}]},  //到時候要把這調成 off
+            {"featureType": "road","elementType": "labels","stylers":[{"visibility":"on"}]},
+            {"featureType": "transit.station","elementType": "labels","stylers":[{"visibility":"on"}]},
+            {"featureType": "transit.station.bus","elementType": "labels","stylers":[{"visibility":"on"}]},
+            {"featureType": "water","elementType": "labels","stylers":[{"visibility":"on"}]}
+          ]
             
         });
         render_map_and_user_all_place();
 
         //依據 zoom 的大小 決定地圖顯示多少地標
         google.maps.event.addListener(map, 'zoom_changed', function() {
-                var zoom = map.getZoom();
-                console.log(zoom);
-                // Update May 2017
-                //   You can now use setVisible() on a marker instead of
-                //   setting the map to a null value.
-                // if (zoom <= 3) {
-                //     marker.setMap(null);
-                // } else {
-                //     marker.setMap(map);
-                // }
-              });
+          zoom = map.getZoom();
+          console.log(zoom);
+
+          for (let i = 0; i<markers.length; i++){
+            markers[i].setVisible(false);
+            if (zoom > 12) {
+              if(markers[i].category == "藝文館所" ||markers[i].category == "環境教育機構"||markers[i].category == "廢棄物處理場"){
+                markers[i].setVisible(true);
+              }
+            }
+            if (zoom > 13) {
+              if(markers[i].category == "區公所"){
+                markers[i].setVisible(true);
+              }
+            }
+            if (zoom > 14) {
+              if(markers[i].category == "博物館"||markers[i].category == "運動中心"||markers[i].category == "郵局"||markers[i].category == "健康服務中心"){
+                markers[i].setVisible(true);
+              }
+            }
+            if (zoom > 15) {
+              if(markers[i].category == "環保旅店"||markers[i].category == "文化資產"||markers[i].category == "拖吊場"||markers[i].category == "休閒農場"||markers[i].category == "電子遊戲場"||markers[i].category == "健康服務中心"){
+                markers[i].setVisible(true);
+              }
+            }
+
+            if (zoom > 17) {
+              if(markers[i].category == "社區資源回收站"||markers[i].category == "電動機車充電"){
+                markers[i].setVisible(true);
+              }
+            }
+
+
+          }
+          // Update May 2017
+          //   You can now use setVisible() on a marker instead of
+          //   setting the map to a null value.
+          // if (zoom <= 3) {
+          //     marker.setMap(null);
+          // } else {
+          //     marker.setMap(map);
+          // }
+        });
       }
       
       
@@ -143,7 +177,7 @@
                   <p id = ${user_place_index}>${place_data.information}</p>
                   <buttom class = "choice_list" id =${place_data.latitude}_${place_data.longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
                   `;
-                let infoWindow = new google.maps.InfoWindow();
+                infoWindow = new google.maps.InfoWindow();
 
                 let a_place_title = document.getElementsByClassName("a_place_title")[0];
                 e.id = user_place_index;
@@ -377,7 +411,7 @@
               let all_markers = JSON.parse(xhr.responseText);
               console.log(all_markers);
 
-              let infoWindow = new google.maps.InfoWindow();
+              infoWindow = new google.maps.InfoWindow();
               oms = new OverlappingMarkerSpiderfier(map, {
                 markersWontMove: true,
                 markersWontHide: true,
@@ -404,6 +438,9 @@
                   <buttom class = "choice_list" id =${all_markers.places[i].latitude}_${all_markers.places[i].longitude} style="cursor:pointer" onclick="select_list(this)">收藏</buttom>
                 `;                
 
+                //定義每個地標屬於的分類
+                marker.category = all_markers.places[i].category;
+
                 oms.addMarker(marker);
                 google.maps.event.addListener(marker, 'spider_click', function () {
                   //收藏地點的 slidebar 即時顯示 點擊地標上的地名
@@ -424,75 +461,77 @@
                 });
                 
                 markers.push(marker);
-
+                marker.setVisible(false);  //先隱藏 看不到地標
               }
-              for (let i = 0 ; i<all_markers.user_places.length ;i++){
-                
-                let marker = new google.maps.Marker({
-                  position:{lat: Number(all_markers.user_places[i].latitude), lng: Number(all_markers.user_places[i].longitude)},
-                  icon: {
-                    url: `/img/${all_markers.user_places[i].list_icon}.png`
-                    //scaledSize: new google.maps.Size(50, 50)  //調整大小
-                  },
-                  map:map
-                });
-                marker.content = `
-                  <h1 id =${all_markers.user_places[i].place_order}>${all_markers.user_places[i].place_name}</h1>
-                  <p id = ${i}>${all_markers.user_places[i].information}</p>
-                  <buttom class = "choice_list" id =${all_markers.user_places[i].latitude}_${all_markers.user_places[i].longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
-                `;
-                
-                //定義每個地標屬於的清單
-                marker.list = all_markers.user_places[i].list_name
 
-                oms.addMarker(marker);
-                google.maps.event.addListener(marker, 'spider_click', function () {                   
-                  //收藏地點的 slidebar 即時顯示 點擊地標上的地名
-                  let a_place_title = document.getElementsByClassName("a_place_title")[0];
-                  a_place_title.innerHTML = all_markers.user_places[i].place_name;
+              render_user_all_place (all_markers.user_places);
+              // for (let i = 0 ; i<all_markers.user_places.length ;i++){
+                
+              //   let marker = new google.maps.Marker({
+              //     position:{lat: Number(all_markers.user_places[i].latitude), lng: Number(all_markers.user_places[i].longitude)},
+              //     icon: {
+              //       url: `/img/${all_markers.user_places[i].list_icon}.png`
+              //       //scaledSize: new google.maps.Size(50, 50)  //調整大小
+              //     },
+              //     map:map
+              //   });
+              //   marker.content = `
+              //     <h1 id =${all_markers.user_places[i].place_order}>${all_markers.user_places[i].place_name}</h1>
+              //     <p id = ${i}>${all_markers.user_places[i].information}</p>
+              //     <buttom class = "choice_list" id =${all_markers.user_places[i].latitude}_${all_markers.user_places[i].longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
+              //   `;
+                
+              //   //定義每個地標屬於的清單
+              //   marker.list = all_markers.user_places[i].list_name
+
+              //   oms.addMarker(marker);
+              //   google.maps.event.addListener(marker, 'spider_click', function () {                   
+              //     //收藏地點的 slidebar 即時顯示 點擊地標上的地名
+              //     let a_place_title = document.getElementsByClassName("a_place_title")[0];
+              //     a_place_title.innerHTML = all_markers.user_places[i].place_name;
 
                   
-                  //將點擊的地標資訊傳到外面的參數中
-                  marker_content.name = all_markers.user_places[i].place_name;
-                  marker_content.place_order = all_markers.user_places[i].place_order;
-                  marker_content.user_place_order = i,
-                  marker_content.latitude = all_markers.user_places[i].latitude;
-                  marker_content.longitude = all_markers.user_places[i].longitude;
-                  marker_content.information = all_markers.user_places[i].information;
+              //     //將點擊的地標資訊傳到外面的參數中
+              //     marker_content.name = all_markers.user_places[i].place_name;
+              //     marker_content.place_order = all_markers.user_places[i].place_order;
+              //     marker_content.user_place_order = i,
+              //     marker_content.latitude = all_markers.user_places[i].latitude;
+              //     marker_content.longitude = all_markers.user_places[i].longitude;
+              //     marker_content.information = all_markers.user_places[i].information;
 
-                  console.log(marker_content);
-                  console.log(marker);
-                  console.log(marker.icon);
-                  console.log(marker.icon.url);
-                  console.log(marker.list);
+              //     console.log(marker_content);
+              //     console.log(marker);
+              //     console.log(marker.icon);
+              //     console.log(marker.icon.url);
+              //     console.log(marker.list);
 
 
-                  infoWindow.setContent(this.content);
-                  infoWindow.open(this.getMap(), this);
+              //     infoWindow.setContent(this.content);
+              //     infoWindow.open(this.getMap(), this);
 
-                  close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
-                });
-                markers[all_markers.user_places[i].place_order].setMap(null); //將相對應的公用地點 隱藏
-                user_markers.push(marker);
+              //     close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
+              //   });
+              //   markers[all_markers.user_places[i].place_order].setMap(null); //將相對應的公用地點 隱藏
+              //   user_markers.push(marker);
 
-                //如果是隱藏的清單要隱藏，並讓公用地點回復原狀
-                if(all_markers.user_places[i].appear_list == "false"){
-                  user_markers.map(item=>{
-                    if(item.list == all_markers.user_places[i].list_name){
-                      item.setMap(null);
-                      markers[all_markers.user_places[i].place_order].setMap(map);
-                    }
-                  });
-                }
+              //   //如果是隱藏的清單要隱藏，並讓公用地點回復原狀
+              //   if(all_markers.user_places[i].appear_list == "false"){
+              //     user_markers.map(item=>{
+              //       if(item.list == all_markers.user_places[i].list_name){
+              //         item.setMap(null);
+              //         markers[all_markers.user_places[i].place_order].setMap(map);
+              //       }
+              //     });
+              //   }
                 
-              }
+              // }
 
 
-              google.maps.event.addListener(map, 'click', function () { 
-                infoWindow.close();
+              // google.maps.event.addListener(map, 'click', function () { 
+              //   infoWindow.close();
 
-                close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
-              });
+              //   close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
+              // });
             }
           }
       }
@@ -543,6 +582,81 @@
           }
         }
       }
+
+      function render_user_all_place (user_all_place){
+
+        for (let i = 0 ; i<user_all_place.length ;i++){
+                
+          let marker = new google.maps.Marker({
+            position:{lat: Number(user_all_place[i].latitude), lng: Number(user_all_place[i].longitude)},
+            icon: {
+              url: `/img/${user_all_place[i].list_icon}.png`
+              //scaledSize: new google.maps.Size(50, 50)  //調整大小
+            },
+            map:map
+          });
+          marker.content = `
+            <h1 id =${user_all_place[i].place_order}>${user_all_place[i].place_name}</h1>
+            <p id = ${i}>${user_all_place[i].information}</p>
+            <buttom class = "choice_list" id =${user_all_place[i].latitude}_${user_all_place[i].longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
+          `;
+          
+          //定義每個地標屬於的清單
+          marker.list = user_all_place[i].list_name
+
+          oms.addMarker(marker);
+          google.maps.event.addListener(marker, 'spider_click', function () {                   
+            //收藏地點的 slidebar 即時顯示 點擊地標上的地名
+            let a_place_title = document.getElementsByClassName("a_place_title")[0];
+            a_place_title.innerHTML = user_all_place[i].place_name;
+
+            
+            //將點擊的地標資訊傳到外面的參數中
+            marker_content.name = user_all_place[i].place_name;
+            marker_content.place_order = user_all_place[i].place_order;
+            marker_content.user_place_order = i,
+            marker_content.latitude = user_all_place[i].latitude;
+            marker_content.longitude = user_all_place[i].longitude;
+            marker_content.information = user_all_place[i].information;
+
+            console.log(marker_content);
+            console.log(marker);
+            console.log(marker.icon);
+            console.log(marker.icon.url);
+            console.log(marker.list);
+
+
+            infoWindow.setContent(this.content);
+            infoWindow.open(this.getMap(), this);
+
+            close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
+          });
+          markers[user_all_place[i].place_order].setMap(null); //將相對應的公用地點 隱藏
+          user_markers.push(marker);
+
+          //如果是隱藏的清單要隱藏，並讓公用地點回復原狀
+          if(user_all_place[i].appear_list == "false"){
+            user_markers.map(item=>{
+              if(item.list == user_all_place[i].list_name){
+                item.setMap(null);
+                markers[user_all_place[i].place_order].setMap(map);
+              }
+            });
+          }
+          
+        }
+
+
+        google.maps.event.addListener(map, 'click', function () { 
+          infoWindow.close();
+
+          close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
+        });
+
+
+        
+      }
+
 
       function open_slidebar() {
 
@@ -975,7 +1089,7 @@
                 }
 
 
-                let infoWindow = new google.maps.InfoWindow();
+                infoWindow = new google.maps.InfoWindow();
                 for(let i =0 ; i< user_place_data.user_list_place.length;i++){
                   //顯示公開的使用者的收藏地點
                   let marker = new google.maps.Marker({
@@ -1065,7 +1179,22 @@
               alert("複製成功");
               delete_child_element("user_own_list_content");
               render_user_all_lists_name();
- 
+
+              // markers.map(item=>{item.setMap(null)})//同下下
+              // markers=[]; //因為下一步要重新顯示 ，所以 markers 要先清空，才不會重複算
+              // user_markers.map(item=>{item.setMap(null)}); //不先 null 掉的話，顯示時會被刪除的點依舊存在
+              // user_markers = []; //同上上
+              //render_map_and_user_all_place();
+
+
+              render_user_all_place (user_place_data.data);
+
+              // // let mapObject = new google.maps.Map(document.getElementById("map"), _mapOptions);
+              // //console.log(mapObject.getZoom())
+              // zoom = map.getZoom()
+              // console.log(map.getZoom())
+              // //map.getZoom() = mapObject.getZoom();
+
             }
               
           }

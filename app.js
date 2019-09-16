@@ -568,7 +568,7 @@ app.post("/api/user/map_list/search/list",async function(req,res){
       final_result = removeDuplicates(search_list_result, 'list_id');
       console.log(i);
       //當最後結果超過特定數字就停止迴圈
-      if(final_result.length>5){
+      if(final_result.length>6){
         break;
       }
     } 
@@ -657,7 +657,7 @@ app.post("/api/user/map_list/copy",async function(req,res){
     }
 
     //先確認使用者清單沒有與複製清單名稱重複
-    let select_copy_list_in_user = await dao_map.select_2("user_map_list","user_name",insert_copy_list.user_name,"list_name",insert_copy_list.list_name)
+    let select_copy_list_in_user = await dao_map.select_2("user_map_list","user_name",insert_copy_list.user_name,"list_name",insert_copy_list.list_name);
     console.log(insert_copy_list);
     console.log(select_copy_list_in_user);
     if (select_copy_list_in_user != 0){
@@ -714,7 +714,10 @@ app.post("/api/user/map_list/copy",async function(req,res){
 
     let update_owner_list = await dao_map.update("user_map_list","list_id",select_owner_list[0].list_id,update_owner,update_owner.list_id)
 
-    res.send({success:"copy OK"})
+    //將使用者的複製清單裡面的地點找出來傳給前端
+    let select_place_of_copy_list = await dao_map.select_2("user_map_place","user_name",insert_copy_list.user_name,"list_name",insert_copy_list.list_name);
+
+    res.send({success:"copy OK",data:select_place_of_copy_list})
   }
 
 });

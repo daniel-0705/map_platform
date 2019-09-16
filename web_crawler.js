@@ -155,6 +155,13 @@ let full_address = async function(address){
         address =await find_district(address);
     };
     address = add_taipet_city(address);
+    //把臺北市前面的郵遞區號拿掉
+    for(let i = 0 ; i<address.length ; i++){
+        if(address.charAt(i) == "臺"){
+            address = address.substring(i, address.length);
+        }
+    }
+
     address = address.replace(/ *\([^)]*\) */g, "");
     return address;
 }
@@ -169,11 +176,13 @@ let full_name = function(name){
     return name;
 }
 
+
+
 let core_geocode_function = async function(map_data,category,search){
 
-    //判斷 名稱與地址都不一樣的話 就當作不一樣，因為現在沒有經緯度協助判斷，所以還是會有經緯度不一樣但地址一樣的地點無法插入，只好先用地點名稱不一樣當作判斷，最後再用人工判斷的方式，畢竟地名不是可靠的變數可以當作參考值
-    let select_map_result = await dao_map.select_2("map","address",map_data.address,"name",map_data.name);
-
+    //判斷地址不一樣的話 就當作不一樣，因為現在沒有經緯度協助判斷，所以還是會有經緯度不一樣但地址一樣的地點無法插入，只好先用地點不一樣當作判斷，畢竟地名不是可靠的變數可以當作參考值
+    let select_map_result = await dao_map.select ("map","address",map_data.address);
+ 
     if(select_map_result.length > 0){
         
         if(!select_map_result[0].category.includes(category)){
@@ -296,7 +305,6 @@ let taipei_city_request = async function (url,category,place_icon,api_name,api_a
             }
     });
 };
-
 
 
 
@@ -550,40 +558,5 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
 
 });
 
-   //中華郵政 臺北市郵局
-   (async () => {
-    const browser = await puppeteer.launch({headless: false});
-    const page = await browser.newPage();
-    await page.goto('https://www.post.gov.tw/post/internet/I_location/index_all.jsp');
-    await page.waitForSelector("#FooterContainer")
-    await page.select('#city', '臺北市');
-    await page.click("#pointbluelineTitle > div > form > input");
-    await page.waitForSelector("#FooterContainer");
 
-    // get data details
-    const result = await page.evaluate(() => {
-        let data_name_array = [];
-        let data_name = document.querySelectorAll('a.rwd-close')
-        let data_address_array = [];
-        let data_address = document.querySelectorAll('td.detail')
-        data_name.forEach((item) => {
-            if(!item.innerText.trim() == ""){
-                data_name_array.push(item.innerText.trim())
-            };
-        });
-        data_address.forEach((item) => {
-            if(!item.innerText.trim() == ""){
-                data_address_array.push(item.innerText.trim())
-            };
-        });
 
-        return {
-            name:data_name_array,
-            address:data_address_array
-        }
-   })
-
-   await puppeteer_for_geocode_function ("郵局","postal",result,null,null,"name");
-   
-   await browser.close();
-})();

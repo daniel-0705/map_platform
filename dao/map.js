@@ -119,6 +119,19 @@ let update_mysql = function(table_name,column_name,data_detail,data,data_name){
     })
 };
 
+let update_3_conditions_mysql = function(table_name,column_name_1,data_1,column_name_2,data_2,column_name_3,data_3,data,data_name){ 
+    return new Promise(function(resolve, reject){
+        mysql.con.query(`UPDATE ${table_name} SET ? where ${column_name_1} ="${data_1}" and ${column_name_2} = "${data_2}" and ${column_name_3} = "${data_3}"`,data,function (err,result) {
+            if (err) {
+                console.log(`${data_name} update ${table_name} table failed`);
+                reject(err);
+            }else{
+                console.log(`${data_name} update ${table_name} table ok`);
+                resolve(`${data_name} update ${table_name} table ok`);
+            }
+        })
+    })
+};
 
 
 let delete_mysql = function(table_name,column_name,data_detail,data_name){ 
@@ -163,6 +176,7 @@ module.exports={
     fuzzy_select:fuzzy_search,
     insert:insert_mysql,
     update:update_mysql,
+    update_3:update_3_conditions_mysql,
     delete:delete_mysql,
     delete_3:delete_3_conditions_mysql
 };

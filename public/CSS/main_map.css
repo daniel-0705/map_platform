@@ -11,14 +11,10 @@ body{
 }
 
 
-.search_and_edit_bar{
-    height: 60px;
-    background-color: rgb(233, 202, 129);
-}
 
 .public_map{
     display: flex;
-    height: calc(100% - 170px);
+    height: calc(100% - 60px);
     position: relative;
 }
 
@@ -28,6 +24,19 @@ body{
     transition: margin-left .5s;
 }
 
+#open_bar,#close_bar,#open_new_list_bar{
+    position: absolute;
+    z-index: 8;
+    transition: margin-left .5s;
+}
+
+#open_bar{
+    top:50px;
+}
+
+#open_new_list_bar{
+    top:100px;
+}
 
 /* slidebar */
 

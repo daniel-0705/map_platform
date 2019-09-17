@@ -170,12 +170,14 @@ let full_name = function(name){
     if(name.includes("台北")){
         name = name.replace("台北", "臺北");
     }
+    if(name.includes("台灣")){
+        name = name.replace("台灣", "臺灣");
+    }
     name = replace_full_and_symbol(name);
     name = number_change_words(name);
     name = word_change_number(name);
     return name;
 }
-
 
 
 let core_geocode_function = async function(map_data,category,search){
@@ -305,7 +307,6 @@ let taipei_city_request = async function (url,category,place_icon,api_name,api_a
             }
     });
 };
-
 
 
 

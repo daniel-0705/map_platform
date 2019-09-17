@@ -694,6 +694,9 @@ app.post("/api/user/map_list/search/place",async function(req,res){
         if(search_word.includes("台北")){
           search_word = search_word.replace("台北", "臺北");
         }
+        if(name.includes("台灣")){
+          name = name.replace("台灣", "臺灣");
+        }
         search_word = replace_full_and_symbol(search_word);
         search_word = number_change_words(search_word);
         search_word = word_change_number(search_word);
@@ -720,13 +723,14 @@ app.post("/api/user/map_list/search/place",async function(req,res){
       fuzzy_search_place_in_address.map(item =>{search_place_result.push(item)});
 
       //從字串中刪除最後一個字開始找
-      // let positive_word = search_word.slice(0, -i-1);
-      // let positive_fuzzy_select_list = await dao_map.fuzzy_select("map","list_name",positive_word,"copy_number",10);
-      // positive_fuzzy_select_list.map(item =>{search_place_result.push(item)});
-      // //從字串中刪除第一個字開始找
-      // let negative_word = search_word.substring(i+1);
-      // let negative_fuzzy_select_list = await dao_map.fuzzy_select("map","list_name",negative_word,"copy_number",10);
-      // negative_fuzzy_select_list.map(item =>{search_place_result.push(item)});
+      let positive_word = search_word.slice(0, -i-1);
+      console.log(positive_word)
+      let positive_fuzzy_select_name = await dao_map.fuzzy_search_place("map","name",positive_word,6);
+      positive_fuzzy_select_name.map(item =>{search_place_result.push(item)});
+      let positive_fuzzy_select_address = await dao_map.fuzzy_search_place("map","address",positive_word,6);
+      positive_fuzzy_select_address.map(item =>{search_place_result.push(item)});
+ 
+
       //將重複的結果剃除
       final_result = removeDuplicates(search_place_result, 'map_id');
       //console.log(i);

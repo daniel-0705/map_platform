@@ -1,0 +1,18 @@
+
+Hope you enjoy your new logo, here are the people that
+made your beautiful logo happen :)
+font name: Decalotype-Black
+font link: https://hanken.co/product/decalotype/
+font author: Hanken Design Co.
+font author site: https://hanken.co/
+
+
+icon designer: Nun
+icon designer link: /nhy7565
+        
+
+fontColor: {"hex":"#FF982E"}
+bgColor: {"hex":"#FFFFFF"}
+iconColor: {"hex":"#FF982E"}
+
+      

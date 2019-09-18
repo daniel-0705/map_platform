@@ -1,7 +1,45 @@
-.main_picture{
+body{
   background-image: url("/img/main_page_picture.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  height: 900px;
+}
+
+.main_picture{
+  display: flex;
+  /* background-image: url("/img/main_page_picture.jpg"); */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  height: calc(100% - 60px);
+}
+
+.content{
+  display: flex;
+  margin: auto;
+  flex-direction:column;
+  align-items: center;
+  /* background-color: antiquewhite; */
+}
+
+.title{
+  font-size: 100px;
+  font-family: 'Fredericka the Great', cursive;
+  font-weight: normal;
+}
+
+.slogan{
+  font-size: 50px;
+  margin: 10px auto 30px auto;
+  font-family: 'Allura', cursive;
+  font-weight: normal;
+}
+
+.go{
+  -webkit-border-radius: 50px;
+  border : none;
+  background-color:rgba(250, 235, 215, 0.9);
+  font-size: 50px;
+  font-family: "sans";
+  cursor: pointer;
 }

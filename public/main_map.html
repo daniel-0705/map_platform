@@ -45,7 +45,15 @@
             {"featureType": "transit.station.bus","elementType": "labels","stylers":[{"visibility":"on"}]},
             {"featureType": "water","elementType": "labels","stylers":[{"visibility":"on"}]}
           ]
-            
+          
+        
+
+
+
+
+
+
+
         });
         render_map_and_user_all_place();
 
@@ -637,7 +645,6 @@
       function close_list_input_and_edit() {
         document.getElementById("input_list_name").style.width = "0";
         document.getElementById("edit_list_name").style.width = "0";
-        document.getElementById("signin_container").style.width = "0";
       }
 
       function close_a_place_slidebar(){
@@ -1137,7 +1144,7 @@
 
       function change_center_to_place(e){
         console.log(e)
-        map.setZoom(18)
+        // map.setZoom(18)
         map.panTo({lat: Number(e.id.split("_")[1]), lng: Number(e.id.split("_")[0])});
       }
  
@@ -1146,7 +1153,7 @@
     </script>
 </head>
 <body>
-  <div class = "main">
+  <div class = "main" >
     <nav>
       <div>
         <a href="/">
@@ -1262,7 +1269,7 @@
 
 
 
-    <div class = "public_map">
+    <div class = "public_map" >
 
       <button id ="open_bar" style="font-size:30px;cursor:pointer" onclick="open_slidebar()" >></button>
       <button id ="close_bar" style="font-size:30px;cursor:pointer" onclick="close_slidebar()" >&times;</button>

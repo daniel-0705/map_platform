@@ -8,45 +8,44 @@
     <script src="js/common.js"></script>
     <link rel="stylesheet" href="CSS/signup.css" media="all">
     <script src="js/signup.js"></script>
+    <!-- logo 字體 -->
+    <link href="https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap" rel="stylesheet"> 
     <title>mapBook Sign Up</title>
 
    
 </head>
 <body>
-    <div>
+    <div  class = "main">
         <nav>
-                <div>
-                    <a href="/" >
-                        <p class="Logo">mapBook</p>
-                    </a>
-                </div>
-                <div>
-                    <ul>
-                        <li class="nav_item"><a href="/">About</a></li>
-                        <li class="nav_item"><a href="/main_map.html">Explore</a></li>
-                        <li class="nav_item" onclick="signin_or_profile()"><a>User</a></li>
-                    </ul>
-                </div>
-            </nav>
+            <div>
+                <a href="/" >
+                    <p class="Logo">mapBook</p>
+                </a>
+            </div>
+            <div>
+                <ul>
+                    <li class="nav_item"><a href="/">About</a></li>
+                    <li class="nav_item"><a href="/main_map.html">Explore</a></li>
+                    <li class="nav_item" onclick="signin_or_profile()"><a>User</a></li>
+                </ul>
+            </div>
+        </nav>
 
         <div class="container">
-            <div class="picture_container">
-                <img class="picture" src="/img/sign.jpg"> 
-            </div>
+            <div class="mask">
             <div class="sign_in_container">
-                <img class ="logo" src="image_pool/logo_transparent.png">
-                <h1>Account Log In</h1>
+                <!-- <p class="title">mapBook</p> -->
+                <h1> &nbsp </h1>
                 <div class="text">
                     <input class="user" id = "name" type="text" placeholder="name">
                     <input class="user" id = "email" type="text" placeholder="email">
                     <input class="user" id = "password" type="password" placeholder="password">
-                    <button onclick="set_header()">Sign up</button>
-                
+                    <button onclick="set_header()">Sign Up</button>
                 </div>
-                
             </div>
-
+            </div>
         </div>
+
 
         <footer>
             <div class="footer_bar">

@@ -31,31 +31,27 @@
             </div>
         </nav>
 
-
         <div class="container">
-            <div class="picture_container">
-                <img class="picture" src="/img/sign.jpg"> 
-            </div>
+            <div class="mask">
             <div class="sign_in_container">
-                    <p class="Logo">mapBook</p>
-                <h1>Account Log In</h1>
+                <!-- <p class="title">mapBook</p> -->
+                <h1> &nbsp </h1>
                 <div class="text">
                     <input class="user" id = "email" type="text" placeholder="email">
                     <input class="user" id = "password" type="password" placeholder="password">
-                    <button onclick="set_header()">Log In</button>
+                    <button onclick="set_header()">Sign In</button>
                 
                     <div id="fb-root">
 
-                    </div>
+                    </div> 
                     <!-- <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
                     </fb:login-button> -->
                     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.3&appId=330988461138069&autoLogAppEvents=1"></script>
-                    <div class="fb-login-button" data-width="314px" data-size="medium" data-button-type="login_with" data-auto-logout-link="false" data-use-continue-as="false" scope="public_profile,email" onlogin="checkLoginState();"></div>
+                    <div class="fb-login-button" data-width="100px" data-size="medium" data-button-type="login_with" data-auto-logout-link="false" data-use-continue-as="false" scope="public_profile,email" onlogin="checkLoginState();"></div>
                 </div>
-                <p class="signup">Create an account? <a class=
-                    "sign_up" href="/signup.html">Sign up</a> </p>
+                <p class="signup">New here? <a class="sign_up" href="/signup.html">Sign up</a> </p>
             </div>
-
+            </div>
         </div>
 
         <footer>

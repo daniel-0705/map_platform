@@ -326,7 +326,7 @@ app.post("/api/user/map_list",async function(req,res){
       console.log(select_user_update_place);
 
 
-      res.send({success:`update ${select_user_update_place[0].appear_list}`,data:select_user_update_place});
+      res.send({success:`update ${user_list_data.appear_list}`,data:select_user_update_place});
     }else{
       let user_list_data = {
         user_name : select_user_result[0].name,
@@ -694,8 +694,8 @@ app.post("/api/user/map_list/search/place",async function(req,res){
         if(search_word.includes("台北")){
           search_word = search_word.replace("台北", "臺北");
         }
-        if(name.includes("台灣")){
-          name = name.replace("台灣", "臺灣");
+        if(search_word.includes("台灣")){
+          search_word = search_word.replace("台灣", "臺灣");
         }
         search_word = replace_full_and_symbol(search_word);
         search_word = number_change_words(search_word);

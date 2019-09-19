@@ -39,6 +39,7 @@ a{
 
 body{
   height: 100%;
+  font-family: 'Noto Sans TC', sans-serif;
 }
 
 .main{
@@ -55,10 +56,7 @@ nav{
   display: flex;
   width: 100%;
   justify-content: space-between;
-  background-color: rgba(0,0,0,0.5);
-  /* box-shadow: 0.5px 0.5px 5px #D0D3D4; */
-  /* background: url("/img/black_board.jpg") no-repeat;
-  background-size: cover; */
+  background-color: rgba(92, 52, 52, 0.5);
 }
 
 .Logo{
@@ -76,7 +74,7 @@ nav > div >ul > li{
   align-items: center;
   margin-right: 10px;
   height: 60px;
-  /* font-family: 'Noto Sans TC', sans-serif; */
+  font-family: "sans";
   font-size: 20px;
   font-weight: normal;
   font-style: normal;
@@ -101,6 +99,7 @@ footer{
   position:absolute;
   bottom: 0;
   width: 100%;
+  font-family: "sans";
 }
 
 footer > div.footer_bar{

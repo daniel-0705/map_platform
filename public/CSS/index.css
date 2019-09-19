@@ -36,10 +36,20 @@ body{
 }
 
 .go{
-  -webkit-border-radius: 50px;
+  -webkit-border-radius: 40px;
   border : none;
-  background-color:rgba(250, 235, 215, 0.9);
-  font-size: 50px;
+  background-color:rgba(0, 0, 0, 0.7);
+  font-size: 30px;
   font-family: "sans";
   cursor: pointer;
+  color: white;
+  letter-spacing: 4px;
+  padding: 5px 0px;
+  transition: 0.3s;
+
+  /* font-family: 'Allura', cursive; */
+}
+
+.go:hover{
+  padding:10px 5px;
 }

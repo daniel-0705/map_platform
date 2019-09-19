@@ -7,6 +7,7 @@
     <title>Explore</title>
     <!-- logo 字體 -->
     <link href="https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC&display=swap" rel="stylesheet">
     <!-- 登入頁面 CSS -->
     <link rel="stylesheet" href="CSS/sign_in.css" media="all">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js"></script>
@@ -36,7 +37,8 @@
           zoom:12,
           options: {
             clickableIcons: true,
-            mapTypeControl: false
+            mapTypeControl: false,
+            fullscreenControl:false,
           },
           styles: [
             {"elementType":"labels","stylers":[{"visibility":"off"}]},  //到時候要把這調成 off
@@ -816,6 +818,13 @@
 
       }
 
+      function confirm_delete() {
+        let remove = confirm("確定是否刪除此清單?");
+        if(remove == true){
+          delete_a_list();
+        }
+      }
+
       function delete_a_list(){
         let a_list_title = document.getElementsByClassName("a_list_title")[0];
         console.log(a_list_title)
@@ -1280,8 +1289,8 @@
         <div id = "a_list_name" class="a_list_name">
           <img class="user_a_list_icon">
           <p class="a_list_title" ></p>
-          <button style="font-size:10px;cursor:pointer" onclick="open_list_edit(this)">編輯</button>
-          <button style="font-size:10px;cursor:pointer" onclick="delete_a_list()">刪除</button>
+          <img class="a_list_edit_icon" src="img/edit.png" onclick="open_list_edit(this)">
+          <img class="a_list_delete_icon" src="img/remove.png" onclick="confirm_delete()">
         </div>
         <div class="a_list_content">
   
@@ -1325,8 +1334,6 @@
         <div class = "search_list_result">
 
         </div>
-        
-
 
         <div class = "user_own_list">
           <div class = "user_own_list_title">

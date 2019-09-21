@@ -462,7 +462,7 @@ app.post("/api/user/map_list/place",async function(req,res){
 
       console.log(user_list_data);
 
-      let delete_user_list_name = await dao_map.delete_3("user_map_place","user_name",user_list_data.user_name,"list_name",user_list_data.list_name,"place_name",user_list_data.place_name)
+      let delete_user_list_name = await dao_map.delete_3("user_map_place","user_name",user_list_data.user_name,"list_name",user_list_data.list_name,"place_name",user_list_data.place_name,user_list_data.place_name)
 
       let check_place_is_exist = await dao_map.select_2("user_map_place","user_name",user_list_data.user_name,"place_name",user_list_data.place_name)
       console.log("確認存在與否")
@@ -868,7 +868,7 @@ app.post("/api/user/map_list/copy",async function(req,res){
     }
     let insert_copy_user_in_public_list = await dao_map.insert("user_map_copy",copy_from_who,copy_from_who.list_id)
     //更新被複製名單的複製數量
-    let select_owner_list = await dao_map.select_2("user_map_list","user_name",list_data.data.list_owner,"list_name",list_data.data.list_name)
+    let select_owner_list = await dao_map.select_2("user_map_list","list_id",list_data.data.list_id,"list_name",list_data.data.list_name)
 
     console.log(select_owner_list)
 

@@ -3,6 +3,13 @@ nav{
     z-index: 3;
 }
 
+
+
+
+
+
+
+
 .main{
     position: relative;
 }
@@ -58,6 +65,7 @@ nav{
     display: flex;
     justify-content: space-around;
     align-items: center;
+    position: relative;
 }
 
 #search,.lsit_result{
@@ -66,7 +74,24 @@ nav{
 
 #search{
     width:60%;
+    padding-right: 40px;
 }
+
+/* input{
+    font-family:inherit;
+    padding-left:15px;
+    -webkit-border-radius: 50px;
+    border: none;
+} */
+
+.lsit_result{
+    position: absolute;
+    cursor:pointer;
+    right: 35px;
+}
+
+
+
 
 .search_list_result{
     height: calc((100% - 60px)/2) ;
@@ -74,22 +99,102 @@ nav{
     overflow-y: auto;
 }
 
+.public_list_container{
+    padding: 5px 0px 5px 15px;
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+.public_list_container:hover{
+    padding: 5px 0px 5px 15px;
+    background-color: rgba(128,128,128,0.3);
+}
+
+.public_list{
+    cursor:pointer;
+    width: 210px;
+    font-size: 16px;
+    overflow : hidden;
+    text-overflow : ellipsis;
+    white-space: nowrap;
+    margin-right:10px;
+}
+
+
+.list_copy_number{
+    width: 15px;
+    font-size: 10px;
+    margin-right:5px;
+    line-height: 24px;
+}
+
+
+.public_list_owner{
+    font-size: 8px;
+    width: 100px;
+    overflow : hidden;
+    text-overflow : ellipsis;
+    white-space: nowrap;
+    text-align:left;
+    
+}
+
+
+.list_copy_number_img{
+   height: 15px;
+   width: 15px; 
+   margin-right:5px;
+   margin-top: 5px;
+}
+
+
+
+
 .user_own_list{
     height: calc((100% - 60px)/2) ;
     background-color: rgb(255, 184, 19);
 }
 
+h1{
+    font-family: "sans";
+    text-align: center;
+    height: 30px;
+    font-size: 25px;
+}
+
+.user_list_icon{
+    height: 37px;
+    width: 32px;
+    margin-left: 10px;
+    margin-right:10px;
+}
+
 .user_list_name{
     cursor:pointer;
+    overflow : hidden;
+    text-overflow : ellipsis;
+    white-space: nowrap;
+    font-size: 16px;
+    height: 30px;
+    line-height: 25px;
+    width: 180px;
+    margin-right: 10px;
 }
+
+.user_list_name:hover{
+    font-weight: bold;
+}
+
 
 .user_own_list_content{
     overflow-y: auto;
-    height: calc(100% - 29px);
+    height: calc(100% - 30px);
 }
 
 .user_every_list_container{
     display: flex;
+    align-items: center;
 }
 
 /* slidebar toggle switch */
@@ -97,8 +202,9 @@ nav{
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    width: 40px;
+    height: 20px;
+    margin-right: 10px;
   }
   
   .switch input { 
@@ -122,27 +228,27 @@ nav{
   .slider:before {
     position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
+    height: 20px;
+    width: 20px;
+    left: 0px;
+    bottom: 0px;
     background-color: white;
     -webkit-transition: .4s;
     transition: .4s;
   }
   
-  input:checked + .slider {
+  .switch_toggle:checked + .slider {
     background-color: #2196F3;
   }
   
-  input:focus + .slider {
+  .switch_toggle:focus + .slider {
     box-shadow: 0 0 1px #2196F3;
   }
   
-  input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
+  .switch_toggle:checked + .slider:before {
+    -webkit-transform: translateX(20px);
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
   }
   
   /* Rounded sliders */
@@ -183,6 +289,13 @@ nav{
     margin-left: 50px;
 }
 
+#list_name{
+    padding-right:15px;
+    font-size: 20px;
+    margin: 15px 0px;
+    text-align: center;
+}
+
 
 
 /* edit_list_input */
@@ -210,8 +323,17 @@ nav{
 }
 
 
+#list_name_edit{
+    padding-right:15px;
+    font-size: 20px;
+    margin: 15px 0px;
+    text-align: center;
+}
+
 
 /* a list  and a public list  */
+
+
 
 .a_list {
     height: 100%;
@@ -235,15 +357,9 @@ nav{
 .a_list_content{
     height: calc(100% - 60px) ;
     box-sizing: content-box;
-    background-color: #D0D3C8;
+    background-color: orange;
     overflow-y: auto;
 }
-/* .user_place_name:nth-of-type(even) {
-    
-    background-color: rgb(149, 149, 147);
-    
-} */
-
 
 
 .a_list_edit_icon{
@@ -268,6 +384,14 @@ nav{
     margin-right:10px;
 }
 
+.public_icon{
+    height: 37px;
+    width: 32px;
+    margin-left: 10px;
+    margin-right:10px;
+}
+
+
 .a_list_title {
     width: 178px;
     height: 30px;
@@ -275,6 +399,34 @@ nav{
     text-overflow : ellipsis;
     white-space: nowrap;
 }
+
+.a_public_list_title{
+    cursor:pointer;
+    width: 208px;
+    height: 30px;
+    overflow : hidden;
+    text-overflow : ellipsis;
+    white-space: nowrap;
+
+}
+
+.no_content_in_list{
+    padding-left: 15px;
+}
+
+
+.copy_img{
+    cursor:pointer;
+    height: 20px;
+    width: 20px;
+    margin-right:10px;
+    margin-left: 10px;
+
+}
+
+
+
+
 
 
 
@@ -287,32 +439,12 @@ nav{
     padding: 5px 0px;
     padding-left: 15px;
     font-size: 16px;
-    /* border-bottom-style:solid;
-    border-bottom-width:1px;
-    border-bottom-color:rgba(128,128,128,1); */
-
 }
 
 .user_place_name:hover{
-    background-color: rgba(128,128,128,0.3)
+    background-color: rgba(128,128,128,0.3);
 }
 
-
-
-/* search_public_list */
-
-.public_list_container{
-    display: flex;
-    flex-wrap: nowrap;
-}
-
-.list_copy_img{
-    height: 30px;
-}
-
-.public_list{
-    cursor:pointer;
-}
 
 
 
@@ -352,10 +484,50 @@ nav{
     overflow-y: auto;
 }
 
+.a_place_title{
+    margin: 0px 15px ;
+    overflow : hidden;
+    text-overflow : ellipsis;
+    white-space: nowrap;
+
+}
+
+
+
 .list_cotainer{
     display: flex;
-    justify-content: space-around;
+    padding: 5px 0px;
+    padding-left: 15px;
+    font-size: 16px;
 }
+
+
+.list_cotainer > button{
+    margin-right: 10px;
+    -webkit-border-radius: 40px;
+    border: none;
+    background-color: antiquewhite
+}
+
+
+.list_cotainer > img{
+    height: 37px;
+    width: 32px;
+    padding-right: 10px;
+}
+
+.list_cotainer > p{
+    overflow : hidden;
+    text-overflow : ellipsis;
+    white-space: nowrap;
+    height: 30px;
+    width: 180px;
+    margin-right: 10px;
+    line-height: 30px;
+    
+}
+
+
 
 
 
@@ -378,3 +550,8 @@ nav{
     display: flex;
     cursor:pointer;
 }
+
+
+
+
+

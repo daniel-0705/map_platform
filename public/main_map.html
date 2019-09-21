@@ -8,8 +8,7 @@
     <!-- logo 字體 -->
     <link href="https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC&display=swap" rel="stylesheet">
-    <!-- 登入頁面 CSS -->
-    <link rel="stylesheet" href="CSS/sign_in.css" media="all">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkK5NajaFKNXkYT2WsdB96edSWRo5kYhY" async defer></script>
     <link rel="stylesheet" href="CSS/common.css" media="all">
@@ -137,7 +136,7 @@
 
         let place_data ={
           access_token : localStorage.getItem("access_token"),
-          list_name : e.parentElement.children[2].innerHTML,
+          list_name : e.parentElement.children[1].innerHTML,
           place_name : marker_content.name,
           place_order : marker_content.place_order,
           longitude : marker_content.longitude,
@@ -338,6 +337,7 @@
                 user_every_list_container.appendChild(label);
 
                 let input = document.createElement("input");
+                input.className = "switch_toggle";
                 input.type = "checkbox";
                 if(user_list_data[i].appear_list == "true"){
                   input.checked = true;
@@ -497,15 +497,6 @@
                 list_cotainer.className = "list_cotainer"
                 a_place_content.appendChild(list_cotainer);
 
-                let collection_button = document.createElement("button");
-                if(user_list_data[i].check_place_is_exist == "true"){
-                  collection_button.innerHTML = "移除";
-                }else{
-                  collection_button.innerHTML = "收藏";
-                }
-                collection_button.setAttribute("onClick", "store_place_in_list(this)");
-                list_cotainer.appendChild(collection_button);
-
                 let list_icon = document.createElement("img");
                 list_icon.src = `/img/${user_list_data[i].list_icon}.png`
                 list_cotainer.appendChild(list_icon);
@@ -517,6 +508,15 @@
                 //new_list_name.setAttribute("onClick", "open_a_list(this)");
                 new_list_name.innerHTML = user_list_data[i].list_name;
                 list_cotainer.appendChild(new_list_name);
+
+                let collection_button = document.createElement("button");
+                if(user_list_data[i].check_place_is_exist == "true"){
+                  collection_button.innerHTML = "移除";
+                }else{
+                  collection_button.innerHTML = "收藏";
+                }
+                collection_button.setAttribute("onClick", "store_place_in_list(this)");
+                list_cotainer.appendChild(collection_button);
                 
               }
             } 
@@ -1008,7 +1008,6 @@
                 document.getElementById("close_bar").style.marginLeft = "300px";
                 document.getElementById("open_new_list_bar").style.marginLeft = "300px";
 
-
                 console.log(user_place_data);
 
                 //let a_public_list_name = document.getElementById("a_public_list_name");
@@ -1019,16 +1018,6 @@
                 public_list_name.id =e.id;
                 public_list_name.setAttribute("onclick","show_and_open_public_list(this)")
 
-                let list_owner = document.querySelector("#a_public_list_name >p:nth-child(2)");
-                list_owner.innerHTML = user_place_data.user_list[0].user_name;
-
-                let list_copy_img = document.querySelector("#a_public_list_name > img");
-                list_copy_img.className = "list_copy_img";
-                list_copy_img.src = "/img/multiple-users-silhouette.png"
-
-                let list_copy_number = document.querySelector("#a_public_list_name >p:nth-child(4)");
-                list_copy_number.innerHTML = e.parentElement.children[3].innerHTML;
-
                 delete_child_element("a_public_list_content");
                 
                 //製作新的public place 的內容 p
@@ -1037,6 +1026,7 @@
 
                 if(user_place_data.user_list_place.length == 0){
                   let new_place_name = document.createElement("p");
+                  new_place_name.className = "no_content_in_list"
                   new_place_name.innerHTML = "該使用者尚未收藏地點";
                   parent_place.appendChild(new_place_name);
                   return;
@@ -1104,21 +1094,16 @@
       function copy_other_list(e){
         console.log(e);
 
-        let a_public_list_name = e.parentElement.children[0];
-
-        let a_public_list_owner = e.parentElement.children[1];
+        let a_public_list_name = e.parentElement.children[1];
 
         console.log(a_public_list_name);
-        console.log(a_public_list_owner);
 
         let copy_list={
           access_token : localStorage.getItem("access_token"),
           list_id : a_public_list_name.id,
-          list_name : a_public_list_name.innerHTML,
-          list_owner : a_public_list_owner.innerHTML
+          list_name : a_public_list_name.innerHTML
         }
         console.log(copy_list);
-        
 
         let xhr = new XMLHttpRequest();
         xhr.open("post", "/api/user/map_list/copy");  
@@ -1172,43 +1157,16 @@
       <div class = "search_container">
         <div class = "search_place_input">
           <input id = "search_place" type="text" placeholder="搜尋">
-          <!-- <select>
-            <option>地名</option>
-            <option>地址</option>
-          </select> -->
-          <select>
-            <option>行政區</option>
-            <option>北投區</option>
-            <option>士林區</option>
-            <option>松山區</option>
-            <option>中山區</option>
-            <option>內湖區</option>
-            <option>大同區</option>
-            <option>萬華區</option>
-            <option>信義區</option>
-            <option>中正區</option>
-            <option>南港區</option>
-            <option>大安區</option>
-            <option>文山區</option>
-          </select>
-          <select>
-            <option>分類</option>
-            <option>博物館</option>
-            <option>藝文館所</option>
-            <option>郵局</option>
-            <option>文化資產</option>
-            <option>環保旅店</option>
-          </select>
           <button>搜尋</button>
           <div class = "search_place_result" id = "search_place_result">
-      
           </div>
         </div>
-        
       </div>
 
       <div>
+          
         <ul>
+            
             <li class="nav_item"><a href="/">About</a></li>
             <li class="nav_item"><a href="/main_map.html">Explore</a></li>
             <li class="nav_item" onclick="signin_or_profile()"><a>User</a></li>
@@ -1224,7 +1182,7 @@
       <input type="radio" name="category" value="false"> 私人<br>
       <input type="text" id = "list_name" name="list_name" placeholder="請輸入清單名稱"><br>
       <div>
-        <p>清單地標樣式選擇</p>
+        <p style="margin-bottom: 15px;">清單地標樣式選擇</p>
         <input type="radio" id = "reset" name="pattern" value="red" checked ><img src ="/img/red.png">
         <input type="radio" name="pattern" value="aqua" ><img src ="/img/aqua.png">
         <input type="radio" name="pattern" value="black" ><img src ="/img/black.png">
@@ -1242,7 +1200,7 @@
         <input type="radio" name="pattern" value="white" ><img src ="/img/white.png">
         <input type="radio" name="pattern" value="yellow" ><img src ="/img/yellow.png">
       </div>
-      <button type="submit" onclick="send_list_name()")>Submit</button>
+      <button type="submit" onclick="send_list_name()")>完成</button>
     </div>
     <!-- 畫面外的介面結束 -->
 
@@ -1253,7 +1211,7 @@
       <input type="radio" name="edit_category" value="false"> 私人<br>
       <input type="text" id = "list_name_edit" name="list_name_edit" placeholder="請輸入清單名稱"><br>
       <div>
-        <p>清單地標樣式選擇</p>
+        <p style="margin-bottom: 15px;">清單地標樣式選擇</p>
         <input type="radio" id = "edit_reset" name="edit_pattern" value="red" checked ><img src ="/img/red.png">
         <input type="radio" name="edit_pattern" value="aqua" ><img src ="/img/aqua.png">
         <input type="radio" name="edit_pattern" value="black" ><img src ="/img/black.png">
@@ -1271,7 +1229,7 @@
         <input type="radio" name="edit_pattern" value="white" ><img src ="/img/white.png">
         <input type="radio" name="edit_pattern" value="yellow" ><img src ="/img/yellow.png">
       </div>
-      <button type="submit" onclick="send_edit_list_name()")>Submit</button>
+      <button type="submit" onclick="send_edit_list_name()")>完成</button>
     </div>
     <!-- 畫面外的介面結束 -->
 
@@ -1300,17 +1258,15 @@
 
       <!-- 畫面外的他人單一清單介面  -->
       <div id ="a_public_list" class="a_list">
-          <div id = "a_public_list_name" class="a_list_name">
-            <p style="cursor:pointer" class="a_list_title" ></p>
-            <p></p>
-            <img>
-            <p></p>
-            <button style="font-size:10px;cursor:pointer" onclick="copy_other_list(this)">複製</button>
-          </div>
-          <div class="a_public_list_content">
-    
-          </div>
+        <div id = "a_public_list_name" class="a_list_name">
+          <img class= "public_icon" src="img/point.png">
+          <p class="a_public_list_title" ></p>
+          <img src="img/copy.png" class="copy_img" onclick="copy_other_list(this)">
         </div>
+        <div class="a_public_list_content">
+  
+        </div>
+      </div>
       <!-- 畫面外的介面結束 -->
 
       <!-- 畫面外的單一地點介面  -->
@@ -1327,8 +1283,8 @@
 
       <div class= "search_and_list" id="search_and_list">
         <div class = "search_list_bar">
-          <input  id = "search" placeholder="Search list..." >
-          <button class= "lsit_result" type ="button">搜尋</button>
+          <input  id = "search" placeholder="搜尋清單" >
+          <img src="img/search.png" class= "lsit_result" onclick="search_public_list ()">
         </div>
 
         <div class = "search_list_result">
@@ -1337,7 +1293,7 @@
 
         <div class = "user_own_list">
           <div class = "user_own_list_title">
-              <h1>my lists</h1>
+              <h1>My Lists</h1>
           </div>
           <div class = "user_own_list_content" >
 
@@ -1372,7 +1328,71 @@
       }
     });
 
+    function search_public_list (){
+      delete_child_element("search_list_result");
+      let grandpa_list_result = document.getElementsByClassName("search_list_result")[0];
 
+      let xhr = new XMLHttpRequest();
+
+      xhr.open("post", "/api/user/map_list/search/list");  
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      
+      let list_data = {
+        type:"search",
+        data:search_public_list_name.value
+      }
+      console.log(list_data)
+      xhr.send(JSON.stringify(list_data));
+
+      xhr.onreadystatechange=function() {
+        if (this.readyState == 4 && this.status == 200) {
+          if(xhr.response == "There is no user data."){
+            alert("! 查無此使用者，請註冊");
+          }else{
+            let user_list_data = JSON.parse(xhr.response);
+            console.log(user_list_data);
+
+            if(user_list_data.length == 0){
+              let parent_list = document.createElement("p");
+              parent_list.className = "no_public_list";
+              parent_list.innerHTML = "查無清單，請換關鍵字搜尋"
+              grandpa_list_result.appendChild(parent_list);
+
+            }
+
+            for (let i = 0 ;i<user_list_data.length;i++){
+              //製作每一個 list 的內容 
+              let parent_list = document.createElement("div");
+              parent_list.className = "public_list_container";
+              grandpa_list_result.appendChild(parent_list);
+
+              let list_name = document.createElement("p");
+              list_name.innerHTML = user_list_data[i].list_name;
+              list_name.id =user_list_data[i].list_id;
+              list_name.className = "public_list";
+              list_name.setAttribute("onclick","show_and_open_public_list(this)");
+              parent_list.appendChild(list_name);
+
+              let list_copy_number_img = document.createElement("img");
+              list_copy_number_img.className = "list_copy_number_img";
+              list_copy_number_img.src = "/img/multiple-users-silhouette.png";
+              parent_list.appendChild(list_copy_number_img);
+
+              let list_copy_number = document.createElement("p");
+              list_copy_number.innerHTML = user_list_data[i].copy_number;
+              list_copy_number.className = "list_copy_number";
+              parent_list.appendChild(list_copy_number);
+
+              let list_owner = document.createElement("p");
+              list_owner.innerHTML = user_list_data[i].user_name;
+              list_owner.className = "public_list_owner";
+              parent_list.appendChild(list_owner);
+    
+            }
+          }             
+        }
+      }
+    }
 
     let search_public_list_name = document.getElementById("search");
     search_public_list_name.addEventListener("keyup", function(event) {
@@ -1380,71 +1400,14 @@
       //console.log(search_public_list_name)
       if (event.keyCode === 13) {
         event.preventDefault();
+        search_public_list ();
         
-        delete_child_element("search_list_result");
-        let grandpa_list_result = document.getElementsByClassName("search_list_result")[0];
-
-        let xhr = new XMLHttpRequest();
-
-        xhr.open("post", "/api/user/map_list/search/list");  
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        
-        let list_data = {
-          type:"search",
-          data:search_public_list_name.value
-        }
-        console.log(list_data)
-        xhr.send(JSON.stringify(list_data));
-
-        xhr.onreadystatechange=function() {
-          if (this.readyState == 4 && this.status == 200) {
-            if(xhr.response == "There is no user data."){
-              alert("! 查無此使用者，請註冊");
-            }else{
-              let user_list_data = JSON.parse(xhr.response);
-              console.log(user_list_data);
-
-              if(user_list_data.length == 0){
-                let parent_list = document.createElement("p");
-                parent_list.className = "no_public_list";
-                parent_list.innerHTML = "查無清單，請換關鍵字搜尋"
-                grandpa_list_result.appendChild(parent_list);
-
-              }
-
-              for (let i = 0 ;i<user_list_data.length;i++){
-                //製作每一個 list 的內容 
-                let parent_list = document.createElement("div");
-                parent_list.className = "public_list_container";
-                grandpa_list_result.appendChild(parent_list);
-
-                let list_name = document.createElement("p");
-                list_name.innerHTML = user_list_data[i].list_name;
-                list_name.id =user_list_data[i].list_id;
-                list_name.className = "public_list"
-                list_name.setAttribute("onclick","show_and_open_public_list(this)")
-                parent_list.appendChild(list_name);
-
-                let list_owner = document.createElement("p");
-                list_owner.innerHTML = user_list_data[i].user_name;
-                parent_list.appendChild(list_owner);
-
-                let list_copy_img = document.createElement("img");
-                list_copy_img.className = "list_copy_img";
-                list_copy_img.src = "/img/multiple-users-silhouette.png"
-                parent_list.appendChild(list_copy_img);
-
-                let list_copy_number = document.createElement("p");
-                list_copy_number.innerHTML = user_list_data[i].copy_number;
-                parent_list.appendChild(list_copy_number);
-      
-              }
-            }             
-          }
-        }
       }
     });
     
+
+    
+
     let search_place = document.getElementById("search_place");
     search_place.addEventListener("keyup", function(event) {
     // Number 13 is the "Enter" key on the keyboard

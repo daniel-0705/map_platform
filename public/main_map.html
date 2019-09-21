@@ -1137,6 +1137,7 @@
       }
 
       function change_center_to_place(e){
+        document.getElementById("search_place").value = "";
         console.log(e)
         // map.setZoom(18)
         map.panTo({lat: Number(e.id.split("_")[1]), lng: Number(e.id.split("_")[0])});
@@ -1159,11 +1160,9 @@
         <ul>
           <li class = "search_place_input">
             <div class="searchBox">
-              <input id="search_place" class="searchInput" type="text" name="" placeholder="Search">
-              <button class="searchButton" >
-                  <i class="material-icons">
-                    &nbsp;
-                  </i>
+              <input id="search_place" class="searchInput" type="text" name="" placeholder="Search" autocomplete="off">
+              <button class="searchButton" onclick="change_search_place_input_width()">
+             
               </button>
 
               <div class = "search_place_result" id = "search_place_result">
@@ -1184,7 +1183,7 @@
       <a href="javascript:void(0)" class="close_button" onclick="close_list_input_and_edit()">&times;</a>
       <input type="radio" name="category" value="true" checked > 公開<br>
       <input type="radio" name="category" value="false"> 私人<br>
-      <input type="text" id = "list_name" name="list_name" placeholder="請輸入清單名稱"><br>
+      <input type="text" id = "list_name" name="list_name" placeholder="請輸入清單名稱" autocomplete="off"><br>
       <div>
         <p style="margin-bottom: 15px;">清單地標樣式選擇</p>
         <input type="radio" id = "reset" name="pattern" value="red" checked ><img src ="/img/red.png">
@@ -1213,7 +1212,7 @@
       <a href="javascript:void(0)" class="close_button" onclick="close_list_input_and_edit()">&times;</a>
       <input type="radio" name="edit_category" value="true" checked > 公開<br>
       <input type="radio" name="edit_category" value="false"> 私人<br>
-      <input type="text" id = "list_name_edit" name="list_name_edit" placeholder="請輸入清單名稱"><br>
+      <input type="text" id = "list_name_edit" name="list_name_edit" placeholder="請輸入清單名稱" autocomplete="off"><br>
       <div>
         <p style="margin-bottom: 15px;">清單地標樣式選擇</p>
         <input type="radio" id = "edit_reset" name="edit_pattern" value="red" checked ><img src ="/img/red.png">
@@ -1287,7 +1286,7 @@
 
       <div class= "search_and_list" id="search_and_list">
         <div class = "search_list_bar">
-          <input  id = "search" placeholder="搜尋清單" >
+          <input  id = "search" placeholder="搜尋清單" autocomplete="off">
           <img src="img/search.png" class= "lsit_result" onclick="search_public_list ()">
         </div>
 
@@ -1489,18 +1488,29 @@
     });
 
 
-    //點擊搜尋地址結果外的地方，搜尋結果會關掉
-    let search_place_result = document.getElementById('search_place_result');
-    document.onclick = function(e){
-        if(e.target.id !== 'search_place_result'){
-        search_place_result.style.display = 'none';
-        //search_place_result.setAttribute("display","none") ;
-        }
-    };
+
   
+    //點擊搜尋地址按鈕外的地方，搜尋列會縮回去 //點擊搜尋地址結果外的地方，搜尋結果會關掉
+    let search_place_input = document.getElementById("search_place");
+    function change_search_place_input_width(){
+      search_place_input.style.width = "260px";
+      search_place_input.style.padding = "0 6px";
+    }
+    //點擊搜尋地址按鈕外的地方，搜尋列會縮回去 //點擊搜尋地址結果外的地方，搜尋結果會關掉
+    document.onclick = function(e){
+      console.log(e.target.id)
+      console.log(e.target.id !== 'search_place_result')
+      if((e.target.id !== 'search_place' && e.target.className !== 'searchButton')){
+        search_place_input.style.width = "0px";
+        search_place_input.style.padding = "0px";
+      }
+      if(e.target.id !== 'search_place_result'){
+      search_place_result.style.display = 'none';
+      //search_place_result.setAttribute("display","none") ;
+      }
+    };
 
 
-    
    
   </script>
 

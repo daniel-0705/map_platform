@@ -606,14 +606,12 @@ h1{
     display: flex;
 }
 
-.searchBox:hover > .searchInput {
+/* .searchBox:hover > .searchInput {
     width: 260px;
     padding: 0 6px;
-}
+} */
 
-.searchBox:hover > .search_place_result {
-    /* width: 240px; */
-    /* padding: 0 6px; */
+/* .searchBox:hover > .search_place_result {
     display: block;
 }
 
@@ -623,7 +621,7 @@ h1{
 
 .search_place_result:hover{
     display: block;
-}
+} */
 
 
 .searchBox:hover > .searchButton {

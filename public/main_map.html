@@ -1154,22 +1154,26 @@
           <p id="logo" class="Logo">mapBook</p>
         </a>
       </div>
-      <div class = "search_container">
-        <div class = "search_place_input">
-          <input id = "search_place" type="text" placeholder="搜尋">
-          <button>搜尋</button>
-          <div class = "search_place_result" id = "search_place_result">
-          </div>
-        </div>
-      </div>
-
+    
       <div>
-          
         <ul>
-            
-            <li class="nav_item"><a href="/">About</a></li>
-            <li class="nav_item"><a href="/main_map.html">Explore</a></li>
-            <li class="nav_item" onclick="signin_or_profile()"><a>User</a></li>
+          <li class = "search_place_input">
+            <div class="searchBox">
+              <input id="search_place" class="searchInput" type="text" name="" placeholder="Search">
+              <button class="searchButton" >
+                  <i class="material-icons">
+                    &nbsp;
+                  </i>
+              </button>
+
+              <div class = "search_place_result" id = "search_place_result">
+              </div>
+
+            </div>
+          </li>
+          <li class="nav_item"><a href="/">About</a></li>
+          <li class="nav_item"><a href="/main_map.html">Explore</a></li>
+          <li class="nav_item" onclick="signin_or_profile()"><a>User</a></li>
         </ul>
       </div>
     </nav>
@@ -1451,7 +1455,7 @@
                 //製作每一個 place 的內容 
                 let parent_place = document.createElement("div");
                 parent_place.className = "place_container";
-                parent_place.setAttribute("onclick","change_center_to_place(this.children[1])")
+                parent_place.setAttribute("onclick","change_center_to_place(this.children[1].children[0])")
                 grandpa_place_result.appendChild(parent_place);
 
                 let place_img = document.createElement("img");
@@ -1459,16 +1463,22 @@
                 place_img.src = "/img/place_search.png"
                 parent_place.appendChild(place_img);
 
+
+                let name_and_address_container = document.createElement("div");
+                name_and_address_container.className = "name_and_address_container";
+                parent_place.appendChild(name_and_address_container);
+
                 let place_name = document.createElement("p");
                 place_name.innerHTML = place_data[i].name;
                 place_name.id =place_data[i].longitude + "_" + place_data[i].latitude;
-                place_name.className = "public_place";
+                place_name.className = "public_place_name";
                 //place_name.setAttribute("onclick","change_center_to_place(this)");
-                parent_place.appendChild(place_name);
+                name_and_address_container.appendChild(place_name);
 
                 let place_address = document.createElement("p");
                 place_address.innerHTML = place_data[i].address;
-                parent_place.appendChild(place_address);
+                place_address.className = "public_place_address";
+                name_and_address_container.appendChild(place_address);
 
       
               }

@@ -57,6 +57,9 @@ nav{
   width: 100%;
   justify-content: space-between;
   background-color: rgba(92, 52, 52, 0.5);
+
+  /*  */
+  height: 60px;
 }
 
 .Logo{
@@ -80,14 +83,15 @@ nav > div >ul > li{
   font-style: normal;
   font-stretch: normal;
   letter-spacing: 3px;
-  color: white;
+ 
+
 } 
 
-.nav_item_bar{
-  display: flex;
-  align-items: center;
-  margin-right: 1.5%;
-} 
+.nav_item{
+  color: white;
+}
+
+
 
 /* footer */
 

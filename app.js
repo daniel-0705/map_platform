@@ -7,10 +7,15 @@ const dao_map = require("./dao/map.js"); // dao_map.js檔
 const request = require('request'); // request 模組
 const redis = require('redis');       //redis 模組
 
-var client = redis.createClient(6379, '127.0.0.1')      //redis 建立
-client.on('error', function (err) {
-  console.log('Error ' + err);
-});
+// var client = redis.createClient(6379, '127.0.0.1')      //redis 建立
+// client.on('error', function (err) {
+//   console.log('Error ' + err);
+// });
+
+// const PORT = process.env.PORT || 5000;
+const REDIS_PORT = process.env.PORT || 6379;
+
+const client = redis.createClient(REDIS_PORT);
 
 
 

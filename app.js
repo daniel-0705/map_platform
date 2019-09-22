@@ -12,10 +12,10 @@ const redis = require('redis');       //redis 模組
 //   console.log('Error ' + err);
 // });
 
-// const PORT = process.env.PORT || 5000;
-// const REDIS_PORT = process.env.PORT || 6379;
+const PORT = process.env.PORT || 5000;
+const REDIS_PORT = process.env.PORT || 6379;
 
-// const client = redis.createClient(REDIS_PORT);
+const client = redis.createClient(REDIS_PORT);
 
 
 
@@ -115,33 +115,33 @@ app.post("/api/map",async function (req, res) {
       data.user_places =select_all_user_place;
     }
 
-    let select_all_place = await dao_map.select("map",null,"all places");
-    data.places = select_all_place;
-    res.send(data);
-    
+    // let select_all_place = await dao_map.select("map",null,"all places");
+    // data.places = select_all_place;
+    // res.send(data);
+
 
     //接著找公用地圖上所有的點，因為幾乎不會變動，所以這邊設置快取
-    // await client.get('all_place',async function(err, value) {
-    //   if( !err ){
-    //     if(!value){
-    //       console.log("redis","沒值")
-    //       let select_all_place = await dao_map.select("map",null,"all places");
-    //       select_all_place = JSON.stringify(select_all_place);
-    //       client.setex('all_place', 10, select_all_place);
-    //       all_place_data = select_all_place;
+    await client.get('all_place',async function(err, value) {
+      if( !err ){
+        if(!value){
+          console.log("redis","沒值")
+          let select_all_place = await dao_map.select("map",null,"all places");
+          select_all_place = JSON.stringify(select_all_place);
+          client.setex('all_place', 10, select_all_place);
+          all_place_data = select_all_place;
 
-    //       data.places =JSON.parse(all_place_data);
-    //       res.send(data);
-    //     }
-    //     else{
-    //       console.log("redis","有值")
-    //       all_place_data = value;
+          data.places =JSON.parse(all_place_data);
+          res.send(data);
+        }
+        else{
+          console.log("redis","有值")
+          all_place_data = value;
 
-    //       data.places =JSON.parse(all_place_data);
-    //       res.send(data);
-    //     }
-    //   }
-    // })
+          data.places =JSON.parse(all_place_data);
+          res.send(data);
+        }
+      }
+    })
 
   }
 });

@@ -13,9 +13,9 @@ const redis = require('redis');       //redis 模組
 // });
 
 // const PORT = process.env.PORT || 5000;
-const REDIS_PORT = process.env.PORT || 6379;
+// const REDIS_PORT = process.env.PORT || 6379;
 
-const client = redis.createClient(REDIS_PORT);
+// const client = redis.createClient(REDIS_PORT);
 
 
 

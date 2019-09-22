@@ -90,7 +90,9 @@ input{
     right: 35px;
 }
 
-
+.no_public_list{
+    padding-left:15px;
+}
 
 
 .search_list_result{
@@ -606,22 +608,7 @@ h1{
     display: flex;
 }
 
-/* .searchBox:hover > .searchInput {
-    width: 260px;
-    padding: 0 6px;
-} */
 
-/* .searchBox:hover > .search_place_result {
-    display: block;
-}
-
-.search_place_result{
-    display: none;
-}
-
-.search_place_result:hover{
-    display: block;
-} */
 
 
 .searchBox:hover > .searchButton {
@@ -650,6 +637,7 @@ h1{
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    cursor:pointer;
 }
 
 .searchInput {

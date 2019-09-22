@@ -5,15 +5,26 @@ const mysql = require("./mysql_connection.js"); // MySQL Initialization
 const crawler = require("./web_crawler.js"); // 爬蟲檔案
 const dao_map = require("./dao/map.js"); // dao_map.js檔
 const request = require('request'); // request 模組
+const redis = require('redis');       //redis 模組
 
+var client = redis.createClient(6379, '127.0.0.1')      //redis 建立
+client.on('error', function (err) {
+  console.log('Error ' + err);
+});
+
+
+
+
+
+
+const NodeCache = require("node-cache"); // node-cache模組
+const myCache = new NodeCache({ stdTTL: 60, checkperiod: 0 }); // node-cache模組
 var bodyParser = require("body-parser"); // body-parser 模組
 var path = require("path"); // path 模組
 var multer = require("multer"); // multer 模組
 var admin = multer({ dest: "./public" }); // multer 模組
 var async = require("async"); // async模組
 const https = require("https"); // https模組
-const NodeCache = require("node-cache"); // node-cache模組
-const myCache = new NodeCache({ stdTTL: 60, checkperiod: 0 }); // node-cache模組
 var aws = require("aws-sdk"); // Multer S3模組
 var multerS3 = require("multer-s3"); // Multer S3模組
 
@@ -66,10 +77,15 @@ app.post("/test", function (req, res) {
 });
 
 
+
+
+
+
+
 //地圖上所有的點 及使用者收藏的點
 app.post("/api/map",async function (req, res) {
 
-
+ 
   if(req.header('Content-Type') != "application/json"){
     var error = {
         "error": "Invalid request body."
@@ -79,26 +95,44 @@ app.post("/api/map",async function (req, res) {
 
     let list_data = req.body;
 
-    console.log(list_data)
-    
-    let select_all_place = await dao_map.select("map",null,"all places");
+    console.log(list_data);
+  
+    let data ={};
+    let all_place_data;
 
+    //這段先判斷使用者有無登入，有的話找出使用者收藏的地點
     let select_user_result = await dao_map.select("user","access_token",list_data.data.access_token)
     //console.log(select_user_result.length == 0)
-    
-    let data ={};
-  
-    if(select_user_result.length == 0){
-      data.places =select_all_place;
-      res.send(data);
-      //console.log(data)
-    }else{
-      
+
+    if(select_user_result.length !== 0){
       let select_all_user_place = await dao_map.select("user_map_place","user_name",select_user_result[0].name);
-      data.places =select_all_place;
       data.user_places =select_all_user_place;
-      res.send(data);
     }
+
+
+    //接著找公用地圖上所有的點，因為幾乎不會變動，所以這邊設置快取
+    await client.get('all_place',async function(err, value) {
+      if( !err ){
+        if(!value){
+          console.log("redis","沒值")
+          let select_all_place = await dao_map.select("map",null,"all places");
+          select_all_place = JSON.stringify(select_all_place);
+          client.setex('all_place', 10, select_all_place);
+          all_place_data = select_all_place;
+
+          data.places =JSON.parse(all_place_data);
+          res.send(data);
+        }
+        else{
+          console.log("redis","有值")
+          all_place_data = value;
+
+          data.places =JSON.parse(all_place_data);
+          res.send(data);
+        }
+      }
+    })
+
   }
 });
 

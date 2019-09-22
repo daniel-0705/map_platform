@@ -118,6 +118,7 @@ app.post("/api/map",async function (req, res) {
     let select_all_place = await dao_map.select("map",null,"all places");
     data.places = select_all_place;
     res.send(data);
+    
 
     //接著找公用地圖上所有的點，因為幾乎不會變動，所以這邊設置快取
     // await client.get('all_place',async function(err, value) {

@@ -564,3 +564,39 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
 });
 
 
+//臺北市政府衛生局 十二區健康服務中心
+(async () => {
+    const browser = await puppeteer.launch({headless: false});
+    const page = await browser.newPage();
+    await page.goto('https://health.gov.taipei/cp.aspx?n=E04DC448D4D39810');
+    await page.waitForSelector("#base-content")
+
+    // get data details
+    const result = await page.evaluate(() => {
+        let data_all = [];
+        let data_name_array = [];
+        let data_address_array = [];
+        let data_address = document.querySelectorAll('#table_1 > tbody > tr > td')
+
+        data_address.forEach((item) => {
+            data_all.push(item.innerText.trim())
+        });
+        data_all.forEach((item) => {
+            if(data_all.indexOf(item) % 4 == 2){
+                data_name_array.push(item)
+            }
+            if(data_all.indexOf(item) % 4 == 3){
+                data_address_array.push(item)
+            }
+        });
+
+        return {
+            name:data_name_array,
+            address:data_address_array
+        }
+    })
+
+    await puppeteer_for_geocode_function ("健康服務中心","therapy",result,null,null,"name");
+    
+    await browser.close();
+})();

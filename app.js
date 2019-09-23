@@ -6,8 +6,8 @@ const crawler = require("./web_crawler.js"); // 爬蟲檔案
 const dao_map = require("./dao/map.js"); // dao_map.js檔
 const request = require('request'); // request 模組
 const redis = require('redis');       //redis 模組
-// const REDIS_PORT = process.env.PORT || 6379;   //redis 建立
-// const client = redis.createClient(REDIS_PORT);
+const REDIS_PORT = process.env.PORT || 6379;   //redis 建立
+const client = redis.createClient(REDIS_PORT);
 
 
 
@@ -113,26 +113,26 @@ app.post("/api/map",async function (req, res) {
 
 
     //接著找公用地圖上所有的點，因為幾乎不會變動，所以這邊設置快取
-    // await client.get('all_place',async function(err, value) {
-    //   if( !err ){
-    //     if(!value){
-    //       console.log("redis","沒值")
-    //       let select_all_place = await dao_map.select("map",null,"all places");
-    //       select_all_place = JSON.stringify(select_all_place);
-    //       client.setex('all_place', 86400, select_all_place);
-    //       all_place_data = select_all_place;
-    //       data.places =JSON.parse(all_place_data);
-    //       res.send(data);
-    //     }
-    //     else{
-    //       console.log("redis","有值")
-    //       all_place_data = value;
+    await client.get('all_place',async function(err, value) {
+      if( !err ){
+        if(!value){
+          console.log("redis","沒值")
+          let select_all_place = await dao_map.select("map",null,"all places");
+          select_all_place = JSON.stringify(select_all_place);
+          client.setex('all_place', 86400, select_all_place);
+          all_place_data = select_all_place;
+          data.places =JSON.parse(all_place_data);
+          res.send(data);
+        }
+        else{
+          console.log("redis","有值")
+          all_place_data = value;
 
-    //       data.places =JSON.parse(all_place_data);
-    //       res.send(data);
-    //     }
-    //   }
-    // })
+          data.places =JSON.parse(all_place_data);
+          res.send(data);
+        }
+      }
+    })
 
   }
 });

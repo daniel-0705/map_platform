@@ -9,6 +9,8 @@ const googleMapsClient = require('@google/maps').createClient({     //google 可
 });
 
 
+
+
 function sleep (time) {
     return new Promise((resolve) => setTimeout(resolve, time));
 };
@@ -309,6 +311,29 @@ let taipei_city_request = async function (url,category,place_icon,api_name,api_a
 };
 
 
+const Nightmare = require('nightmare')
+const nightmare = Nightmare({ show: true })
+
+
+nightmare
+  .goto('https://duckduckgo.com')
+  .type('#search_form_input_homepage', 'github nightmare')
+  .click('#search_button_homepage')
+  .wait('#r1-0 a.result__a')
+  .evaluate(() => document.querySelector('#r1-0 a.result__a').href)
+  .end()
+  .then(console.log)
+  .catch(error => {
+    console.error('Search failed:', error)
+  })
+
+
+
+
+
+
+
+
 
 var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
 
@@ -556,9 +581,7 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
         await browser.close();
     })();
 
-
-
-
-
-    
 });
+
+
+

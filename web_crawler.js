@@ -1,5 +1,6 @@
 const schedule = require('node-schedule');                          //node-schedule 模組，可定時執行
-const puppeteer = require('puppeteer');                             //爬蟲套件 puppeteer 模組
+// const puppeteer = require('puppeteer');                             //爬蟲套件 puppeteer 模組
+const pptrFirefox = require('puppeteer-firefox');                             //爬蟲套件 puppeteer 模組
 const request = require('request');                                 // request 模組
 const mysql=require("./mysql_connection.js");                       // MySQL Initialization
 const dao_map = require("./dao/map.js")                             // dao_map.js檔
@@ -110,7 +111,7 @@ function word_change_number(address){
 };
 
 let find_district = async function(address) {
-    const browser = await puppeteer.launch({headless: false});
+    const browser = await pptrFirefox.launch({headless: false});
     const page = await browser.newPage();
     await page.goto('https://www.tp.edu.tw/neighbor/html/');
     await page.waitForSelector("table")
@@ -328,7 +329,30 @@ let taipei_city_request = async function (url,category,place_icon,api_name,api_a
 //   })
 
 
+// nightmare
+//   .goto('https://www.priceline.com.au/')
+//   .wait(10000)
+//   .evaluate(() => { })
+//   .then(() => someFunction(nightmare))
+//   .catch(error => {
+//     return someFunction(nightmare);
+//   })
+//   .catch();
 
+
+// const dimensions = yield nightmare.goto('https://www.priceline.com.au/')
+//        .wait('body')
+//        .evaluate(function() {
+//            var body = document.querySelector('body');
+//            return {
+//                width: 1200,
+//                height: 800
+//            }
+//        });
+//    yield nightmare.viewport(dimensions.width, dimensions.height)
+//        .wait(1000)
+//        .screenshot('sample.png');
+//    yield nightmare.end();
 
 
 
@@ -585,3 +609,39 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
 
 
 
+    //臺北市政府衛生局 十二區健康服務中心
+    (async () => {
+        const browser = await pptrFirefox.launch({headless: false});
+        const page = await browser.newPage();
+        await page.goto('https://health.gov.taipei/cp.aspx?n=E04DC448D4D39810');
+        await page.waitForSelector("#base-content")
+
+        // get data details
+        const result = await page.evaluate(() => {
+            let data_all = [];
+            let data_name_array = [];
+            let data_address_array = [];
+            let data_address = document.querySelectorAll('#table_1 > tbody > tr > td')
+
+            data_address.forEach((item) => {
+                data_all.push(item.innerText.trim())
+            });
+            data_all.forEach((item) => {
+                if(data_all.indexOf(item) % 4 == 2){
+                    data_name_array.push(item)
+                }
+                if(data_all.indexOf(item) % 4 == 3){
+                    data_address_array.push(item)
+                }
+            });
+
+            return {
+                name:data_name_array,
+                address:data_address_array
+            }
+        })
+
+        await puppeteer_for_geocode_function ("健康服務中心","therapy",result,null,null,"name");
+        
+        await browser.close();
+    })();

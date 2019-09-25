@@ -166,55 +166,7 @@ let find_district = async function(address) {
     });
 
     return new_address;
-
-    // await request({
-    //     url:`https://zip5.5432.tw/zip5json.py?adrs=${address_URI}&_=1569334120491`,
-    //     method:"GET"
-    //     },async function(error, response, body){
-    //         if(body.error){
-    //             console.log(body.error);
-    //         }else{
-    //             body = JSON.parse(body);
-    //             if(body.zipcode.includes("100")){
-    //                 new_address = [address.slice(0, 3),"中正區",address.slice(3)].join("");
-    //                 return new_address;
-    //             }
-    //             //console.log(new_address);
-                
-    //         }
-    // });
-    // console.log("替代後",new_address)
-    // return new_address
-    
-
-
-
-
-
-
-    // const browser = await pptrFirefox.launch({headless: false});
-    // const page = await browser.newPage();
-    // await page.goto('https://www.tp.edu.tw/neighbor/html/');
-    // await page.waitForSelector("table")
-    // await page.type("#k2", address);
-    // await page.click("#searchBtn2");
-    // await page.waitForSelector("#content > ul:nth-child(3) > p")
-
-    // // get data details
-    // const result = await page.evaluate(() => {
-
-    //     let data = document.querySelector('#content > ul:nth-child(2) ').innerHTML
-
-    //     let district = data.substring(31,34)
-
-    //     return district
-    // })
-    
-    // await browser.close();
-    // return [address.slice(0, 3),result,address.slice(3)].join("");
 };
-
-
 
 
 function add_taipet_city(address){
@@ -238,11 +190,10 @@ let full_address = async function(address){
     address = number_change_words(address);
     address = word_change_number(address);
     address = add_taipet_city(address);
-    
+
     if(!address.includes("區")){
         address =await find_district(address);
     };
-    console.log(address)
     
     //把臺北市前面的郵遞區號拿掉
     for(let i = 0 ; i<address.length ; i++){
@@ -398,8 +349,9 @@ let taipei_city_request = async function (url,category,place_icon,api_name,api_a
 };
 
 
-    //台北市資料大平台 臺北市各區運動中心
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=e7c46724-3517-4ce5-844f-5a4404897b7d","運動中心","sport","name","addr",null,null,"name");
+//台北市資料大平台 臺北市各區運動中心
+taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=e7c46724-3517-4ce5-844f-5a4404897b7d","運動中心","sport","name","addr",null,null,"name");
+
 
 
 
@@ -415,11 +367,7 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                 console.log(body.error);
             }else{
                 data = JSON.parse(body);
-    
-                function sleep (time) {
-                    return new Promise((resolve) => setTimeout(resolve, time));
-                }
-            
+     
                 for (let i = 0; i<data.length;i++){
                     if (data[i].cityName.includes("臺北市")){
                         
@@ -664,127 +612,37 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
 
 
 
-    // request({
-    //     url:"https://andy6804tw.github.io/2018/02/11/nodejs-crawler/",
-    //     method:"GET"
-    //     },async function(error, response, body){
-    //         if(body.error){
-    //             console.log(body.error);
-    //         }else{
-    //             // let $ = cheerio.load(body); // 載入 body
-    //             console.log(response.body)
-    //             console.log(body,"123")
-    //             // console.log($('a').text())
-    //             // console.log($('#table_1').text())
+// request({
+//     url:"http://tada2002.ehosting.com.tw/Support.Tada2002.org.tw/NewsDtl.aspx?pk=104",
+//     method:"GET"
+//     },async function(error, response, body){
+//         if(body.error){
+//             console.log(body.error);
+//         }else{
 
-
-
-    //             // $('#table_1 > tbody > tr:nth-child(2) > td:nth-child(2)').each((idx,el) => {
-    //             //     console.log($(el).text())
-    //             // })
-
-
-    //             // let data_name_array = [];
-    //             // let data_address_array = [];
-
-
-    //             // let mail_name = $('a.rwd-close')
-    //             // $('a.rwd-close').each((idx,el) => {
-    //             //     if(!$(el).text() == ""){
-    //             //         data_name_array.push($(el).text())
-    //             //     };
-    //             // })
-                
-    //             // $('.detail').each((idx,el) => {
-    //             //     data_address_array.push($(el).text())
-                    
-    //             // });
-
-    //             // for (let i = 0; i<data_address_array.length;i++){
-
-    //             //     if(data_address_array[i].includes("臺北市")){
-                        
-    //             //         let map_list={
-    //             //             name:data_name_array[i],
-    //             //             address:data_address_array[i],
-    //             //             place_icon:"postal",
-    //             //         };
-    
-    //             //         if(!map_list.address.includes("路") && !map_list.address.includes("段") && !map_list.address.includes("號")){
-    //             //             continue;
-    //             //         }
-    
-    //             //         map_list.address =await full_address(map_list.address);
-    //             //         map_list.name = full_name(map_list.name);
-    
-    //             //         core_geocode_function (map_list,"郵局","name");
-    //             //     }
-
-    //             // }   
-    //         }
-    // });
-
-
-
-
-
-    // (async () => {
-    //     const browser = await puppeteer.launch({headless: false});
-    //     const page = await browser.newPage();
-    //     await page.goto('https://health.gov.taipei/cp.aspx?n=E04DC448D4D39810');
-    //     await page.waitForSelector("#base-content")
-
-    //     // get data details
-    //     const result = await page.evaluate(() => {
-    //         let data_all = [];
-    //         let data_name_array = [];
-    //         let data_address_array = [];
-    //         let data_address = document.querySelectorAll('#table_1 > tbody > tr > td')
-
-    //         data_address.forEach((item) => {
-    //             data_all.push(item.innerText.trim())
-    //         });
-    //         data_all.forEach((item) => {
-    //             if(data_all.indexOf(item) % 4 == 2){
-    //                 data_name_array.push(item)
-    //             }
-    //             if(data_all.indexOf(item) % 4 == 3){
-    //                 data_address_array.push(item)
-    //             }
-    //         });
-
-    //         return {
-    //             name:data_name_array,
-    //             address:data_address_array
-    //         }
-    //     })
-
-    //     await puppeteer_for_geocode_function ("健康服務中心","therapy",result,null,null,"name");
+//             console.log(body)
         
-    //     await browser.close();
-    // })();
+//             // for (let i = 0; i<data.length;i++){
+//             //     if (data[i].cityName.includes("臺北市")){
+                    
+//             //         let map_list={
+//             //             name:data[i].name,
+//             //             address:data[i].cityName+data[i].address,
+//             //             place_icon:"museum",
+//             //             information:data[i].ticketPrice,
+//             //             url:data[i].website
+//             //         };
 
+//             //         if(!map_list.address.includes("路") && !map_list.address.includes("段") && !map_list.address.includes("號")){
+//             //             continue;
+//             //         }
 
+//             //         map_list.address =await full_address(map_list.address);
+//             //         map_list.name = full_name(map_list.name);
 
+//             //         core_geocode_function (map_list,"博物館","name");
 
-    // https://map97.tpgos.taipei.gov.tw/embed/webapi.cfm?callback=jQuery3110648608215798592_1569331560165&SERVICE=ADDRESS&ADDRESS=%E5%85%89%E5%BE%A9%E5%8D%97%E8%B7%AF132%E8%99%9F&APIKEY=918A7CB57AE38AD226859ECFEE7811F0CF9BFC00B197C8D0780CF8C3C9BEE820BDAB728ECD6775DA2DF39DCAF26DBB68&ITEM_LIST=TPGOS_CA_ADDR%3A30%2CTPGOS_PWLMK_ADDR%3A30%2CTPGOS_XY_ADDR%3A30%2CTGOS_V2_ADDR%3A30%2CGMAPI_ADDR%3A30&SRS_T=WGS84&format=JSONP&_=1569331560166
-
-
-    // https://map97.tpgos.taipei.gov.tw/embed/webapi.cfm?callback=jQuery3110648608215798592_1569331560165&SERVICE=ADDRESS&ADDRESS=%E5%9F%BA%E9%9A%86%E8%B7%AF66%E8%99%9F&APIKEY=918A7CB57AE38AD226859ECFEE7811F0CF9BFC00B197C8D0780CF8C3C9BEE820BDAB728ECD6775DA2DF39DCAF26DBB68&ITEM_LIST=TPGOS_CA_ADDR%3A30%2CTPGOS_PWLMK_ADDR%3A30%2CTPGOS_XY_ADDR%3A30%2CTGOS_V2_ADDR%3A30%2CGMAPI_ADDR%3A30&SRS_T=WGS84&format=JSONP&_=1569331560168
-
-
-    // var str =encodeURI("台北市仁愛路4段１０號");
-    // console.log(str)
-
-
-    // request({
-    //     url:`https://zip5.5432.tw/zip5json.py?adrs=${str}&_=1569334120491`,
-    //     method:"GET"
-    //     },async function(error, response, body){
-    //         if(body.error){
-    //             console.log(body.error);
-    //         }else{
-    //             body = JSON.parse(body)
-    //             console.log(body);
-    //         }
-    // });
+//             //     }
+//             // };
+//         }
+// });

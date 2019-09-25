@@ -119,7 +119,7 @@ app.post("/api/map",async function (req, res) {
           console.log("redis","沒值")
           let select_all_place = await dao_map.select("map",null,"all places");
           select_all_place = JSON.stringify(select_all_place);
-          client.setex('all_place', 86400, select_all_place);
+          client.setex('all_place', 1, select_all_place); //記得要改回86400
           all_place_data = select_all_place;
           data.places =JSON.parse(all_place_data);
           res.send(data);

@@ -1,6 +1,4 @@
 const schedule = require('node-schedule');                          //node-schedule 模組，可定時執行
-// const puppeteer = require('puppeteer');                             //爬蟲套件 puppeteer 模組
-const pptrFirefox = require('puppeteer-firefox');                             //爬蟲套件 puppeteer 模組
 const request = require('request');                                 // request 模組
 const cheerio = require("cheerio");                                   //爬蟲時，可以讓前端的東西變成 DOM 物件
 const axios = require('axios');                                    //讓 request 變成類似 promise 物件

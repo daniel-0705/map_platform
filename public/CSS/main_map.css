@@ -68,13 +68,13 @@ nav{
     position: relative;
 }
 
-#search,.lsit_result{
+#search{
     height:50%;
 }
 
 #search{
     width:60%;
-    padding-right: 40px;
+    padding-right: 80px;
 }
 
 input{
@@ -85,9 +85,17 @@ input{
 }
 
 .lsit_result{
+    height:30%;
     position: absolute;
     cursor:pointer;
-    right: 35px;
+    right: 60px;
+}
+
+.delete_lsit_result{
+    height:30%;
+    position: absolute;
+    cursor:pointer;
+    right: 25px;
 }
 
 .no_public_list{

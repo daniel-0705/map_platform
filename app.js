@@ -119,7 +119,7 @@ app.post("/api/map",async function (req, res) {
           console.log("redis","沒值")
           let select_all_place = await dao_map.select("map",null,"all places");
           select_all_place = JSON.stringify(select_all_place);
-          client.setex('all_place', 1, select_all_place); //記得要改回86400
+          client.setex('all_place', 600, select_all_place); //記得要改回86400
           all_place_data = select_all_place;
           data.places =JSON.parse(all_place_data);
           res.send(data);
@@ -757,12 +757,20 @@ app.post("/api/user/map_list/search/place",async function(req,res){
       let fuzzy_search_place_in_address = await dao_map.fuzzy_search_place("map","address",search_word,5);
       fuzzy_search_place_in_address.map(item =>{search_place_result.push(item)});
 
+      //將重複的結果剃除
+      final_result = removeDuplicates(search_place_result, 'map_id');
+      //console.log(i);
+      //當最後結果超過特定數字就停止迴圈
+      if(final_result.length>5){
+        break;
+      }
+
       //從字串中刪除最後一個字開始找
       let positive_word = search_word.slice(0, -i-1);
       console.log(positive_word)
-      let positive_fuzzy_select_name = await dao_map.fuzzy_search_place("map","name",positive_word,6);
+      let positive_fuzzy_select_name = await dao_map.fuzzy_search_place("map","name",positive_word,5);
       positive_fuzzy_select_name.map(item =>{search_place_result.push(item)});
-      let positive_fuzzy_select_address = await dao_map.fuzzy_search_place("map","address",positive_word,6);
+      let positive_fuzzy_select_address = await dao_map.fuzzy_search_place("map","address",positive_word,5);
       positive_fuzzy_select_address.map(item =>{search_place_result.push(item)});
  
 
@@ -770,7 +778,7 @@ app.post("/api/user/map_list/search/place",async function(req,res){
       final_result = removeDuplicates(search_place_result, 'map_id');
       //console.log(i);
       //當最後結果超過特定數字就停止迴圈
-      if(final_result.length>6){
+      if(final_result.length>5){
         break;
       }
     } 

@@ -28,6 +28,7 @@
       var user_markers = [];      //使用者自己所有的地點
       var zoom;                   //設定 zoom 的全域變數
       var infoWindow;             //設定 infoWindow 的全域變數
+      var marker           //設定 搜尋的 marker 的全域變數
 
       function initMap() {
         //new map
@@ -56,35 +57,35 @@
           console.log(zoom);
 
 
-          // for (let i = 0; i<markers.length; i++){
-          //   markers[i].setVisible(false);
-          //   if (zoom > 12) {
-          //     if(markers[i].category.includes("藝文館所") ||markers[i].category.includes("環境教育機構") ||markers[i].category.includes("廢棄物處理場")){
-          //       markers[i].setVisible(true);
-          //     }
-          //   }
-          //   if (zoom > 13) {
-          //     if(markers[i].category.includes("區公所")){
-          //       markers[i].setVisible(true);
-          //     }
-          //   }
-          //   if (zoom > 14) {
-          //     if(markers[i].category.includes("博物館")||markers[i].category.includes("運動中心")||markers[i].category.includes("郵局")||markers[i].category.includes("健康服務中心")){
-          //       markers[i].setVisible(true);
-          //     }
-          //   }
-          //   if (zoom > 15) {
-          //     if(markers[i].category.includes("環保旅店")||markers[i].category.includes("文化資產")||markers[i].category.includes("拖吊場")||markers[i].category.includes("休閒農場")||markers[i].category.includes("電子遊戲場")||markers[i].category.includes("健康服務中心")){
-          //       markers[i].setVisible(true);
-          //     }
-          //   }
+          for (let i = 0; i<markers.length; i++){
+            markers[i].setVisible(false);
+            if (zoom > 12) {
+              if(markers[i].category.includes("藝文館所") ||markers[i].category.includes("環境教育機構") ||markers[i].category.includes("廢棄物處理場")){
+                markers[i].setVisible(true);
+              }
+            }
+            if (zoom > 13) {
+              if(markers[i].category.includes("區公所")){
+                markers[i].setVisible(true);
+              }
+            }
+            if (zoom > 14) {
+              if(markers[i].category.includes("博物館")||markers[i].category.includes("運動中心")||markers[i].category.includes("郵局")||markers[i].category.includes("健康服務中心")){
+                markers[i].setVisible(true);
+              }
+            }
+            if (zoom > 15) {
+              if(markers[i].category.includes("環保旅店")||markers[i].category.includes("文化資產")||markers[i].category.includes("拖吊場")||markers[i].category.includes("休閒農場")||markers[i].category.includes("電子遊戲場")||markers[i].category.includes("健康服務中心")){
+                markers[i].setVisible(true);
+              }
+            }
 
-          //   if (zoom > 17) {
-          //     if(markers[i].category.includes("社區資源回收站")||markers[i].category.includes("電動機車充電")){
-          //       markers[i].setVisible(true);
-          //     }
-          //   }
-          // }
+            if (zoom > 17) {
+              if(markers[i].category.includes("社區資源回收站")||markers[i].category.includes("電動機車充電")){
+                markers[i].setVisible(true);
+              }
+            }
+          }
         });
       }
       
@@ -164,7 +165,7 @@
                     url: `/img/${user_place_data[0].list_icon}.png`
                   },
                   animation: google.maps.Animation.DROP,
-                  //zIndex: 500,
+                  zIndex: -1,
                   map:map
                 });
                 
@@ -340,10 +341,6 @@
                 let span = document.createElement("span");
                 span.className = "slider round";
                 label.appendChild(span);
-
-
-                
-                
               }
             }
               
@@ -428,6 +425,7 @@
                     url: `/img/${all_markers.places[i].place_icon}.png`//,
                     //scaledSize: new google.maps.Size(30, 30)  //調整大小
                   },
+                  zIndex: -1,
                   map:map
                 });
                 // id = i 是用位置坐定位，當知道每個地點的順序後，因為公用地點的數量不會變，所以可以用位置來決定哪個地點 null
@@ -453,6 +451,7 @@
                   marker_content.longitude = all_markers.places[i].longitude;
                   marker_content.information = all_markers.places[i].information;
                   console.log(marker_content)
+
                   infoWindow.setContent(this.content);
                   infoWindow.open(this.getMap(), this);
 
@@ -460,7 +459,7 @@
                 });
                 
                 markers.push(marker);
-                //marker.setVisible(false);  //先隱藏 看不到地標
+                marker.setVisible(false);  //先隱藏 看不到地標
               }
 
               render_user_all_place (all_markers.user_places);
@@ -526,6 +525,7 @@
               url: `/img/${user_all_place[i].list_icon}.png`
               //scaledSize: new google.maps.Size(50, 50)  //調整大小
             },
+            zIndex: -1,
             map:map
           });
           marker.content = `
@@ -580,7 +580,7 @@
 
         google.maps.event.addListener(map, 'click', function () { 
           infoWindow.close();
-
+          marker.setMap(null);
           close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
         });
 
@@ -1043,7 +1043,7 @@
                     url: `/img/point.png`
                     },
                     animation: google.maps.Animation.DROP,
-                    zIndex: 500,
+                    zIndex: 5,
                     map:map
                   });
 
@@ -1129,10 +1129,58 @@
       }
 
       function change_center_to_place(e){
+
+        //清除上一個顯示的地點
+        if(marker){
+          marker.setMap(null);
+        }
+
         document.getElementById("search_place").value = "";
         console.log(e)
-        // map.setZoom(18)
+        map.setZoom(17);
+
         map.panTo({lat: Number(e.id.split("_")[1]), lng: Number(e.id.split("_")[0])});
+
+        marker = new google.maps.Marker({
+            position:{lat: Number(e.id.split("_")[1]), lng: Number(e.id.split("_")[0])},
+            icon: {
+              url: `/img/point2.png`,
+              zIndex: 10000
+              //scaledSize: new google.maps.Size(50, 50)  //調整大小
+            },
+            animation: google.maps.Animation.DROP,
+            map:map
+        });
+
+        marker.content = `
+        <h1 id =>${e.innerHTML}</h1>
+        <br>
+        <buttom class = "choice_list" id =${e.id.split("_")[1]}_${e.id.split("_")[0]} style="cursor:pointer" onclick="select_list(this)">收藏</buttom>
+        `;                
+
+        infoWindow = new google.maps.InfoWindow();
+        google.maps.event.addListener(marker, 'spider_click', function () {
+          //收藏地點的 slidebar 即時顯示 點擊地標上的地名
+          let a_place_title = document.getElementsByClassName("a_place_title")[0];
+          a_place_title.innerHTML = all_markers.places[i].name;
+
+          console.log('655')
+          // //將點擊的地標資訊傳到外面的參數中
+          // marker_content.name = all_markers.places[i].name;
+          // marker_content.place_order = i;
+          // marker_content.latitude = all_markers.places[i].latitude;
+          // marker_content.longitude = all_markers.places[i].longitude;
+          // marker_content.information = all_markers.places[i].information;
+          // console.log(marker_content)
+
+          infoWindow.setContent(this.content);
+          infoWindow.open(this.getMap(), this);
+
+          close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
+        });
+
+       
+
       }
  
       render_user_all_lists_name();
@@ -1218,7 +1266,7 @@
         <input type="radio" name="edit_pattern" value="maroon" ><img src ="/img/maroon.png">
         <input type="radio" name="edit_pattern" value="navy" ><img src ="/img/navy.png">
         <input type="radio" name="edit_pattern" value="olive" ><img src ="/img/olive.png">
-        <input type="radio" name="edit_pattern" value="purple" ><img src ="/img/purple.png"><br>
+        <input type="radio" name="edit_pattern" value="purple" ><img src ="/img/purple.png"><p>
         <input type="radio" name="edit_pattern" value="silver" ><img src ="/img/silver.png">
         <input type="radio" name="edit_pattern" value="teal" ><img src ="/img/teal.png">
         <input type="radio" name="edit_pattern" value="white" ><img src ="/img/white.png">
@@ -1278,8 +1326,9 @@
 
       <div class= "search_and_list" id="search_and_list">
         <div class = "search_list_bar">
-          <input  id = "search" placeholder="搜尋清單" autocomplete="off">
+          <input  id = "search" placeholder="搜尋他人清單" autocomplete="off">
           <img src="img/search.png" class= "lsit_result" onclick="search_public_list ()">
+          <img src="img/delete.png" class= "delete_lsit_result" onclick="delete_search_public_list ()">
         </div>
 
         <div class = "search_list_result">
@@ -1400,7 +1449,10 @@
       }
     });
     
-
+    function delete_search_public_list (){
+      delete_child_element("search_list_result");
+      document.getElementById("search").value = "";
+    }
     
 
     let search_place = document.getElementById("search_place");
@@ -1490,16 +1542,21 @@
     }
     //點擊搜尋地址按鈕外的地方，搜尋列會縮回去 //點擊搜尋地址結果外的地方，搜尋結果會關掉
     document.onclick = function(e){
-      console.log(e.target.id)
-      console.log(e.target.id !== 'search_place_result')
+      // console.log(e.target.id);
+      // console.log(e.target.className);
       if((e.target.id !== 'search_place' && e.target.className !== 'searchButton')){
         search_place_input.style.width = "0px";
         search_place_input.style.padding = "0px";
       }
       if(e.target.id !== 'search_place_result'){
       search_place_result.style.display = 'none';
-      //search_place_result.setAttribute("display","none") ;
       }
+
+      //點擊地圖以外的地方 infoWindow 會關掉
+      if(e.target.id || e.target.className){
+        infoWindow.close();
+      }
+
     };
 
 

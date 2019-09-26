@@ -37,6 +37,7 @@ function replace_full_and_symbol(address){
     address = address.replace(/［/g, "(");
     address = address.replace(/］/g, ")");
     address = address.replace(/号/g, "號");
+    address = address.replace(/～/g, "~");
     // address = address.replace(/F/g, "樓");
     // address = address.replace(/Ｆ/g, "樓");
     // address = address.replace(/f/g, "樓");
@@ -188,16 +189,12 @@ let full_address = async function(address){
     address = address.replace(/ｆ/g, "樓");
     address = address.replace(/Ｂ/g, "B");
     address = address.replace(/\./g, "、"); 
-
+  
     address = replace_full_and_symbol(address);
     address = number_change_words(address);
     address = word_change_number(address);
     address = add_taipet_city(address);
     address = address.replace(/ *\([^)]*\) */g, "");
-
-    if(!address.includes("區")){
-        address =await find_district(address);
-    };
 
     //把臺北市前面的郵遞區號拿掉
     for(let i = 0 ; i<address.length ; i++){
@@ -206,8 +203,15 @@ let full_address = async function(address){
         }
     }
 
+    await sleep(1000); //太快會被禁
+
+    if(!address.includes("區")){
+        address =await find_district(address);
+    };
+    
     return address;
 }
+
 
 let full_name = function(name){
     if(name.includes("台北")){
@@ -1127,60 +1131,284 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
             }
     })
 
+    //政府資料開放平台 休閒農業 更新接在臺北休閒農場後面
+    request({
+    url:"http://data.coa.gov.tw/Service/OpenData/ODwsv/ODwsvAttractions.aspx",
+    method:"GET"
+        },async function(error, response, body){
+        if(body.error){
+            console.log(body.error);
+        }else{
+            data = JSON.parse(body);
+            console.log(data)
+            
+            for (let i = 0; i<data.length;i++){
+                if (data[i].City.includes("臺北市")){
+                    
+                    let map_list={
+                        name:data[i].Name,
+                        address:data[i].Address,
+                        place_icon:"farm",
+                        information:data[i].Introduction
+                    };
+
+                    if(!map_list.address.includes("路") && !map_list.address.includes("段") && !map_list.address.includes("號")&& !map_list.address.includes("街")){
+                        continue;
+                    }
+                    if(map_list.address.length > 50 || map_list.address.length < 5){
+                        continue;
+                    }
+
+
+                    map_list.address =await full_address(map_list.address);
+                    map_list.name = full_name(map_list.name);
+
+                    core_geocode_function (map_list,"休閒農場","name");
+
+                }
+            };
+        }
+    });
+
+    //政府資料開放平台 休閒農業 更新接在臺北休閒農場後面 只有多一個
+    request({
+        url:"http://data.coa.gov.tw/Service/OpenData/ODwsv/ODwsvOutdoorEdu.aspx",
+        method:"GET"
+        },async function(error, response, body){
+            if(body.error){
+                console.log(body.error);
+            }else{
+                data = JSON.parse(body);
+                
+                for (let i = 0; i<data.length;i++){
+                    if (data[i].County.includes("台北市")){
+                        
+                        let map_list={
+                            name:data[i].FarmNm_CH,
+                            address:data[i].Address_CH,
+                            place_icon:"farm"
+                        };
+
+                        if(!map_list.address.includes("路") && !map_list.address.includes("段") && !map_list.address.includes("號")&& !map_list.address.includes("街")){
+                            continue;
+                        }
+                        if(map_list.address.length > 50 || map_list.address.length < 5){
+                            continue;
+                        }
+
+
+                        map_list.address =await full_address(map_list.address);
+                        map_list.name = full_name(map_list.name);
+
+                        core_geocode_function (map_list,"休閒農場","name");
+
+                    }
+                };
+            }
+    });
+
+    //政府資料開放平台 休閒農業 更新接在臺北休閒農場後面 只有多一個
+    request({
+        url:"http://data.coa.gov.tw/Service/OpenData/ODwsv/ODwsvPermitAgri.aspx",
+        method:"GET"
+            },async function(error, response, body){
+            if(body.error){
+                console.log(body.error);
+            }else{
+                data = JSON.parse(body);
+                
+                for (let i = 0; i<data.length;i++){
+                    if (data[i].CountyName.includes("臺北市")){
+                        
+                        let map_list={
+                            name:data[i].AgriMainName,
+                            address:data[i].AgriMainAdrs,
+                            place_icon:"farm"
+                        };
+
+                        if(!map_list.address.includes("路") && !map_list.address.includes("段") && !map_list.address.includes("號")&& !map_list.address.includes("街")){
+                            continue;
+                        }
+                        if(map_list.address.length > 50 || map_list.address.length < 5){
+                            continue;
+                        }
+
+
+                        map_list.address =await full_address(map_list.address);
+                        map_list.name = full_name(map_list.name);
+
+                        core_geocode_function (map_list,"休閒農場","name");
+
+                    }
+                };
+            }
+    });
+
+    //政府資料開放平台 特色圖書館
+    request({
+        url:"https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=K",
+        method:"GET"
+            },async function(error, response, body){
+            if(body.error){
+                console.log(body.error);
+            }else{
+                let data = JSON.parse(body);
+            
+                for (let i = 0; i<data.length;i++){
+                    if (data[i].cityName.includes("臺北市")){
+                        
+                        let map_list={
+                            name:data[i].name,
+                            address:data[i].address,
+                            place_icon:"library",
+                            information:data[i].intro
+                        };
+
+                        if(!map_list.address.includes("路") && !map_list.address.includes("段") && !map_list.address.includes("號")&& !map_list.address.includes("街")){
+                            continue;
+                        }
+                        if(map_list.address.length > 50 || map_list.address.length < 5){
+                            continue;
+                        }
+
+
+                        map_list.address =await full_address(map_list.address);
+                        map_list.name = full_name(map_list.name);
+
+                        core_geocode_function (map_list,"圖書館","name");
+
+                    }
+                };
+            }
+    });
+
+    //政府資料開放平台 獨立書店
+    request({
+        url:"https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=M",
+        method:"GET"
+            },async function(error, response, body){
+            if(body.error){
+                console.log(body.error);
+            }else{
+                let data = JSON.parse(body);
+            
+                for (let i = 0; i<data.length;i++){
+                    if (data[i].cityName.includes("臺北市")){
+                        
+                        let map_list={
+                            name:data[i].name,
+                            address:data[i].address,
+                            place_icon:"store",
+                            information:data[i].intro
+                        };
+
+                        if(!map_list.address.includes("路") && !map_list.address.includes("段") && !map_list.address.includes("號")&& !map_list.address.includes("街")){
+                            continue;
+                        }
+                        if(map_list.address.length > 50 || map_list.address.length < 5){
+                            continue;
+                        }
+
+                        map_list.address =await full_address(map_list.address);
+                        map_list.name = full_name(map_list.name);
+
+                        core_geocode_function (map_list,"獨立書店","name");
+
+                    }
+                };
+            }
+    });
+
+    //台北市立圖書館 圖書館
+    request({
+        url:`https://tpml.gov.taipei/News_Content.aspx?n=5319E72A2B31CC90&sms=CFFFC938B352678A&s=E997B413EC53833C`,
+        method:"GET",
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
+            'Accept': '*/*',
+            'Cache-Control': 'no-cache',
+            'Host': 'tpml.gov.taipei',
+            'Connection': 'keep-alive'
+        }
+            },async function(error, response, body){
+            if(body.error){
+                console.log(body.error);
+            }else{
+                let $ = cheerio.load(body); // 載入 body
+                
+                let data_name_array = [];
+                let data_address_array = [];
+                
+                $('td').each((idx,el) => {
+                    //console.log($(el).text(),idx) 
+                    if(idx % 5 == 0 && idx <40){
+                        //console.log($(el).text(),idx)
+                        data_name_array.push($(el).text())
+                    };
+                    if(idx % 5 == 1 && idx <40){
+                        //console.log($(el).text(),idx)
+                        data_address_array.push($(el).text())
+                    };
+                })
+
+                $('#table_2 > tbody > tr > td').each((idx,el) => {
+                    //console.log($(el).text(),idx) 
+                    if(idx % 16 == 0){
+                        //console.log($(el).text(),idx)
+                        data_name_array.push("臺北市立圖書館"+$(el).text())
+                    };
+                    if(idx % 16 == 2){
+                        //console.log($(el).text(),idx)
+                        data_address_array.push($(el).text())
+                    };
+                })
+
+                $('td > a').each((idx,el) => {
+                    //console.log($(el).text(),idx) 
+                    if(idx % 2 == 0 && idx >45){
+                        //console.log($(el).text(),idx)
+                        if($(el).text().includes("分館") || $(el).text().includes("總館")){
+                            data_name_array.push("臺北市立圖書館"+$(el).text())
+                        }else{
+                        data_name_array.push($(el).text())
+                        }
+                    };
+                    if(idx % 2 == 1 && idx >45){
+                        //console.log($(el).text(),idx)
+                        data_address_array.push($(el).text())
+                    };
+                })
+
+                
+
+                for (let i = 0; i<data_address_array.length;i++){
+                
+                    let map_list={
+                        name:data_name_array[i],
+                        address:data_address_array[i],
+                        place_icon:"library",
+                    };
+
+                    if(!map_list.address.includes("路") && !map_list.address.includes("段") && !map_list.address.includes("號")&& !map_list.address.includes("街")){
+                        continue;
+                    }
+                    if(map_list.address.length > 50 || map_list.address.length < 5){
+                        continue;
+                    }
+                    
+                    map_list.address =await full_address(map_list.address);
+                    map_list.name = full_name(map_list.name);
+                    console.log(map_list)
+                    core_geocode_function (map_list,"圖書館","name");
+                
+                }   
+            }
+    });
+
+
 
 
 });
 
-
-
-   //維基百科 電影院
-//    request({
-//     url:"https://quality.data.gov.tw/dq_download_json.php?nid=53681&md5_url=79c5148d3e161b52e6765f865aba32dc",
-//     method:"GET"
-//         },async function(error, response, body){
-//         if(body.error){
-//             console.log(body.error);
-//         }else{
-//             let $ = cheerio.load(body); // 載入 body
-//             console.log(body);
-//             let data_name_array = [];
-//             let data_address_array = [];
-
-            // $('#mw-content-text > div > table:nth-child(6) > tbody > tr > td').each((idx,el) => {
-            //     //console.log($(el).text(),idx) 
-            //     if(idx % 6 == 0){
-            //         //console.log($(el).text(),idx)
-            //         data_name_array.push($(el).text())
-            //     };
-            //     if(idx % 6 == 4){
-            //         //console.log($(el).text(),idx)
-            //         data_address_array.push($(el).text())
-            //     };
-            // })
-
-
-            // for (let i = 0; i<data_address_array.length;i++){
-             
-            //     let map_list={
-            //         name:data_name_array[i],
-            //         address:data_address_array[i],
-            //         place_icon:"movie",
-            //     };
-
-            //     if(!map_list.address.includes("路") && !map_list.address.includes("段") && !map_list.address.includes("號")&& !map_list.address.includes("街")){
-            //         continue;
-            //     }
-            //     if(map_list.address.length > 50 || map_list.address.length < 5){
-            //         continue;
-            //     }
-
-            //     map_list.address =await full_address(map_list.address);
-            //     map_list.name = full_name(map_list.name);
-                
-            //     core_geocode_function (map_list,"電影院","name");
-            
-            // }   
-//         }
-//    });
 
 

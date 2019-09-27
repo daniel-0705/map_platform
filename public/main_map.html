@@ -24,11 +24,10 @@
       var map;
       var oms;                    //設定 spiderfy的全域變數
       var markers = [];           //map 上所有公開的地點
-      var marker_content = {};    //將點擊到的地標資訊存在這裡
       var user_markers = [];      //使用者自己所有的地點
       var zoom;                   //設定 zoom 的全域變數
       var infoWindow;             //設定 infoWindow 的全域變數
-      var marker           //設定 搜尋的 marker 的全域變數
+      var search_marker;          //設定 搜尋的 marker 的全域變數
 
       function initMap() {
         //new map
@@ -99,6 +98,13 @@
           e.removeAttribute("onclick");
           // close_slidebar();
 
+          console.log(e)
+          console.log(e.parentElement.children[0].innerHTML)
+          let a_place_title = document.getElementsByClassName("a_place_title")[0];
+          
+          a_place_title.innerHTML = e.parentElement.children[0].innerHTML;
+          a_place_title.id = e.parentElement.children[0].id;
+
           document.getElementById("a_place").style.width = "300px";
           document.getElementById("map").style.marginLeft = "300px";
           document.getElementById("open_bar").style.marginLeft = "300px";
@@ -111,31 +117,28 @@
             type :"select",
             data : {
               access_token:localStorage.getItem("access_token"),
-              place_name : marker_content.name
+              place_name : a_place_title.innerHTML
             }
           };
-
           render_collection_list_or_not(list_data);
         }
-        
-        
       }
 
       function store_place_in_list(e){
-        // console.log(e)
-        // console.log(marker_content)
+        console.log(e)
+        console.log(e.parentElement.parentElement.parentElement.children[0].children[0].innerHTML)
+        console.log(e.parentElement.parentElement.parentElement.children[0].children[0].id)
 
         let a_place_name = document.getElementById("a_place_name")
 
         let place_data ={
           access_token : localStorage.getItem("access_token"),
           list_name : e.parentElement.children[1].innerHTML,
-          place_name : marker_content.name,
-          place_order : marker_content.place_order,
-          longitude : marker_content.longitude,
-          latitude : marker_content.latitude,
-          information : marker_content.information
+          place_name : e.parentElement.parentElement.parentElement.children[0].children[0].innerHTML,
+          place_order : e.parentElement.parentElement.parentElement.children[0].children[0].id,
         }
+
+
 
         console.log(place_data)
 
@@ -160,21 +163,29 @@
                 console.log(user_place_data);
                 //新增收藏地點
                 let marker = new google.maps.Marker({
-                  position:{lat: place_data.latitude, lng: place_data.longitude},
+                  position:{lat: Number(user_place_data[0].latitude), lng: Number(user_place_data[0].longitude)},
                   icon: {
                     url: `/img/${user_place_data[0].list_icon}.png`
                   },
                   animation: google.maps.Animation.DROP,
-                  zIndex: -1,
+                  zIndex: 15,
                   map:map
                 });
                 
                 let user_place_index = user_markers.length
+                
+                //資訊是空的時候，不要顯示 null
+                if(user_place_data[0].information == null){
+                  user_place_data[0].information="";
+                }
 
                 marker.content = `
-                  <h1 id=${place_data.place_order}>${place_data.place_name}</h1>
-                  <p id = ${user_place_index}>${place_data.information}</p>
-                  <buttom class = "choice_list" id =${place_data.latitude}_${place_data.longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
+                  <div class = "infowindow_container">
+                    <h1 class ="infowindow_title" id=${user_place_data[0].place_order}>${user_place_data[0].place_name}</h1>
+                    <p class ="infowindow_content" id = ${user_place_index}>${user_place_data[0].information}</p>
+                    <br>
+                    <buttom class = "choice_list" id =${user_place_data[0].latitude}_${user_place_data[0].longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
+                  </div>
                   `;
                 infoWindow = new google.maps.InfoWindow();
 
@@ -183,22 +194,12 @@
 
                 //定義每個地標屬於的清單
                 marker.list = user_place_data[0].list_name
+                //定義每個地標屬於的地名
+                marker.name = user_place_data[0].place_name;
 
                 oms.addMarker(marker);
                 google.maps.event.addListener(marker, 'spider_click', function (e) { 
-                  //收藏地點的 slidebar 即時顯示 點擊地標上的地名
-                  let a_place_title = document.getElementsByClassName("a_place_title")[0];
-                  a_place_title.innerHTML = place_data.place_name;
-                  
-                  //將點擊的地標資訊傳到外面的參數中
-                  marker_content.name = place_data.place_name;
-                  marker_content.place_order = place_data.place_order;
-                  marker_content.user_place_order = user_place_index,
-                  marker_content.latitude = place_data.latitude;
-                  marker_content.longitude = place_data.longitude;
-                  marker_content.information = place_data.information;
-                  
-                  console.log(marker_content)
+
                   infoWindow.setContent(this.content);
                   infoWindow.open(this.getMap(), this);
 
@@ -218,9 +219,9 @@
                 delete_child_element("a_list_content");
                 render_a_list_all_place_name(place_data);
                 
-
+                
                 user_markers.push(marker);
-                markers[marker_content.place_order].setMap(null); //把原本的地標 隱藏
+                markers[user_place_data[0].place_order].setMap(null); //把原本的地標 隱藏
 
               }
             }
@@ -242,13 +243,25 @@
                 console.log(user_place_data);
                 console.log(place_data)
                 if(user_place_data.check_place_is_exist == 0){
-                  markers[marker_content.place_order].setMap(map); //把原本的地標 調回來
+                  markers[place_data.place_order].setMap(map); //把原本的地標 調回來
                 }
 
                 //區別移除的點是當下存的還是之前存的
                 if (e.id == ""){
                   console.log("先前存的的地點")
-                  user_markers[marker_content.user_place_order].setMap(null); //把使用者先前存的的地標隱藏
+
+                  //為了在搜尋列 顯示地點名稱時知道順序 所以只好用迴圈的方式找出該地名的順序
+                  let marker_order;
+                  for (let j =0 ; j <user_markers.length; j++){
+                    console.log(place_data.place_name)
+                    console.log(user_markers[j])
+                    if(user_markers[j].name == place_data.place_name){
+                      marker_order = j;
+                      console.log(marker_order)
+                    }
+                  }
+
+                  user_markers[marker_order].setMap(null); //把使用者先前存的的地標隱藏
                   //使用者按下移除後，會顯現收藏的清單名稱及內容
                   delete_child_element("a_list_content");
                   render_a_list_all_place_name(place_data);
@@ -374,7 +387,7 @@
               for(let i =0; i<user_place_data.length ; i++){     
                 let new_place_name = document.createElement("p");
                 new_place_name.className = "user_place_name";
-                new_place_name.id = user_place_data[i].longitude+"_"+user_place_data[i].latitude
+                new_place_name.id = user_place_data[i].longitude+"_"+user_place_data[i].latitude+"_"+user_place_data[i].place_order
                 new_place_name.innerHTML = user_place_data[i].place_name;
                 new_place_name.setAttribute("onClick", "change_center_to_place(this)");
                 let a_list_content = document.getElementsByClassName("a_list_content")[0];
@@ -428,29 +441,30 @@
                   zIndex: -1,
                   map:map
                 });
+
+                //資訊是空的時候，不要顯示 null
+                if(all_markers.places[i].information == null){
+                  all_markers.places[i].information="";
+                }
+
                 // id = i 是用位置坐定位，當知道每個地點的順序後，因為公用地點的數量不會變，所以可以用位置來決定哪個地點 null
                 marker.content = `
-                  <h1 id =${i}>${all_markers.places[i].name}</h1>
-                  <p>${all_markers.places[i].information}</p>
-                  <buttom class = "choice_list" id =${all_markers.places[i].latitude}_${all_markers.places[i].longitude} style="cursor:pointer" onclick="select_list(this)">收藏</buttom>
+                  <div class = "infowindow_container">
+                    <h1 class ="infowindow_title" id =${i}>${all_markers.places[i].name}</h1>
+                    <p class ="infowindow_content">${all_markers.places[i].information}</p>
+                    <br>
+                    <buttom class = "choice_list" id =${all_markers.places[i].latitude}_${all_markers.places[i].longitude} style="cursor:pointer" onclick="select_list(this)">收藏</buttom>
+                  </div>
                 `;                
 
                 //定義每個地標屬於的分類
                 marker.category = all_markers.places[i].category;
+                //定義每個地標屬於的地名
+                marker.name = all_markers.places[i].name;
+
 
                 oms.addMarker(marker);
                 google.maps.event.addListener(marker, 'spider_click', function () {
-                  //收藏地點的 slidebar 即時顯示 點擊地標上的地名
-                  let a_place_title = document.getElementsByClassName("a_place_title")[0];
-                  a_place_title.innerHTML = all_markers.places[i].name;
-
-                  //將點擊的地標資訊傳到外面的參數中
-                  marker_content.name = all_markers.places[i].name;
-                  marker_content.place_order = i;
-                  marker_content.latitude = all_markers.places[i].latitude;
-                  marker_content.longitude = all_markers.places[i].longitude;
-                  marker_content.information = all_markers.places[i].information;
-                  console.log(marker_content)
 
                   infoWindow.setContent(this.content);
                   infoWindow.open(this.getMap(), this);
@@ -528,31 +542,29 @@
             zIndex: -1,
             map:map
           });
+
+          //資訊是空的時候，不要顯示 null
+          if(user_all_place[i].information == null){
+            user_all_place[i].information="";
+          }
+
           marker.content = `
-            <h1 id =${user_all_place[i].place_order}>${user_all_place[i].place_name}</h1>
-            <p id = ${i}>${user_all_place[i].information}</p>
-            <buttom class = "choice_list" id =${user_all_place[i].latitude}_${user_all_place[i].longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
+            <div class = "infowindow_container">
+              <h1 class ="infowindow_title" id =${user_all_place[i].place_order}>${user_all_place[i].place_name}</h1>
+              <p class ="infowindow_content" id = ${i}>${user_all_place[i].information}</p>
+              <br>
+              <buttom class = "choice_list" id =${user_all_place[i].latitude}_${user_all_place[i].longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
+            </div>
           `;
           
           //定義每個地標屬於的清單
           marker.list = user_all_place[i].list_name
+          //定義每個地標屬於的地名
+          marker.name = user_all_place[i].place_name;
 
           oms.addMarker(marker);
           google.maps.event.addListener(marker, 'spider_click', function () {                   
-            //收藏地點的 slidebar 即時顯示 點擊地標上的地名
-            let a_place_title = document.getElementsByClassName("a_place_title")[0];
-            a_place_title.innerHTML = user_all_place[i].place_name;
 
-            
-            //將點擊的地標資訊傳到外面的參數中
-            marker_content.name = user_all_place[i].place_name;
-            marker_content.place_order = user_all_place[i].place_order;
-            marker_content.user_place_order = i,
-            marker_content.latitude = user_all_place[i].latitude;
-            marker_content.longitude = user_all_place[i].longitude;
-            marker_content.information = user_all_place[i].information;
-
-            console.log(marker_content);
             console.log(marker);
             console.log(marker.icon);
             console.log(marker.icon.url);
@@ -580,7 +592,7 @@
 
         google.maps.event.addListener(map, 'click', function () { 
           infoWindow.close();
-          marker.setMap(null);
+          search_marker.setMap(null); //使用者點擊其他地方時關掉紅色的搜尋地標
           close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
         });
 
@@ -1047,10 +1059,17 @@
                     map:map
                   });
 
+                  //資訊是空的時候，不要顯示 null
+                  if(user_place_data.user_list_place[i].information == null){
+                    user_place_data.user_list_place[i].information="";
+                  }
+
                   marker.content = `
-                        <h1>${user_place_data.user_list_place[i].place_name}</h1>
-                        <p>${user_place_data.user_list_place[i].information}</p>
-                        `;
+                    <div class = "infowindow_container">
+                      <h1 class ="infowindow_title">${user_place_data.user_list_place[i].place_name}</h1>
+                      <p class ="infowindow_content">${user_place_data.user_list_place[i].information}</p>
+                    </div>
+                  `;
 
                   user_public_list_markers.push(marker);
                   oms.addMarker(marker);
@@ -1131,55 +1150,52 @@
       function change_center_to_place(e){
 
         //清除上一個顯示的地點
-        if(marker){
-          marker.setMap(null);
+        if(search_marker){
+          search_marker.setMap(null);
         }
-
+     
         document.getElementById("search_place").value = "";
         console.log(e)
         map.setZoom(17);
 
         map.panTo({lat: Number(e.id.split("_")[1]), lng: Number(e.id.split("_")[0])});
 
-        marker = new google.maps.Marker({
-            position:{lat: Number(e.id.split("_")[1]), lng: Number(e.id.split("_")[0])},
-            icon: {
-              url: `/img/point2.png`,
-              zIndex: 10000
-              //scaledSize: new google.maps.Size(50, 50)  //調整大小
-            },
-            animation: google.maps.Animation.DROP,
-            map:map
+        search_marker = new google.maps.Marker({
+          position:{lat: Number(e.id.split("_")[1]), lng: Number(e.id.split("_")[0])},
+          icon: {
+            url: `/img/point2.png`,
+            zIndex: 10000
+            //scaledSize: new google.maps.Size(50, 50)  //調整大小
+          },
+          //animation: google.maps.Animation.DROP,
+          map:map
         });
+        
 
-        marker.content = `
-        <h1 id =>${e.innerHTML}</h1>
-        <br>
-        <buttom class = "choice_list" id =${e.id.split("_")[1]}_${e.id.split("_")[0]} style="cursor:pointer" onclick="select_list(this)">收藏</buttom>
-        `;                
+        search_marker.content = `
+        <div class = "infowindow_container">
+          <h1 class ="infowindow_title" id = ${e.id.split("_")[2]} >${e.innerHTML}</h1>
+          <br>
+          <buttom class = "choice_list" id =${e.id.split("_")[1]}_${e.id.split("_")[0]} style="cursor:pointer" onclick="select_list(this)">收藏</buttom>
+        </div>
+        `;
+        
 
-        infoWindow = new google.maps.InfoWindow();
-        google.maps.event.addListener(marker, 'spider_click', function () {
-          //收藏地點的 slidebar 即時顯示 點擊地標上的地名
-          let a_place_title = document.getElementsByClassName("a_place_title")[0];
-          a_place_title.innerHTML = all_markers.places[i].name;
+        let search_place_infoWindow = new google.maps.InfoWindow();
+
+        //直接顯示資訊
+        search_place_infoWindow.setContent(search_marker.content);
+        search_place_infoWindow.open(search_marker.getMap(), search_marker);
+
+        google.maps.event.addListener(search_marker, 'click', function () {
 
           console.log('655')
-          // //將點擊的地標資訊傳到外面的參數中
-          // marker_content.name = all_markers.places[i].name;
-          // marker_content.place_order = i;
-          // marker_content.latitude = all_markers.places[i].latitude;
-          // marker_content.longitude = all_markers.places[i].longitude;
-          // marker_content.information = all_markers.places[i].information;
-          // console.log(marker_content)
 
-          infoWindow.setContent(this.content);
-          infoWindow.open(this.getMap(), this);
+          search_place_infoWindow.setContent(this.content);
+          search_place_infoWindow.open(this.getMap(), this);
 
           close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
         });
-
-       
 
       }
  
@@ -1511,9 +1527,17 @@
                 name_and_address_container.className = "name_and_address_container";
                 parent_place.appendChild(name_and_address_container);
 
+                //為了在搜尋列 顯示地點名稱時知道順序 所以只好用迴圈的方式找出該地名的順序
+                let marker_order;
+                for (let j =0 ; j <markers.length; j++){
+                  if(markers[j].name == place_data[i].name){
+                    marker_order = j;
+                  }
+                }
+
                 let place_name = document.createElement("p");
                 place_name.innerHTML = place_data[i].name;
-                place_name.id =place_data[i].longitude + "_" + place_data[i].latitude;
+                place_name.id =place_data[i].longitude + "_" + place_data[i].latitude + "_" + marker_order;
                 place_name.className = "public_place_name";
                 //place_name.setAttribute("onclick","change_center_to_place(this)");
                 name_and_address_container.appendChild(place_name);

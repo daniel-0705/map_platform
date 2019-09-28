@@ -1,6 +1,6 @@
 nav{
     position: absolute;
-    z-index: 3;
+    z-index: 5;
 }
 
 
@@ -25,12 +25,17 @@ nav{
     height: 100%;
     transition: margin-left .5s;
     position: relative;
+    margin-left:300px;
 }
 
-#open_bar,#close_bar,#open_new_list_bar{
+#open_bar,#close_bar,#open_search_bar{
     position: absolute;
     z-index: 8;
     transition: margin-left .5s;
+    margin-left:300px;
+    height: 40px;
+    width: 40px;
+    border: none;
 }
 
 #close_bar{
@@ -41,15 +46,20 @@ nav{
     top:110px;
 }
 
-#open_new_list_bar{
+
+#open_search_bar{
     top:160px;
+    background-image: url("/img/search.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 
 /* slidebar */
 
-.search_and_list {
+.search_list_and_place {
     height: 100%;
-    width: 0px;
+    width: 300px;
     position: fixed;
     position: absolute;
     overflow-x: hidden;
@@ -59,7 +69,7 @@ nav{
     box-sizing: border-box;
 }
 
-.search_list_bar{
+.search_list_and_place_bar{
     height: 60px;
     background-color: rgb(240, 230, 207);
     display: flex;
@@ -68,14 +78,12 @@ nav{
     position: relative;
 }
 
-#search{
-    height:50%;
+#search_list_and_place_input{
+    height:55%;
+    width:45%;
+    padding-right: 65px;
 }
 
-#search{
-    width:60%;
-    padding-right: 80px;
-}
 
 input{
     font-family:inherit;
@@ -84,29 +92,202 @@ input{
     border: none;
 }
 
-.lsit_result{
+.list_and_place_result{
     height:30%;
     position: absolute;
     cursor:pointer;
-    right: 60px;
+    right: 130px;
 }
 
-.delete_lsit_result{
+.delete_list_and_place_result{
     height:30%;
     position: absolute;
     cursor:pointer;
-    right: 25px;
+    right: 95px;
 }
+
+/* 搜尋模式 */
+/* Button 10 */
+
+.toggle-button-cover
+{
+    display: table-cell;
+    position: relative;
+    width: 90px;
+    height: 60px;
+    box-sizing: border-box;
+}
+
+.button-cover
+{
+    height: 60px;
+    /* margin: 20px; */
+    /* background-color: #fff;
+    box-shadow: 0 10px 20px -8px #c5d6d6; */
+    border-radius: 4px;
+}
+
+/* .button-cover:before
+{
+    counter-increment: button-counter;
+    content: counter(button-counter);
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    color: #d7e3e3;
+    font-size: 12px;
+    line-height: 1;
+    padding: 5px;
+} */
+
+.button-cover, .knobs, .layer
+{
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.button
+{
+    position: relative;
+    top: 50%;
+    width: 74px;
+    height: 36px;
+    margin: -20px auto 0 auto;
+    overflow: hidden;
+}
+
+.button.r, .button.r .layer
+{
+    border-radius: 100px;
+}
+
+.button.b2
+{
+    border-radius: 40px;
+}
+
+.checkbox
+{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.knobs
+{
+    z-index: 2;
+}
+
+.layer
+{
+    width: 100%;
+    background-color: #ebf7fc;
+    transition: 0.3s ease all;
+    z-index: 1;
+}
+
+#button-10 .knobs:before, #button-10 .knobs:after
+{
+    position: absolute;
+    top: 4px;
+    width: 20px;
+    height: 10px;
+    font-size: 10px;
+    /* font-weight: bold; */
+    text-align: center;
+    line-height: 1;
+    padding: 9px 4px;
+    border-radius: 40px;
+    transition: 0.3s ease all;
+}
+
+#button-10 .knobs span
+{
+    position: absolute;
+    top: -2px;
+    width: 20px;
+    height: 10px;
+    font-size: 10px;
+    /* font-weight: bold; */
+    text-align: center;
+    line-height: 1;
+    padding: 9px 4px;
+    border-radius: 2px;
+    transition: 0.3s ease all;
+}
+
+
+
+
+#button-10 .knobs:before
+{
+    content: '';
+    left: 4px;
+    background-color: #03A9F4;
+}
+
+#button-10 .knobs:after
+{
+    content: '地點';
+    right: 4px;
+    top:-2px;
+    color: #4e4e4e;
+}
+
+
+
+#button-10 .knobs span
+{
+    display: inline-block;
+    left: 4px;
+    color: #fff;
+    z-index: 1;
+}
+
+#button-10 .checkbox:checked + .knobs span
+{
+    color: #4e4e4e;
+}
+
+#button-10 .checkbox:checked + .knobs:before
+{
+    left: 42px;
+    background-color: #F44336;
+}
+
+#button-10 .checkbox:checked + .knobs:after
+{
+    color: #fff;
+}
+
+#button-10 .checkbox:checked ~ .layer
+{
+    background-color: #fcebeb;
+}
+
+
+/* 搜尋模式結束 */
+
+
 
 .no_public_list{
     padding-left:15px;
 }
 
 
-.search_list_result{
-    height: calc((100% - 60px)/2) ;
+.search_list_and_place_result{
+    height: calc(100% - 60px) ;
     background-color: rgb(248, 201, 92);
     overflow-y: auto;
+
 }
 
 .public_list_container{
@@ -160,18 +341,50 @@ input{
 
 
 
+/* 使用者所有清單介面 */
 
-.user_own_list{
-    height: calc((100% - 60px)/2) ;
-    background-color: rgb(255, 184, 19);
+.user_own_list {
+    height: 100%;
+    width: 0px;
+    position: fixed;
+    position: absolute;
+    transition: 0.5s;
+    background-color: rgb(230, 208, 157);
+    z-index: 3;
+    padding-top: 60px;
+    box-sizing: border-box;
 }
 
-h1{
+.user_own_list_title{
+    height: 60px;
+    background-color: rgb(173, 145, 80);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    overflow : hidden;
+}
+
+
+.user_own_list_content{
+    height: calc(100% - 60px) ;
+    background-color: rgb(255, 184, 19);
+    /* overflow-x: hidden; */
+}
+
+.my_list{
     font-family: "sans";
     text-align: center;
     height: 30px;
-    font-size: 25px;
+    font-size: 25px; 
 }
+
+.creat_new_list{
+    cursor: pointer;
+    height: 20px;
+    width: 20px;
+}
+
+
 
 .user_list_icon{
     height: 37px;
@@ -199,7 +412,7 @@ h1{
 
 .user_own_list_content{
     overflow-y: auto;
-    height: calc(100% - 30px);
+    height: calc(100% - 60px);
 }
 
 .user_every_list_container{
@@ -348,7 +561,7 @@ h1{
 .a_list {
     height: 100%;
     width: 0px;
-    z-index: 2;
+    z-index: 3;
     position: fixed;
     position: absolute;
     overflow-x: hidden;
@@ -435,25 +648,46 @@ h1{
 }
 
 
-
-
-
-
-
-
-.a_list_content >p ,.a_public_list_content>p{
-    cursor:pointer;
+.user_place_container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
+
 
 .user_place_name{
     padding: 5px 0px;
     padding-left: 15px;
     font-size: 16px;
+    overflow : hidden;
+    text-overflow : ellipsis;
+    white-space: nowrap;
+    cursor:pointer;
+    width: 255px;
 }
 
 .user_place_name:hover{
+    font-weight:900;
+}
+
+.user_place_container:hover{
     background-color: rgba(128,128,128,0.3);
 }
+
+.user_delete_place{
+    font-size: 16px;
+    cursor:pointer;
+    margin-right: 12px;
+    top:10px;
+}
+
+.user_delete_place:hover{
+    font-size: 20px;
+    font-weight:900;
+    cursor:pointer;
+    
+}
+
 
 
 
@@ -468,7 +702,7 @@ h1{
     overflow-x: hidden;
     transition: 0.5s;
     background-color: rgb(230, 208, 157);
-    z-index: 2;
+    z-index: 4;
     padding-top: 60px;
     box-sizing: border-box;
 }
@@ -558,7 +792,7 @@ h1{
 .place_container{
     display: flex;
     cursor:pointer;
-    width: 290px;
+    width: 280px;
     margin: 5px 5px;
 }
 
@@ -601,18 +835,15 @@ h1{
 
 /*search place input*/
 
-
-
-.searchBox {
+/* .searchBox {
     position: relative;
-    /* top: 50%;
-    right: 50%; */
-    /* transform:  translate(-50%,50%); */
+    top: 50%;
+    right: 50%;
+    transform:  translate(-50%,50%);
     background: #acb9cc;
     height: 30px;
     border-radius: 40px;
-    /* padding: 10px; */
-
+    padding: 10px;
     display: flex;
 }
 
@@ -631,7 +862,7 @@ h1{
 
 .searchButton {
     color: white;
-    /* float: right; */
+    float: right;
     width: 30px;
     height: 30px;
     border-radius: 50%;
@@ -662,5 +893,5 @@ h1{
 
     font-family: 'Noto Sans TC', sans-serif;
 
-}
+} */
 

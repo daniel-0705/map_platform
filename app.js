@@ -417,7 +417,7 @@ app.post("/api/user/map_list/place",async function(req,res){
   }else{
     let list_data = req.body;
 
-    console.log(list_data);
+    console.log(1,list_data);
 
     let select_user_result = await dao_map.select("user","access_token",list_data.data.access_token)
     if(select_user_result == 0){
@@ -581,7 +581,7 @@ app.post("/api/user/map_list/result",async function(req,res){
     let select_user_result = await dao_map.select("user","access_token",list_data.data.access_token)
     if(select_user_result == 0){
       var error = {
-        "error": "There is no user data."
+        "error": "!查無此使用者，請重新註冊"
       };
       res.send(error);
       return;

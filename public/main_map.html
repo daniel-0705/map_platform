@@ -109,7 +109,7 @@
           document.getElementById("map").style.marginLeft = "300px";
           document.getElementById("open_bar").style.marginLeft = "300px";
           document.getElementById("close_bar").style.marginLeft = "300px";
-          document.getElementById("open_new_list_bar").style.marginLeft = "300px";
+          document.getElementById("open_search_bar").style.marginLeft = "300px";
 
           delete_child_element("a_place_content");
 
@@ -124,10 +124,119 @@
         }
       }
 
+
+      function delete_place_function(list_data){
+        console.log(list_data)
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("post", "/api/user/map_list/place");  
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(list_data));
+
+        xhr.onreadystatechange=function() {
+          if (this.readyState == 4 && this.status == 200) {
+            let user_place_data = JSON.parse(xhr.response);
+            if(user_place_data.error){
+              alert(user_place_data.error);
+            }else{
+              console.log(user_place_data);
+              
+              if(user_place_data.check_place_is_exist == 0){
+                markers[list_data.data.place_order].setMap(map); //把原本的地標 調回來
+              }
+
+
+              //為了在搜尋列 顯示地點名稱時知道順序 所以只好用迴圈的方式找出該地名的順序
+              let marker_order;
+              for (let j =0 ; j <user_markers.length; j++){
+                // console.log(list_data.data.place_name)
+                // console.log(user_markers[j])
+                if(user_markers[j].name == list_data.data.place_name && user_markers[j].list == list_data.data.list_name){
+                  marker_order = j;
+                  console.log(marker_order)
+                }
+              }
+
+
+              user_markers[marker_order].setMap(null); //把使用者先前存的的地標隱藏
+
+              let select_place ={
+                access_token : localStorage.getItem("access_token"),
+                list_name : list_data.data.list_name
+              }
+              //使用者按下移除後，會顯現收藏的清單名稱及內容
+              delete_child_element("a_list_content");
+              render_a_list_all_place_name(select_place);
+
+              infoWindow.close(); //做完動作後要把地標視窗關掉
+
+
+              
+
+
+
+              // //區別移除的點是當下存的還是之前存的
+              // if (e.id == ""){
+              //   console.log("先前存的的地點")
+
+              //   //為了在搜尋列 顯示地點名稱時知道順序 所以只好用迴圈的方式找出該地名的順序
+              //   let marker_order;
+              //   for (let j =0 ; j <user_markers.length; j++){
+              //     console.log(list_data.data.place_name)
+              //     console.log(user_markers[j])
+              //     if(user_markers[j].name == list_data.data.place_name){
+              //       marker_order = j;
+              //       console.log(marker_order)
+              //     }
+              //   }
+
+              //   user_markers[marker_order].setMap(null); //把使用者先前存的的地標隱藏
+              //   //使用者按下移除後，會顯現收藏的清單名稱及內容
+              //   delete_child_element("a_list_content");
+              //   render_a_list_all_place_name(list_data.data.place_data);
+
+              //   infoWindow.close();  //做完動作後要把地標視窗關掉
+              // }else{
+              //   console.log("當下存的地點")
+              //   user_markers[e.id].setMap(null); //把使用者當下存的地標隱藏
+
+              //   //使用者按下移除後，會顯現收藏的清單名稱及內容
+              //   delete_child_element("a_list_content");
+              //   render_a_list_all_place_name(list_data.data.place_data);
+
+              //   infoWindow.close(); //做完動作後要把地標視窗關掉
+              // }
+            }
+          }
+        }
+      }
+
+      function delete_user_place(e){
+        // console.log(e);
+        // console.log(e.parentElement.parentElement.parentElement.children[0].children[1].innerHTML);
+
+        let place_data ={
+          access_token : localStorage.getItem("access_token"),
+          list_name : e.parentElement.parentElement.parentElement.children[0].children[1].innerHTML,
+          place_name : e.parentElement.children[0].innerHTML,
+          place_order : e.parentElement.children[0].id.split("_")[2]
+        }
+
+        let list_data = {
+            type:"delete",
+            data:place_data
+        }
+
+        console.log(place_data)
+
+        delete_place_function(list_data);
+      }
+
+
       function store_place_in_list(e){
-        console.log(e)
-        console.log(e.parentElement.parentElement.parentElement.children[0].children[0].innerHTML)
-        console.log(e.parentElement.parentElement.parentElement.children[0].children[0].id)
+        console.log(e);
+        // console.log(e.parentElement.parentElement.parentElement.children[0].children[0].innerHTML);
+        // console.log(e.parentElement.parentElement.parentElement.children[0].children[0].id);
 
         let a_place_name = document.getElementById("a_place_name")
 
@@ -135,7 +244,7 @@
           access_token : localStorage.getItem("access_token"),
           list_name : e.parentElement.children[1].innerHTML,
           place_name : e.parentElement.parentElement.parentElement.children[0].children[0].innerHTML,
-          place_order : e.parentElement.parentElement.parentElement.children[0].children[0].id,
+          place_order : e.parentElement.parentElement.parentElement.children[0].children[0].id
         }
 
 
@@ -168,7 +277,7 @@
                     url: `/img/${user_place_data[0].list_icon}.png`
                   },
                   animation: google.maps.Animation.DROP,
-                  zIndex: 15,
+                  zIndex: 100000,
                   map:map
                 });
                 
@@ -190,7 +299,7 @@
                 infoWindow = new google.maps.InfoWindow();
 
                 let a_place_title = document.getElementsByClassName("a_place_title")[0];
-                e.id = user_place_index;
+                e.id = user_place_index;  //判斷使用者新增的地點是排第幾個，方便之後 set null
 
                 //定義每個地標屬於的清單
                 marker.list = user_place_data[0].list_name
@@ -253,8 +362,8 @@
                   //為了在搜尋列 顯示地點名稱時知道順序 所以只好用迴圈的方式找出該地名的順序
                   let marker_order;
                   for (let j =0 ; j <user_markers.length; j++){
-                    console.log(place_data.place_name)
-                    console.log(user_markers[j])
+                    // console.log(place_data.place_name)
+                    // console.log(user_markers[j])
                     if(user_markers[j].name == place_data.place_name){
                       marker_order = j;
                       console.log(marker_order)
@@ -299,64 +408,82 @@
 
       function render_user_all_lists_name(){
 
-        let xhrt= new XMLHttpRequest();
-        xhrt.open("post", "/api/user/map_list/result");  
-        xhrt.setRequestHeader('Content-Type', 'application/json');
-        
+        //有使用者 token 才執行下列動作
+        if(localStorage.getItem("access_token")){
+          let xhrt= new XMLHttpRequest();
+          xhrt.open("post", "/api/user/map_list/result");  
+          xhrt.setRequestHeader('Content-Type', 'application/json');
+          
 
-        let list_data ={
-          type :"select",
-          data : {access_token:localStorage.getItem("access_token")}
-        };
+          let list_data ={
+            type :"select",
+            data : {access_token:localStorage.getItem("access_token")}
+          };
 
-        //localStorage.getItem("access_token")
-        xhrt.send(JSON.stringify(list_data));
-        xhrt.onreadystatechange=function() {
-          if (this.readyState == 4 && this.status == 200) {
-
-            if(xhrt.response == "error"){
-                alert("查無此使用者，請註冊");
-            }else{
+          //localStorage.getItem("access_token")
+          xhrt.send(JSON.stringify(list_data));
+          xhrt.onreadystatechange=function() {
+            if (this.readyState == 4 && this.status == 200) {
               let user_list_data = JSON.parse(xhrt.response);
-              console.log(user_list_data);
-              for (let i = 0 ;i<user_list_data.length;i++){
-                //製作每一個 list 的內容 img p
+              if(user_list_data.error){
+                  alert(user_list_data.error);
+              }else{
+                
+                console.log(user_list_data);
+
+                delete_child_element("user_own_list_content");
                 let user_own_list_content = document.getElementsByClassName("user_own_list_content")[0];
-                let user_every_list_container = document.createElement("div");
-                user_every_list_container.className = "user_every_list_container";
-                user_own_list_content.appendChild(user_every_list_container);
+                let user_own_list_p = document.createElement("p");
+                user_own_list_p.innerHTML= "點選 + 開始建立屬於自己的清單"
+                //user_own_list_p.className = "user_every_list_container";
+                user_own_list_content.appendChild(user_own_list_p);
 
-                let user_list_icon = document.createElement("img");
-                user_list_icon.className = "user_list_icon";
-                user_list_icon.src = `/img/${user_list_data[i].list_icon}.png`
-                user_every_list_container.appendChild(user_list_icon);
 
-                let user_list_name = document.createElement("p");
-                user_list_name.className = "user_list_name";
-                user_list_name.id = `${user_list_data[i].list_id}`;
-                user_list_name.setAttribute("onClick", "open_a_list(this)");
-                user_list_name.innerHTML = user_list_data[i].list_name;
-                user_every_list_container.appendChild(user_list_name);
+                if(user_list_data.length > 0){
+                  delete_child_element("user_own_list_content");
 
-                let label = document.createElement("label");
-                label.className = "switch";
-                user_every_list_container.appendChild(label);
+                  for (let i = 0 ;i<user_list_data.length;i++){
+                    //製作每一個 list 的內容 img p
+                    let user_own_list_content = document.getElementsByClassName("user_own_list_content")[0];
+                    let user_every_list_container = document.createElement("div");
+                    user_every_list_container.className = "user_every_list_container";
+                    user_own_list_content.appendChild(user_every_list_container);
 
-                let input = document.createElement("input");
-                input.className = "switch_toggle";
-                input.type = "checkbox";
-                if(user_list_data[i].appear_list == "true"){
-                  input.checked = true;
+                    let user_list_icon = document.createElement("img");
+                    user_list_icon.className = "user_list_icon";
+                    user_list_icon.src = `/img/${user_list_data[i].list_icon}.png`
+                    user_every_list_container.appendChild(user_list_icon);
+
+                    let user_list_name = document.createElement("p");
+                    user_list_name.className = "user_list_name";
+                    user_list_name.id = `${user_list_data[i].list_id}`;
+                    user_list_name.setAttribute("onClick", "open_a_list(this)");
+                    user_list_name.innerHTML = user_list_data[i].list_name;
+                    user_every_list_container.appendChild(user_list_name);
+
+                    let label = document.createElement("label");
+                    label.className = "switch";
+                    user_every_list_container.appendChild(label);
+
+                    let input = document.createElement("input");
+                    input.className = "switch_toggle";
+                    input.type = "checkbox";
+                    if(user_list_data[i].appear_list == "true"){
+                      input.checked = true;
+                    }
+                    input.setAttribute("onclick","appear_list_or_not(this)")
+                    label.appendChild(input);
+
+                    let span = document.createElement("span");
+                    span.className = "slider round";
+                    label.appendChild(span);
+                  }
                 }
-                input.setAttribute("onclick","appear_list_or_not(this)")
-                label.appendChild(input);
 
-                let span = document.createElement("span");
-                span.className = "slider round";
-                label.appendChild(span);
+                
               }
+                
             }
-              
           }
         }
       }
@@ -383,15 +510,31 @@
             }else{
               console.log(user_place_data);
 
+              let a_list_content = document.getElementsByClassName("a_list_content")[0];
+
               //製作新的 place 的內容 p
               for(let i =0; i<user_place_data.length ; i++){     
+
+                let user_place_container = document.createElement("div");
+                user_place_container.className = "user_place_container";
+                a_list_content.appendChild(user_place_container);
+
                 let new_place_name = document.createElement("p");
                 new_place_name.className = "user_place_name";
                 new_place_name.id = user_place_data[i].longitude+"_"+user_place_data[i].latitude+"_"+user_place_data[i].place_order
                 new_place_name.innerHTML = user_place_data[i].place_name;
                 new_place_name.setAttribute("onClick", "change_center_to_place(this)");
-                let a_list_content = document.getElementsByClassName("a_list_content")[0];
-                a_list_content.appendChild(new_place_name);
+                user_place_container.appendChild(new_place_name);
+
+                let user_delete_place = document.createElement("p");
+                user_delete_place.className = "user_delete_place";
+                user_delete_place.innerHTML = "&times;";
+                user_delete_place.setAttribute("onClick", "delete_user_place(this)");
+                user_place_container.appendChild(user_delete_place);
+
+
+
+
               }
               console.log("顯示地點列表完成")
             }
@@ -468,7 +611,7 @@
 
                   infoWindow.setContent(this.content);
                   infoWindow.open(this.getMap(), this);
-
+                  
                   close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
                 });
                 
@@ -604,11 +747,27 @@
 
         close_slidebar();
 
-        document.getElementById("search_and_list").style.width = "300px";
+        document.getElementById("search_list_and_place").style.width = "300px";
         document.getElementById("map").style.marginLeft = "300px";
         document.getElementById("open_bar").style.marginLeft = "300px";
         document.getElementById("close_bar").style.marginLeft = "300px";
-        document.getElementById("open_new_list_bar").style.marginLeft = "300px";
+        document.getElementById("open_search_bar").style.marginLeft = "300px";
+
+        //使用者跳出公開單一清單頁面時，要把座標跟值隱藏掉，所以在返回清單搜尋時要把值設回預設，不要顯示公開清單的地點
+        user_public_list_markers.map(item=>{item.setMap(null)});
+        user_public_list_markers=[];
+        switch_for_public_list_map=1;
+
+      }
+
+      function open_user_list_bar() {
+        close_slidebar();
+
+        document.getElementById("user_own_list").style.width = "300px";
+        document.getElementById("map").style.marginLeft = "300px";
+        document.getElementById("open_bar").style.marginLeft = "300px";
+        document.getElementById("close_bar").style.marginLeft = "300px";
+        document.getElementById("open_search_bar").style.marginLeft = "300px";
 
         //使用者跳出公開單一清單頁面時，要把座標跟值隱藏掉，所以在返回清單搜尋時要把值設回預設，不要顯示公開清單的地點
         user_public_list_markers.map(item=>{item.setMap(null)});
@@ -618,15 +777,16 @@
       }
 
       function close_slidebar() {
-        document.getElementById("search_and_list").style.width = "0";
+        document.getElementById("search_list_and_place").style.width = "0";
         document.getElementById("a_public_list").style.width = "0";
         document.getElementById("a_list").style.width = "0";
         document.getElementById("a_place").style.width = "0";
+        document.getElementById("user_own_list").style.width = "0";
+
         document.getElementById("map").style.marginLeft= "0";
         document.getElementById("open_bar").style.marginLeft = "0";
         document.getElementById("close_bar").style.marginLeft = "0";
-        document.getElementById("open_new_list_bar").style.marginLeft = "0";
-        
+        document.getElementById("open_search_bar").style.marginLeft = "0";
       }
 
       function open_list_input() {
@@ -656,18 +816,18 @@
       function close_a_place_slidebar(){
         document.getElementById("a_place").style.width = "0px";
 
-        if (document.getElementById("a_public_list").style.width == "" && document.getElementById("a_list").style.width == "" && document.getElementById("search_and_list").style.width == ""){
+        if (document.getElementById("a_public_list").style.width == "" && document.getElementById("a_list").style.width == "" && document.getElementById("search_list_and_place").style.width == "" && document.getElementById("user_own_list").style.width == ""){
           document.getElementById("map").style.marginLeft = "0";
           document.getElementById("open_bar").style.marginLeft = "0";
           document.getElementById("close_bar").style.marginLeft = "0";
-          document.getElementById("open_new_list_bar").style.marginLeft = "0";
+          document.getElementById("open_search_bar").style.marginLeft = "0";
         }
 
-        if (document.getElementById("a_public_list").style.width == "0px" && document.getElementById("a_list").style.width == "0px" && document.getElementById("search_and_list").style.width == "0px"){
+        if (document.getElementById("a_public_list").style.width == "0px" && document.getElementById("a_list").style.width == "0px" && document.getElementById("search_list_and_place").style.width == "0px" && document.getElementById("user_own_list").style.width == "0px"){
           document.getElementById("map").style.marginLeft = "0px";
           document.getElementById("open_bar").style.marginLeft = "0";
           document.getElementById("close_bar").style.marginLeft = "0";
-          document.getElementById("open_new_list_bar").style.marginLeft = "0";
+          document.getElementById("open_search_bar").style.marginLeft = "0";
           }
 
       }
@@ -803,7 +963,7 @@
         document.getElementById("map").style.marginLeft = "300px";
         document.getElementById("open_bar").style.marginLeft = "300px";
         document.getElementById("close_bar").style.marginLeft = "300px";
-        document.getElementById("open_new_list_bar").style.marginLeft = "300px";
+        document.getElementById("open_search_bar").style.marginLeft = "300px";
      
         new_a_list_name.id = e.id;
         new_a_list_name.className = "a_list_title";
@@ -937,6 +1097,7 @@
                     item.setMap(null);
                   }
                 });
+
                 for(let i = 0 ; i< user_list_data.data.length ; i++){
                   // ==0 代表沒有其他點了，所以可以顯示
                   if(user_list_data.data[i].place_is_exist == 0){
@@ -945,12 +1106,20 @@
                   
                 }
               }else{
-                user_markers.map(item=>{
-                  if(item.list == user_list_data.data[0].list_name){
-                    //console.log(user_list_data.data[0].list_name)
-                    item.setMap(map);
+                //抓出使用者的地標，從後面開始抓，理論上最後面的是最新的，也避免刪掉的點 再次顯示的問題
+                for(let i = 0; i <user_list_data.data.length  ; i++){
+                  console.log(user_list_data.data[i].place_name)
+                  for(let j = user_markers.length-1 ; j >= 0 ; j--){
+                    console.log(user_markers[j].name)
+                    if(user_markers[j].name == user_list_data.data[i].place_name && user_markers[j].list == user_list_data.data[i].list_name){
+                      //console.log(user_list_data.data[0].list_name)
+                      user_markers[j].setMap(map);
+                      break;
+                    }
                   }
-                });
+                }
+
+                //公用地點要隱藏
                 for(let i = 0 ; i< user_list_data.data.length ; i++){
                   markers[user_list_data.data[i].place_order].setMap(null);
                 }
@@ -1010,7 +1179,7 @@
                 document.getElementById("map").style.marginLeft = "300px";
                 document.getElementById("open_bar").style.marginLeft = "300px";
                 document.getElementById("close_bar").style.marginLeft = "300px";
-                document.getElementById("open_new_list_bar").style.marginLeft = "300px";
+                document.getElementById("open_search_bar").style.marginLeft = "300px";
 
                 console.log(user_place_data);
 
@@ -1153,10 +1322,9 @@
         if(search_marker){
           search_marker.setMap(null);
         }
-     
-        document.getElementById("search_place").value = "";
+
         console.log(e)
-        map.setZoom(17);
+        map.setZoom(15);
 
         map.panTo({lat: Number(e.id.split("_")[1]), lng: Number(e.id.split("_")[0])});
 
@@ -1164,7 +1332,7 @@
           position:{lat: Number(e.id.split("_")[1]), lng: Number(e.id.split("_")[0])},
           icon: {
             url: `/img/point2.png`,
-            zIndex: 10000
+            zIndex: -1
             //scaledSize: new google.maps.Size(50, 50)  //調整大小
           },
           //animation: google.maps.Animation.DROP,
@@ -1189,13 +1357,24 @@
 
         google.maps.event.addListener(search_marker, 'click', function () {
 
-          console.log('655')
-
           search_place_infoWindow.setContent(this.content);
           search_place_infoWindow.open(this.getMap(), this);
 
           close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
         });
+
+      }
+
+      // 選擇不同模式下 input 的 placeholder 會改變
+      function switch_for_search_condition (){
+       
+        let search_condition = document.getElementsByClassName("checkbox")[0];
+
+        if(search_condition.checked == false){
+          document.getElementById("search_list_and_place_input").placeholder = "搜尋他人清單"
+        }else{
+          document.getElementById("search_list_and_place_input").placeholder = "搜尋地點"
+        }
 
       }
  
@@ -1214,9 +1393,9 @@
     
       <div>
         <ul>
-          <li class = "search_place_input">
+          <!-- <li class = "search_place_input">
             <div class="searchBox">
-              <input id="search_place" class="searchInput" type="text" name="" placeholder="Search" autocomplete="off">
+              <input id="search_place" class="searchInput" type="text" name="" placeholder="搜尋地點" autocomplete="off">
               <button class="searchButton" onclick="change_search_place_input_width()">
              
               </button>
@@ -1225,7 +1404,7 @@
               </div>
 
             </div>
-          </li>
+          </li> -->
           <li class="nav_item"><a href="/">About</a></li>
           <li class="nav_item"><a href="/main_map.html">Explore</a></li>
           <li class="nav_item" onclick="signin_or_profile()"><a>User</a></li>
@@ -1297,9 +1476,9 @@
 
     <div class = "public_map" >
 
-      <button id ="open_bar" style="font-size:30px;cursor:pointer" onclick="open_slidebar()" >></button>
+      <button id ="open_bar" style="font-size:30px;cursor:pointer" onclick="open_user_list_bar()" >></button>
       <button id ="close_bar" style="font-size:30px;cursor:pointer" onclick="close_slidebar()" >&times;</button>
-      <button id ="open_new_list_bar" style="font-size:30px;cursor:pointer" onclick="open_list_input()">+</button>
+      <button id ="open_search_bar" style="font-size:30px;cursor:pointer" onclick="open_slidebar()">&nbsp;</button>
 
       <!-- 畫面外的使用者單一清單介面  -->
       <div id ="a_list" class="a_list">
@@ -1339,26 +1518,54 @@
       </div>
       <!-- 畫面外的介面結束 -->
 
+      <!-- 畫面外的使用者所有清單介面  -->
+      <div id ="user_own_list" class="user_own_list">
+          <div id = "user_own_list_title" class="user_own_list_title">
+            <p class="my_list">My Lists</p>
+            <img class="creat_new_list" src="/img/add.png" onclick="open_list_input()">
+          </div>
+          <div class="user_own_list_content">
+            <p>登入後可點選 + 符號</p>
+            <p>開始建立屬於自己的清單</p>
+          </div>
+      </div>
+      <!-- 畫面外的介面結束 -->
 
-      <div class= "search_and_list" id="search_and_list">
-        <div class = "search_list_bar">
-          <input  id = "search" placeholder="搜尋他人清單" autocomplete="off">
-          <img src="img/search.png" class= "lsit_result" onclick="search_public_list ()">
-          <img src="img/delete.png" class= "delete_lsit_result" onclick="delete_search_public_list ()">
+
+
+      <div class= "search_list_and_place" id="search_list_and_place">
+        <div class = "search_list_and_place_bar">
+          <input id = "search_list_and_place_input" placeholder="搜尋他人清單" autocomplete="off">
+          <img src="img/search.png" class= "list_and_place_result" onclick="search_list_or_place()">
+          <img src="img/delete.png" class= "delete_list_and_place_result" onclick="delete_search_input ()">
+
+          <div class="toggle-button-cover">
+            <div class="button-cover">
+              <div class="button b2" id="button-10">
+                <input type="checkbox" class="checkbox" onclick="switch_for_search_condition ()">
+                <div class="knobs">
+                  <span>清單</span>
+                </div>
+                <div class="layer"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class = "search_list_result">
-
+        <div class = "search_list_and_place_result">
+          <p>選擇不同的條件搜尋不同的東西</p>
+          <p>選擇清單，可搜尋他人公開的清單</p>
+          <p>選擇地點，可搜尋地址或地名</p>
         </div>
 
-        <div class = "user_own_list">
+        <!-- <div class = "user_own_list">
           <div class = "user_own_list_title">
               <h1>My Lists</h1>
           </div>
           <div class = "user_own_list_content" >
 
           </div>
-        </div>
+        </div> -->
       </div>
       
       <div id="map">  
@@ -1380,6 +1587,7 @@
       
 
   <script>
+    //新增清單，按下按鍵送出
     let list_name = document.getElementById("list_name");
     list_name.addEventListener("keyup", function(event) {
       if (event.keyCode === 13) {
@@ -1388,9 +1596,10 @@
       }
     });
 
+    //搜尋他人清單
     function search_public_list (){
-      delete_child_element("search_list_result");
-      let grandpa_list_result = document.getElementsByClassName("search_list_result")[0];
+      delete_child_element("search_list_and_place_result");
+      let grandpa_list_result = document.getElementsByClassName("search_list_and_place_result")[0];
 
       let xhr = new XMLHttpRequest();
 
@@ -1399,7 +1608,7 @@
       
       let list_data = {
         type:"search",
-        data:search_public_list_name.value
+        data:search_list_or_place_input.value
       }
       console.log(list_data)
       xhr.send(JSON.stringify(list_data));
@@ -1454,32 +1663,10 @@
       }
     }
 
-    let search_public_list_name = document.getElementById("search");
-    search_public_list_name.addEventListener("keyup", function(event) {
-    // Number 13 is the "Enter" key on the keyboard
-      //console.log(search_public_list_name)
-      if (event.keyCode === 13) {
-        event.preventDefault();
-        search_public_list ();
-        
-      }
-    });
-    
-    function delete_search_public_list (){
-      delete_child_element("search_list_result");
-      document.getElementById("search").value = "";
-    }
-    
-
-    let search_place = document.getElementById("search_place");
-    search_place.addEventListener("keyup", function(event) {
-    // Number 13 is the "Enter" key on the keyboard
-      //console.log(search_place)
-      if (event.keyCode === 13) {
-        event.preventDefault();
-        
-        delete_child_element("search_place_result");
-        let grandpa_place_result = document.getElementsByClassName("search_place_result")[0];
+    //搜尋地點
+    function search_place (){
+      delete_child_element("search_list_and_place_result");
+        let grandpa_place_result = document.getElementsByClassName("search_list_and_place_result")[0];
 
         let xhr = new XMLHttpRequest();
 
@@ -1488,7 +1675,7 @@
         
         let place_data = {
           type:"search",
-          data:search_place.value
+          data:search_list_or_place_input.value
         }
         console.log(place_data)
         xhr.send(JSON.stringify(place_data));
@@ -1552,29 +1739,58 @@
             }             
           }
         }
+    }
+
+    let search_list_or_place_input = document.getElementById("search_list_and_place_input");
+    //搜尋他人清單或是地點
+    function search_list_or_place (){
+      let search_condition = document.getElementsByClassName("checkbox")[0];
+      if(search_condition.checked == false){
+        search_public_list ();
+      }else{
+        search_place ();
+      }
+    }
+    
+    //按下按鍵搜尋他人清單或是地點
+    search_list_or_place_input.addEventListener("keyup", function(event) {
+    // Number 13 is the "Enter" key on the keyboard
+      //console.log(search_list_or_place_input)
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        search_list_or_place (); 
       }
     });
 
+    
 
-
+    
+    //刪除 input 的內容及搜尋結果
+    function delete_search_input (){
+      delete_child_element("search_list_and_place_result");
+      document.getElementById("search").value = "";
+    }
+    
   
     //點擊搜尋地址按鈕外的地方，搜尋列會縮回去 //點擊搜尋地址結果外的地方，搜尋結果會關掉
-    let search_place_input = document.getElementById("search_place");
-    function change_search_place_input_width(){
-      search_place_input.style.width = "260px";
-      search_place_input.style.padding = "0 6px";
-    }
+    // let search_place_input = document.getElementById("search_place");
+    // function change_search_place_input_width(){
+    //   search_place_input.style.width = "260px";
+    //   search_place_input.style.padding = "0 6px";
+    // }
+
+
     //點擊搜尋地址按鈕外的地方，搜尋列會縮回去 //點擊搜尋地址結果外的地方，搜尋結果會關掉
     document.onclick = function(e){
       // console.log(e.target.id);
       // console.log(e.target.className);
-      if((e.target.id !== 'search_place' && e.target.className !== 'searchButton')){
-        search_place_input.style.width = "0px";
-        search_place_input.style.padding = "0px";
-      }
-      if(e.target.id !== 'search_place_result'){
-      search_place_result.style.display = 'none';
-      }
+      // if((e.target.id !== 'search_place' && e.target.className !== 'searchButton')){
+      //   search_place_input.style.width = "0px";
+      //   search_place_input.style.padding = "0px";
+      // }
+      // if(e.target.id !== 'search_place_result'){
+      // search_place_result.style.display = 'none';
+      // }
 
       //點擊地圖以外的地方 infoWindow 會關掉
       if(e.target.id || e.target.className){

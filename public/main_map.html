@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkK5NajaFKNXkYT2WsdB96edSWRo5kYhY" async defer></script>
     <link rel="stylesheet" href="CSS/common.css" media="all">
-    <script src="js/common.js"></script>
+    
     <link rel="stylesheet" href="CSS/main_map.css" media="all">
 
     
@@ -37,6 +37,7 @@
           options: {
             clickableIcons: true,
             mapTypeControl: false,
+            streetViewControl: false,
             fullscreenControl:false,
           },
           styles: [
@@ -1117,11 +1118,12 @@
               }else{
                 //抓出使用者的地標，從後面開始抓，理論上最後面的是最新的，也避免刪掉的點 再次顯示的問題
                 for(let i = 0; i <user_list_data.data.length  ; i++){
-                  console.log(user_list_data.data[i].place_name)
+                  // console.log("清單的點",user_list_data.data[i].place_name)
                   for(let j = user_markers.length-1 ; j >= 0 ; j--){
-                    console.log(user_markers[j].name)
+                    // console.log("要消失的的點",user_markers[j].name)
                     if(user_markers[j].name == user_list_data.data[i].place_name && user_markers[j].list == user_list_data.data[i].list_name){
                       //console.log(user_list_data.data[0].list_name)
+                      console.log("要消失的的點",user_markers[j].name,user_markers[j].list)
                       user_markers[j].setMap(map);
                       break;
                     }
@@ -1220,7 +1222,7 @@
 
                   return;
                 }
-                console.log("dwije")
+                
                 for(let i =0; i<user_place_data.user_list_place.length ; i++){     
                   let new_place_name = document.createElement("p");
                   new_place_name.className = "user_place_name";
@@ -1428,7 +1430,7 @@
           </li> -->
           <li class="nav_item"><a href="/">About</a></li>
           <li class="nav_item"><a href="/main_map.html">Explore</a></li>
-          <li class="nav_item" onclick="signin_or_profile()"><a>User</a></li>
+          <li class="nav_item" onclick="signin_or_out()"><a></a></li>
         </ul>
       </div>
     </nav>
@@ -1437,8 +1439,8 @@
     <!-- 畫面外的新增清單 -->
     <div id="input_list_name" class="input_list_name">
       <a href="javascript:void(0)" class="close_button" onclick="close_list_input_and_edit()">&times;</a>
-      <input type="radio" name="category" value="true" checked > 公開<br>
-      <input type="radio" name="category" value="false"> 私人<br>
+      <input type="radio" name="category" value="true" checked > 公開 (可在搜尋列搜尋到您的清單)<br>
+      <input type="radio" name="category" value="false"> 私人 (搜尋列無法搜尋到您的清單)<br>
       <input type="text" id = "list_name" name="list_name" placeholder="請輸入清單名稱" autocomplete="off"><br>
       <div>
         <p style="margin-bottom: 15px;">清單地標樣式選擇</p>
@@ -1586,14 +1588,6 @@
           
         </div>
 
-        <!-- <div class = "user_own_list">
-          <div class = "user_own_list_title">
-              <h1>My Lists</h1>
-          </div>
-          <div class = "user_own_list_content" >
-
-          </div>
-        </div> -->
       </div>
       
       <div id="map">  
@@ -1830,7 +1824,7 @@
 
    
   </script>
-
+  <script src="js/common.js"></script>
 </body>
 
 

@@ -804,7 +804,7 @@ app.post("/api/user/map_list/search/place",async function(req,res){
     //迴圈尋資料庫
     for (let i = 0; i<search_word.length; i++){
       //一開始用搜尋字串下去找
-      let fuzzy_search_place_in_name = await dao_map.fuzzy_search_place("map","name",search_word,5);
+      let fuzzy_search_place_in_name = await dao_map.fuzzy_search_place("map","name",search_word,7);
       fuzzy_search_place_in_name.map(item =>{search_place_result.push(item)});
       let fuzzy_search_place_in_address = await dao_map.fuzzy_search_place("map","address",search_word,5);
       fuzzy_search_place_in_address.map(item =>{search_place_result.push(item)});

@@ -39,7 +39,7 @@ nav{
 }
 
 #close_bar{
-    top:60px;
+    top:160px;
 }
 
 #open_bar{
@@ -48,7 +48,7 @@ nav{
 
 
 #open_search_bar{
-    top:160px;
+    top:60px;
     background-image: url("/img/search.png");
     background-repeat: no-repeat;
     background-size: cover;
@@ -719,6 +719,7 @@ input{
 
 .user_place_name:hover{
     font-weight:900;
+    font-size: 18px;
 }
 
 .user_place_container:hover{
@@ -825,10 +826,14 @@ input{
     width: 180px;
     margin-right: 10px;
     line-height: 30px;
-    
+    cursor:pointer;
 }
 
-
+.list_cotainer > p:hover{
+    font-size: 18px;
+    font-weight: bolder;
+    cursor:pointer;
+}
 
 
 
@@ -888,3 +893,6 @@ input{
     color: gray;
 }
 
+.public_place_name{
+    font-weight: bold;
+}

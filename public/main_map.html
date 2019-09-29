@@ -658,11 +658,12 @@
                 let new_list_name = document.createElement("p");
                 new_list_name.className = "user_list";
                 new_list_name.id = `${user_list_data[i].list_id}`;
-                //new_list_name.setAttribute("onClick", "open_a_list(this)");
+                new_list_name.setAttribute("onClick", "open_a_list(this)");
                 new_list_name.innerHTML = user_list_data[i].list_name;
                 list_cotainer.appendChild(new_list_name);
 
                 let collection_button = document.createElement("button");
+                collection_button.className = "collection_button";
                 if(user_list_data[i].check_place_is_exist == "true"){
                   collection_button.innerHTML = "移除";
                 }else{
@@ -1574,6 +1575,8 @@
         </div>
 
         <div class = "search_list_and_place_result">
+          <br>
+          <p class = "search_explain">搜尋說明</p>
           <br>
           <img class = "search_explain_img_1" src="/img/list_example.png">
           <p class = "search_explain">選擇清單，可搜尋他人公開的清單</p>

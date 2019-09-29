@@ -82,6 +82,7 @@ nav{
     height:55%;
     width:45%;
     padding-right: 65px;
+    margin-left: 15px;
 }
 
 
@@ -96,14 +97,14 @@ input{
     height:30%;
     position: absolute;
     cursor:pointer;
-    right: 130px;
+    right: 120px;
 }
 
 .delete_list_and_place_result{
     height:30%;
     position: absolute;
     cursor:pointer;
-    right: 95px;
+    right: 90px;
 }
 
 /* 搜尋模式 */
@@ -143,10 +144,15 @@ input{
 .button-cover, .knobs, .layer
 {
     position: absolute;
-    top: 0;
+    top: 0px;
     right: 0;
     bottom: 0;
     left: 0;
+}
+
+.button-cover
+{
+    top: 2px;
 }
 
 .button
@@ -285,9 +291,22 @@ input{
 
 .search_list_and_place_result{
     height: calc(100% - 60px) ;
-    background-color: rgb(248, 201, 92);
+    background-color: rgb(239, 241, 84);
     overflow-y: auto;
+    position: relative;
+}
 
+.search_explain{
+    font-size: 16px;
+    margin: 0px 0px 5px 15px;
+}
+
+.search_explain_img_1{
+    margin: 5px 0px 0px 12px;
+}
+
+.search_explain_img_2{
+    margin: 5px 0px 0px 14px;
 }
 
 .public_list_container{
@@ -362,12 +381,15 @@ input{
     justify-content: space-around;
     align-items: center;
     overflow : hidden;
+    position: relative;
 }
 
 
 .user_own_list_content{
     height: calc(100% - 60px) ;
-    background-color: rgb(255, 184, 19);
+    background-color: rgb(182, 150, 75);
+    overflow-y: auto;
+    position: relative;
     /* overflow-x: hidden; */
 }
 
@@ -380,10 +402,31 @@ input{
 
 .creat_new_list{
     cursor: pointer;
-    height: 20px;
-    width: 20px;
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    right: 40px;
 }
 
+.creat_new_list:hover{
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
+    content:url(/img/add_hover.png);
+}
+
+.my_list_explain{
+    font-size: 16px;
+    margin:5px 0px 5px 15px;
+}
+
+.my_list_explain_arrow{
+    position: absolute;
+    right: 31px;
+    top:5px;
+    height: 48px;
+    width: 48px;
+}
 
 
 .user_list_icon{
@@ -407,17 +450,16 @@ input{
 
 .user_list_name:hover{
     font-weight: bold;
+    font-size: 18px;
 }
 
 
-.user_own_list_content{
-    overflow-y: auto;
-    height: calc(100% - 60px);
-}
+
 
 .user_every_list_container{
     display: flex;
     align-items: center;
+    margin: 5px 0px;
 }
 
 /* slidebar toggle switch */
@@ -599,6 +641,12 @@ input{
     width: 20px;
 }
 
+.a_list_explain{
+    font-size: 16px;
+    margin:5px 0px 5px 15px;
+}
+
+
 
 .user_a_list_icon{
     height: 37px;
@@ -634,7 +682,8 @@ input{
 }
 
 .no_content_in_list{
-    padding-left: 15px;
+    font-size: 16px;
+    margin:5px 0px 5px 15px;
 }
 
 
@@ -722,6 +771,12 @@ input{
     overflow-y: auto;
 }
 
+.a_place_explain{
+    font-size: 16px;
+    margin:5px 0px 5px 15px;
+}
+
+
 .a_public_list_content{
     height: calc(100% - 60px);
     background-color: rgb(151, 134, 95);
@@ -793,7 +848,7 @@ input{
     display: flex;
     cursor:pointer;
     width: 280px;
-    margin: 5px 5px;
+    margin: 5px 5px 5px 15px;
 }
 
 .place_container:hover{
@@ -830,68 +885,4 @@ input{
 .public_place_address{
     color: gray;
 }
-
-
-
-/*search place input*/
-
-/* .searchBox {
-    position: relative;
-    top: 50%;
-    right: 50%;
-    transform:  translate(-50%,50%);
-    background: #acb9cc;
-    height: 30px;
-    border-radius: 40px;
-    padding: 10px;
-    display: flex;
-}
-
-
-
-
-.searchBox:hover > .searchButton {
-    background: white;
-    color : #acb9cc;
-
-    background-image: url("/img/search.png");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-}
-
-.searchButton {
-    color: white;
-    float: right;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: #76a2e0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: 0.4s;
-
-    background-image: url("/img/search.png");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    cursor:pointer;
-}
-
-.searchInput {
-    border:none;
-    background: none;
-    outline:none;
-    float:left;
-    padding: 0;
-    color: rgb(5, 5, 5);
-    font-size: 16px;
-    transition: 0.4s;
-    line-height: 30px;
-    width: 0px;
-
-    font-family: 'Noto Sans TC', sans-serif;
-
-} */
 

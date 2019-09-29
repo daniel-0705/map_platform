@@ -433,11 +433,17 @@
 
                 delete_child_element("user_own_list_content");
                 let user_own_list_content = document.getElementsByClassName("user_own_list_content")[0];
-                let user_own_list_p = document.createElement("p");
-                user_own_list_p.innerHTML= "點選 + 開始建立屬於自己的清單"
-                //user_own_list_p.className = "user_every_list_container";
-                user_own_list_content.appendChild(user_own_list_p);
 
+                let my_list_explain_arrow = document.createElement("img");
+                my_list_explain_arrow.src= "/img/arrow.png"
+                my_list_explain_arrow.className = "my_list_explain_arrow";
+                user_own_list_content.appendChild(my_list_explain_arrow);
+
+
+                let my_list_explain = document.createElement("p");
+                my_list_explain.innerHTML= "開始建立自己的清單吧!"
+                my_list_explain.className = "my_list_explain";
+                user_own_list_content.appendChild(my_list_explain);
 
                 if(user_list_data.length > 0){
                   delete_child_element("user_own_list_content");
@@ -512,29 +518,40 @@
 
               let a_list_content = document.getElementsByClassName("a_list_content")[0];
 
-              //製作新的 place 的內容 p
-              for(let i =0; i<user_place_data.length ; i++){     
+              if(user_place_data.length == 0){
+                let a_list_explain = document.createElement("p");
+                a_list_explain.className = "a_list_explain";
+                a_list_explain.innerHTML = "此清單尚未收藏地點";
+                a_list_content.appendChild(a_list_explain);
 
-                let user_place_container = document.createElement("div");
-                user_place_container.className = "user_place_container";
-                a_list_content.appendChild(user_place_container);
-
-                let new_place_name = document.createElement("p");
-                new_place_name.className = "user_place_name";
-                new_place_name.id = user_place_data[i].longitude+"_"+user_place_data[i].latitude+"_"+user_place_data[i].place_order
-                new_place_name.innerHTML = user_place_data[i].place_name;
-                new_place_name.setAttribute("onClick", "change_center_to_place(this)");
-                user_place_container.appendChild(new_place_name);
-
-                let user_delete_place = document.createElement("p");
-                user_delete_place.className = "user_delete_place";
-                user_delete_place.innerHTML = "&times;";
-                user_delete_place.setAttribute("onClick", "delete_user_place(this)");
-                user_place_container.appendChild(user_delete_place);
+                let a_list_explain_1 = document.createElement("p");
+                a_list_explain_1.className = "a_list_explain";
+                a_list_explain_1.innerHTML = "點選喜歡的地標，開始收藏吧";
+                a_list_content.appendChild(a_list_explain_1);
 
 
 
+              }else{
+                //製作新的 place 的內容 p
+                for(let i =0; i<user_place_data.length ; i++){     
 
+                  let user_place_container = document.createElement("div");
+                  user_place_container.className = "user_place_container";
+                  a_list_content.appendChild(user_place_container);
+
+                  let new_place_name = document.createElement("p");
+                  new_place_name.className = "user_place_name";
+                  new_place_name.id = user_place_data[i].longitude+"_"+user_place_data[i].latitude+"_"+user_place_data[i].place_order
+                  new_place_name.innerHTML = user_place_data[i].place_name;
+                  new_place_name.setAttribute("onClick", "change_center_to_place(this)");
+                  user_place_container.appendChild(new_place_name);
+
+                  let user_delete_place = document.createElement("p");
+                  user_delete_place.className = "user_delete_place";
+                  user_delete_place.innerHTML = "&times;";
+                  user_delete_place.setAttribute("onClick", "delete_user_place(this)");
+                  user_place_container.appendChild(user_delete_place);
+                }
               }
               console.log("顯示地點列表完成")
             }
@@ -638,9 +655,24 @@
                 alert(user_list_data.error);
             }else{
               console.log(user_list_data);
-              for (let i = 0 ;i<user_list_data.length;i++){
+
+              let a_place_content = document.getElementsByClassName("a_place_content")[0];
+
+              if(user_list_data.length ==0){
+                let a_place_explain = document.createElement("p");
+                a_place_explain.className = "a_place_explain";
+                a_place_explain.innerHTML = "噢不，目前沒有清單可以收藏";
+                a_place_content.appendChild(a_place_explain);
+
+                let a_place_explain_1 = document.createElement("p");
+                a_place_explain_1.className = "a_place_explain";
+                a_place_explain_1.innerHTML = "趕緊建立一個新的清單吧";
+                a_place_content.appendChild(a_place_explain_1);
+
+
+              }else{
+                for (let i = 0 ;i<user_list_data.length;i++){
                 //製作每一個 list 的內容 p
-                let a_place_content = document.getElementsByClassName("a_place_content")[0]
                 let list_cotainer = document.createElement("div");
                 list_cotainer.className = "list_cotainer"
                 a_place_content.appendChild(list_cotainer);
@@ -667,6 +699,9 @@
                 list_cotainer.appendChild(collection_button);
                 
               }
+              }
+
+              
             } 
           }
         }
@@ -735,8 +770,8 @@
 
         google.maps.event.addListener(map, 'click', function () { 
           infoWindow.close();
-          search_marker.setMap(null); //使用者點擊其他地方時關掉紅色的搜尋地標
           close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
+          search_marker.setMap(null); //使用者點擊其他地方時關掉紅色的搜尋地標
         });
 
 
@@ -1200,8 +1235,15 @@
                 if(user_place_data.user_list_place.length == 0){
                   let new_place_name = document.createElement("p");
                   new_place_name.className = "no_content_in_list"
-                  new_place_name.innerHTML = "該使用者尚未收藏地點";
+                  new_place_name.innerHTML = "噢不，該使用者尚未收藏地點";
                   parent_place.appendChild(new_place_name);
+
+                  let new_place_name_1 = document.createElement("p");
+                  new_place_name_1.className = "no_content_in_list"
+                  new_place_name_1.innerHTML = "再看看其他人的清單吧";
+                  parent_place.appendChild(new_place_name_1);
+
+
                   return;
                 }
                 console.log("dwije")
@@ -1525,8 +1567,9 @@
             <img class="creat_new_list" src="/img/add.png" onclick="open_list_input()">
           </div>
           <div class="user_own_list_content">
-            <p>登入後可點選 + 符號</p>
-            <p>開始建立屬於自己的清單</p>
+              <img class="my_list_explain_arrow" src="/img/arrow.png">
+            <p class="my_list_explain">登入後點選上方符號</p>
+            <p class="my_list_explain">開始建立屬於自己的清單</p>
           </div>
       </div>
       <!-- 畫面外的介面結束 -->
@@ -1553,9 +1596,13 @@
         </div>
 
         <div class = "search_list_and_place_result">
-          <p>選擇不同的條件搜尋不同的東西</p>
-          <p>選擇清單，可搜尋他人公開的清單</p>
-          <p>選擇地點，可搜尋地址或地名</p>
+          <br>
+          <img class = "search_explain_img_1" src="/img/list_example.png">
+          <p class = "search_explain">選擇清單，可搜尋他人公開的清單</p>
+          <br>
+          <img class = "search_explain_img_2" src="/img/place_example.png">
+          <p class = "search_explain">選擇地點，可搜尋地址或地名</p>
+          
         </div>
 
         <!-- <div class = "user_own_list">

@@ -33,7 +33,7 @@
         //new map
         map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 25.033499866, lng: 121.558997764},
-          zoom:12,
+          zoom:13,
           options: {
             clickableIcons: true,
             mapTypeControl: false,
@@ -58,29 +58,31 @@
 
           for (let i = 0; i<markers.length; i++){
             markers[i].setVisible(false);
+
             if (zoom > 12) {
-              if(markers[i].category.includes("藝文館所") ||markers[i].category.includes("環境教育機構") ||markers[i].category.includes("廢棄物處理場")){
-                markers[i].setVisible(true);
-              }
-            }
-            if (zoom > 13) {
-              if(markers[i].category.includes("區公所")){
-                markers[i].setVisible(true);
-              }
-            }
-            if (zoom > 14) {
-              if(markers[i].category.includes("博物館")||markers[i].category.includes("運動中心")||markers[i].category.includes("郵局")||markers[i].category.includes("健康服務中心")){
-                markers[i].setVisible(true);
-              }
-            }
-            if (zoom > 15) {
-              if(markers[i].category.includes("環保旅店")||markers[i].category.includes("文化資產")||markers[i].category.includes("拖吊場")||markers[i].category.includes("休閒農場")||markers[i].category.includes("電子遊戲場")||markers[i].category.includes("健康服務中心")){
+              if(markers[i].category.includes("廢棄物處理場") || markers[i].category.includes("環境教育機構") || markers[i].category.includes("休閒農場")|| markers[i].category.includes("健康服務中心")|| markers[i].category.includes("藝文館所") || markers[i].category.includes("運動中心")){
                 markers[i].setVisible(true);
               }
             }
 
-            if (zoom > 17) {
-              if(markers[i].category.includes("社區資源回收站")||markers[i].category.includes("電動機車充電")){
+            if (zoom > 13) {
+              if(markers[i].category.includes("區公所")|| markers[i].category.includes("夜市")|| markers[i].category.includes("電影院")|| markers[i].category.includes("獨立書店")||markers[i].category.includes("博物館")||markers[i].category.includes("環保旅店")){
+                markers[i].setVisible(true);
+              }
+            }
+            if (zoom > 14) {
+              if(markers[i].category.includes("圖書館")||markers[i].category.includes("文化資產")||markers[i].category.includes("郵局")||markers[i].category.includes("健康服務中心")){
+                markers[i].setVisible(true);
+              }
+            }
+            if (zoom > 15) {
+              if(markers[i].category.includes("醫院")||markers[i].category.includes("診所")||markers[i].category.includes("牙醫")||markers[i].category.includes("電子遊戲場")||markers[i].category.includes("藥局")||markers[i].category.includes("眼科")||markers[i].category.includes("學校")||markers[i].category.includes("旅館")){
+                markers[i].setVisible(true);
+              }
+            }
+
+            if (zoom > 16) {
+              if(markers[i].category.includes("社區資源回收站")||markers[i].category.includes("電動機車充電")||markers[i].category.includes("拖吊場")||markers[i].category.includes("護理所")||markers[i].category.includes("復健")){
                 markers[i].setVisible(true);
               }
             }
@@ -91,7 +93,6 @@
 
       //選擇收藏後會出現清單選項
       function select_list(e){
-
         if(localStorage.getItem("access_token")== undefined){
           alert("! 欲使用此功能，請先登入");
         }else{
@@ -106,6 +107,7 @@
           a_place_title.id = e.parentElement.children[0].id;
 
           document.getElementById("a_place").style.width = "300px";
+
           document.getElementById("map").style.marginLeft = "300px";
           document.getElementById("open_bar").style.marginLeft = "300px";
           document.getElementById("close_bar").style.marginLeft = "300px";
@@ -169,43 +171,6 @@
               render_a_list_all_place_name(select_place);
 
               infoWindow.close(); //做完動作後要把地標視窗關掉
-
-
-              
-
-
-
-              // //區別移除的點是當下存的還是之前存的
-              // if (e.id == ""){
-              //   console.log("先前存的的地點")
-
-              //   //為了在搜尋列 顯示地點名稱時知道順序 所以只好用迴圈的方式找出該地名的順序
-              //   let marker_order;
-              //   for (let j =0 ; j <user_markers.length; j++){
-              //     console.log(list_data.data.place_name)
-              //     console.log(user_markers[j])
-              //     if(user_markers[j].name == list_data.data.place_name){
-              //       marker_order = j;
-              //       console.log(marker_order)
-              //     }
-              //   }
-
-              //   user_markers[marker_order].setMap(null); //把使用者先前存的的地標隱藏
-              //   //使用者按下移除後，會顯現收藏的清單名稱及內容
-              //   delete_child_element("a_list_content");
-              //   render_a_list_all_place_name(list_data.data.place_data);
-
-              //   infoWindow.close();  //做完動作後要把地標視窗關掉
-              // }else{
-              //   console.log("當下存的地點")
-              //   user_markers[e.id].setMap(null); //把使用者當下存的地標隱藏
-
-              //   //使用者按下移除後，會顯現收藏的清單名稱及內容
-              //   delete_child_element("a_list_content");
-              //   render_a_list_all_place_name(list_data.data.place_data);
-
-              //   infoWindow.close(); //做完動作後要把地標視窗關掉
-              // }
             }
           }
         }
@@ -633,8 +598,16 @@
                 });
                 
                 markers.push(marker);
-                marker.setVisible(false);  //先隱藏 看不到地標
+
+                if(marker.category.includes("廢棄物處理場") || marker.category.includes("環境教育機構") || marker.category.includes("休閒農場")|| marker.category.includes("健康服務中心")|| marker.category.includes("藝文館所") || marker.category.includes("運動中心")){
+                  marker.setVisible(true);
+                }else{
+                  marker.setVisible(false);  //先隱藏 看不到地標
+                }
+                
               }
+              
+              
 
               render_user_all_place (all_markers.user_places);
               
@@ -851,12 +824,12 @@
       function close_a_place_slidebar(){
         document.getElementById("a_place").style.width = "0px";
 
-        if (document.getElementById("a_public_list").style.width == "" && document.getElementById("a_list").style.width == "" && document.getElementById("search_list_and_place").style.width == "" && document.getElementById("user_own_list").style.width == ""){
-          document.getElementById("map").style.marginLeft = "0";
-          document.getElementById("open_bar").style.marginLeft = "0";
-          document.getElementById("close_bar").style.marginLeft = "0";
-          document.getElementById("open_search_bar").style.marginLeft = "0";
-        }
+        // if (document.getElementById("a_public_list").style.width == "" && document.getElementById("a_list").style.width == "" && document.getElementById("search_list_and_place").style.width == "" && document.getElementById("user_own_list").style.width == ""){
+        //   document.getElementById("map").style.marginLeft = "0";
+        //   document.getElementById("open_bar").style.marginLeft = "0";
+        //   document.getElementById("close_bar").style.marginLeft = "0";
+        //   document.getElementById("open_search_bar").style.marginLeft = "0";
+        // }
 
         if (document.getElementById("a_public_list").style.width == "0px" && document.getElementById("a_list").style.width == "0px" && document.getElementById("search_list_and_place").style.width == "0px" && document.getElementById("user_own_list").style.width == "0px"){
           document.getElementById("map").style.marginLeft = "0px";
@@ -1316,6 +1289,11 @@
       function copy_other_list(e){
         console.log(e);
 
+        if(localStorage.getItem("access_token")== undefined){
+          alert("! 欲使用此功能，請先登入");
+          return;
+        }
+
         let a_public_list_name = e.parentElement.children[1];
 
         console.log(a_public_list_name);
@@ -1374,7 +1352,7 @@
           position:{lat: Number(e.id.split("_")[1]), lng: Number(e.id.split("_")[0])},
           icon: {
             url: `/img/point2.png`,
-            zIndex: -1
+            zIndex: 10
             //scaledSize: new google.maps.Size(50, 50)  //調整大小
           },
           //animation: google.maps.Animation.DROP,
@@ -1815,7 +1793,7 @@
     //刪除 input 的內容及搜尋結果
     function delete_search_input (){
       delete_child_element("search_list_and_place_result");
-      document.getElementById("search").value = "";
+      document.getElementById("search_list_and_place_input").value = "";
     }
     
   

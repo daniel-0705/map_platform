@@ -184,12 +184,12 @@ input{
     margin: 0;
     opacity: 0;
     cursor: pointer;
-    z-index: 3;
+    z-index: 2;
 }
 
 .knobs
 {
-    z-index: 2;
+    z-index: 1;
 }
 
 .layer
@@ -197,7 +197,7 @@ input{
     width: 100%;
     background-color: #ebf7fc;
     transition: 0.3s ease all;
-    z-index: 1;
+    z-index: 0;
 }
 
 #button-10 .knobs:before, #button-10 .knobs:after
@@ -293,6 +293,7 @@ input{
     height: calc(100% - 60px) ;
     background-color: rgb(239, 241, 84);
     overflow-y: auto;
+    overflow-x:hidden;
     position: relative;
 }
 
@@ -678,6 +679,7 @@ input{
     overflow : hidden;
     text-overflow : ellipsis;
     white-space: nowrap;
+    z-index: 4;
 
 }
 

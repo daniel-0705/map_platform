@@ -715,6 +715,7 @@
           //定義每個地標屬於的地名
           marker.name = user_all_place[i].place_name;
 
+          console.log(marker.name);
           oms.addMarker(marker);
           google.maps.event.addListener(marker, 'spider_click', function () {                   
 
@@ -1216,8 +1217,16 @@
 
                   let new_place_name_1 = document.createElement("p");
                   new_place_name_1.className = "no_content_in_list"
-                  new_place_name_1.innerHTML = "再看看其他人的清單吧";
+                  new_place_name_1.innerHTML = "點選右邊的放大鏡";
                   parent_place.appendChild(new_place_name_1);
+
+
+
+
+                  let new_place_name_2 = document.createElement("p");
+                  new_place_name_2.className = "no_content_in_list"
+                  new_place_name_2.innerHTML = "看看其他人的清單吧 : )";
+                  parent_place.appendChild(new_place_name_2);
 
 
                   return;
@@ -1416,18 +1425,6 @@
     
       <div>
         <ul>
-          <!-- <li class = "search_place_input">
-            <div class="searchBox">
-              <input id="search_place" class="searchInput" type="text" name="" placeholder="搜尋地點" autocomplete="off">
-              <button class="searchButton" onclick="change_search_place_input_width()">
-             
-              </button>
-
-              <div class = "search_place_result" id = "search_place_result">
-              </div>
-
-            </div>
-          </li> -->
           <li class="nav_item"><a href="/">About</a></li>
           <li class="nav_item"><a href="/main_map.html">Explore</a></li>
           <li class="nav_item" onclick="signin_or_out()"><a></a></li>
@@ -1499,9 +1496,9 @@
 
     <div class = "public_map" >
 
-      <button id ="open_bar" style="font-size:30px;cursor:pointer" onclick="open_user_list_bar()" >></button>
-      <button id ="close_bar" style="font-size:30px;cursor:pointer" onclick="close_slidebar()" >&times;</button>
-      <button id ="open_search_bar" style="font-size:30px;cursor:pointer" onclick="open_slidebar()">&nbsp;</button>
+      <button id ="open_bar" onclick="open_user_list_bar()" >&nbsp;</button>
+      <button id ="close_bar"  onclick="close_slidebar()" >&nbsp;</button>
+      <button id ="open_search_bar" onclick="open_slidebar()">&nbsp;</button>
 
       <!-- 畫面外的使用者單一清單介面  -->
       <div id ="a_list" class="a_list">
@@ -1657,12 +1654,27 @@
               parent_list.className = "public_list_container";
               grandpa_list_result.appendChild(parent_list);
 
-              let list_name = document.createElement("p");
-              list_name.innerHTML = user_list_data[i].list_name;
-              list_name.id =user_list_data[i].list_id;
-              list_name.className = "public_list";
-              list_name.setAttribute("onclick","show_and_open_public_list(this)");
-              parent_list.appendChild(list_name);
+              let public_list_icon = document.createElement("img");
+              public_list_icon.className = "public_list_icon";
+              public_list_icon.src = "/img/point.png";
+              parent_list.appendChild(public_list_icon);
+
+
+              let public_list_name_and_owner = document.createElement("div");
+              public_list_name_and_owner.className = "public_list_name_and_owner";
+              parent_list.appendChild(public_list_name_and_owner);
+
+              let public_list_name = document.createElement("p");
+              public_list_name.innerHTML = user_list_data[i].list_name;
+              public_list_name.id =user_list_data[i].list_id;
+              public_list_name.className = "public_list_name";
+              public_list_name.setAttribute("onclick","show_and_open_public_list(this)");
+              public_list_name_and_owner.appendChild(public_list_name);
+
+              let public_list_owner = document.createElement("p");
+              public_list_owner.innerHTML = user_list_data[i].user_name;
+              public_list_owner.className = "public_list_owner";
+              public_list_name_and_owner.appendChild(public_list_owner);
 
               let list_copy_number_img = document.createElement("img");
               list_copy_number_img.className = "list_copy_number_img";
@@ -1674,10 +1686,7 @@
               list_copy_number.className = "list_copy_number";
               parent_list.appendChild(list_copy_number);
 
-              let list_owner = document.createElement("p");
-              list_owner.innerHTML = user_list_data[i].user_name;
-              list_owner.className = "public_list_owner";
-              parent_list.appendChild(list_owner);
+              
     
             }
           }             

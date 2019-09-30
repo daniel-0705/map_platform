@@ -30,6 +30,8 @@ nav{
 
 #open_bar,#close_bar,#open_search_bar{
     position: absolute;
+    background-color: rgba(177, 96, 21, 0.781);
+    cursor:pointer;
     z-index: 8;
     transition: margin-left .5s;
     margin-left:300px;
@@ -40,12 +42,27 @@ nav{
 
 #close_bar{
     top:160px;
+    background-image: url("/img/delete.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+#close_bar:hover{
+    background-image: url("/img/delete_hover.png");
 }
 
 #open_bar{
     top:110px;
+    background-image: url("/img/play.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 
+#open_bar:hover{
+    background-image: url("/img/play_hover.png");
+}
 
 #open_search_bar{
     top:60px;
@@ -53,6 +70,11 @@ nav{
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+}
+
+#open_search_bar:hover{
+    top:60px;
+    background-image: url("/img/search_hover.png");
 }
 
 /* slidebar */
@@ -100,11 +122,19 @@ input{
     right: 120px;
 }
 
+.list_and_place_result:hover{
+    content:url("/img/search_hover.png");
+}
+
 .delete_list_and_place_result{
     height:30%;
     position: absolute;
     cursor:pointer;
     right: 90px;
+}
+
+.delete_list_and_place_result:hover{
+    content:url("/img/delete_hover.png");
 }
 
 /* 搜尋模式 */
@@ -291,7 +321,7 @@ input{
 
 .search_list_and_place_result{
     height: calc(100% - 60px) ;
-    background-color: rgb(239, 241, 84);
+    background-color: #F4EBD9;
     overflow-y: auto;
     overflow-x:hidden;
     position: relative;
@@ -322,22 +352,29 @@ input{
     background-color: rgba(128,128,128,0.3);
 }
 
-.public_list{
+.public_list_icon{
+    width: 32px;
+    height: 37px;
+}
+
+.public_list_name_and_owner{
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+
+
+.public_list_name{
     cursor:pointer;
-    width: 210px;
-    font-size: 16px;
+    width: 180px;
+    font-size: 12px;
     overflow : hidden;
     text-overflow : ellipsis;
     white-space: nowrap;
     margin-right:10px;
-}
-
-
-.list_copy_number{
-    width: 15px;
-    font-size: 10px;
-    margin-right:5px;
-    line-height: 24px;
+    font-family: 'Noto Sans TC', sans-serif;
+    color: black;
+    font-weight: bold;
 }
 
 
@@ -348,15 +385,24 @@ input{
     text-overflow : ellipsis;
     white-space: nowrap;
     text-align:left;
+    font-family: 'Noto Sans TC', sans-serif;
+    color: gray;
+    font-weight: 100;
     
 }
 
+.list_copy_number{
+    width: 15px;
+    font-size: 10px;
+    margin-right:5px;
+    line-height: 13px;
+}
 
 .list_copy_number_img{
    height: 15px;
    width: 15px; 
    margin-right:5px;
-   margin-top: 5px;
+   /* margin-top: 3px; */
 }
 
 
@@ -413,7 +459,7 @@ input{
     cursor: pointer;
     height: 30px;
     width: 30px;
-    content:url(/img/add_hover.png);
+    content:url("/img/add_hover.png");
 }
 
 .my_list_explain{
@@ -615,7 +661,7 @@ input{
 
 .a_list_name{
     height: 60px;
-    background-color: rgb(230, 230, 84);
+    background-color: rgb(182, 182, 69);
     display: flex;
     align-items: center;
 }
@@ -630,16 +676,24 @@ input{
 
 .a_list_edit_icon{
     cursor:pointer;
-    height: 20px;
-    width: 20px;
+    height: 25px;
+    width: 25px;
     margin:0px 10px;
+}
+
+.a_list_edit_icon:hover{
+    content:url("/img/edit_hover.png");
 }
 
 .a_list_delete_icon{
     cursor:pointer;
     margin-right:10px;
-    height: 20px;
-    width: 20px;
+    height: 25px;
+    width: 25px;
+}
+
+.a_list_delete_icon:hover{
+    content:url("/img/remove_hover.png");
 }
 
 .a_list_explain{
@@ -675,12 +729,16 @@ input{
 .a_public_list_title{
     cursor:pointer;
     width: 208px;
-    height: 30px;
+    /* height: 30px; */
     overflow : hidden;
     text-overflow : ellipsis;
     white-space: nowrap;
     z-index: 4;
+}
 
+.a_public_list_title:hover{
+    font-weight: bolder;
+    font-size: 22px;
 }
 
 .no_content_in_list{
@@ -691,13 +749,15 @@ input{
 
 .copy_img{
     cursor:pointer;
-    height: 20px;
-    width: 20px;
+    height: 25px;
+    width: 25px;
     margin-right:10px;
     margin-left: 10px;
-
 }
 
+.copy_img:hover{
+    content:url("/img/copy_hover.png");
+}
 
 .user_place_container{
     display: flex;
@@ -887,10 +947,12 @@ input{
     font-size: 10px;
     font-family: 'Noto Sans TC', sans-serif;
     letter-spacing: 0px;
+    width: 232px;
 }
 
 .public_place_address{
     color: gray;
+    font-weight: 100;
 }
 
 .public_place_name{

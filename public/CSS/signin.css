@@ -93,8 +93,13 @@ p.signup{
 }
 
 
+.sign_up{
+  font-weight: bolder;
+}
 
-
-
+.sign_up:hover{
+  font-weight: bolder;
+  font-size: 24px;
+}
 
 

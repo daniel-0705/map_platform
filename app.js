@@ -822,7 +822,18 @@ app.post("/api/user/map_list/search/place",async function(req,res){
       console.log(positive_word)
       let positive_fuzzy_select_name = await dao_map.fuzzy_search_place("map","name",positive_word,5);
       positive_fuzzy_select_name.map(item =>{search_place_result.push(item)});
-      let positive_fuzzy_select_address = await dao_map.fuzzy_search_place("map","address",positive_word,5);
+      
+
+
+      //從字串中刪除第一個字開始找
+      let negative_word = search_word.substring(i+1);
+      console.log(negative_word)
+      let negative_fuzzy_select_name = await dao_map.fuzzy_search_place("map","name",positive_word,5);
+      negative_fuzzy_select_name.map(item =>{search_place_result.push(item)});
+      // let negative_fuzzy_select_address = await dao_map.fuzzy_search_place("map","address",positive_word,3);
+      // negative_fuzzy_select_address.map(item =>{search_place_result.push(item)});
+
+      let positive_fuzzy_select_address = await dao_map.fuzzy_search_place("map","address",positive_word,3);
       positive_fuzzy_select_address.map(item =>{search_place_result.push(item)});
  
 
@@ -835,7 +846,7 @@ app.post("/api/user/map_list/search/place",async function(req,res){
       }
     } 
 
-    console.log(final_result)
+    //console.log(final_result)
 
     res.send(final_result);
   }
@@ -898,7 +909,7 @@ app.post("/api/user/map_list/copy",async function(req,res){
       return;
     }
 
-
+    //確認使用者的身分
     let select_user_result = await dao_map.select("user","access_token",list_data.data.access_token)
     if(select_user_result == 0){
       let error = {
@@ -908,7 +919,9 @@ app.post("/api/user/map_list/copy",async function(req,res){
       return;
     }
 
+
     let select_public_list_result = await dao_map.select("user_map_list","list_id",list_data.data.list_id)
+    console.log("原清單擁有者",select_public_list_result);
     
     let insert_copy_list = {
       category : "true",
@@ -934,8 +947,8 @@ app.post("/api/user/map_list/copy",async function(req,res){
     //新增複製的清單到使用者中
     let insert_copy_list_in_user = await dao_map.insert("user_map_list",insert_copy_list,insert_copy_list.user_name);
     //搜尋被複製的清單裡的地點
-    let select_place_in_copy_list = await dao_map.select_2("user_map_place","user_name",list_data.data.list_owner,"list_name",list_data.data.list_name);
-    //console.log(select_place_in_copy_list);
+    let select_place_in_copy_list = await dao_map.select_2("user_map_place","user_name",select_public_list_result[0].user_name,"list_name",list_data.data.list_name);
+    console.log("被複製的點",select_place_in_copy_list);
 
     //新增複製的地點到使用者中
     for(let i =0; i<select_place_in_copy_list.length;i++){
@@ -951,7 +964,7 @@ app.post("/api/user/map_list/copy",async function(req,res){
         latitude : select_place_in_copy_list[i].latitude,
         information : select_place_in_copy_list[i].information
       }
-      //console.log(insert_copy_places)
+      console.log("555",insert_copy_places)
       let insert_copy_places_in_user = await dao_map.insert("user_map_place",insert_copy_places,insert_copy_places.place_name)
     }
     

@@ -321,7 +321,7 @@ input{
 
 .search_list_and_place_result{
     height: calc(100% - 60px) ;
-    background-color: #F4EBD9;
+    background-color: #EFF154;
     overflow-y: auto;
     overflow-x:hidden;
     position: relative;

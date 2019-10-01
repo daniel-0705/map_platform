@@ -97,7 +97,7 @@
         if(localStorage.getItem("access_token")== undefined){
           alert("! 欲使用此功能，請先登入");
         }else{
-          e.removeAttribute("onclick");
+          // e.removeAttribute("onclick");
           // close_slidebar();
 
           console.log(e)
@@ -212,8 +212,6 @@
           place_name : e.parentElement.parentElement.parentElement.children[0].children[0].innerHTML,
           place_order : e.parentElement.parentElement.parentElement.children[0].children[0].id
         }
-
-
 
         console.log(place_data)
 
@@ -1220,14 +1218,10 @@
                   new_place_name_1.innerHTML = "點選右邊的放大鏡";
                   parent_place.appendChild(new_place_name_1);
 
-
-
-
                   let new_place_name_2 = document.createElement("p");
                   new_place_name_2.className = "no_content_in_list"
                   new_place_name_2.innerHTML = "看看其他人的清單吧 : )";
                   parent_place.appendChild(new_place_name_2);
-
 
                   return;
                 }
@@ -1236,7 +1230,7 @@
                   let new_place_name = document.createElement("p");
                   new_place_name.className = "user_place_name";
                   new_place_name.innerHTML = user_place_data.user_list_place[i].place_name;
-                  new_place_name.id = user_place_data.user_list_place[i].longitude+"_"+user_place_data.user_list_place[i].latitude
+                  new_place_name.id = user_place_data.user_list_place[i].longitude+"_"+user_place_data.user_list_place[i].latitude+"_"+user_place_data.user_list_place[i].place_order
                   new_place_name.setAttribute("onClick", "change_center_to_place(this)");
                   parent_place.appendChild(new_place_name);
                 }
@@ -1393,6 +1387,12 @@
           search_place_infoWindow.open(this.getMap(), this);
 
           close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
+        });
+
+        google.maps.event.addListener(map, 'click', function () { 
+          search_place_infoWindow.close();
+
+          // close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
         });
 
       }

@@ -14,11 +14,11 @@ const googleMapsClient = require('@google/maps').createClient({     //google 可
 
 
 
-function sleep (time) {
+let sleep = function(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
 };
 
-function replace_full_and_symbol(address){
+let replace_fullwidth_and_symbol = function(address){
     address = address.replace(/\s/g, "");
     address = address.replace(/１/g, "1");
     address = address.replace(/２/g, "2");
@@ -38,16 +38,10 @@ function replace_full_and_symbol(address){
     address = address.replace(/］/g, ")");
     address = address.replace(/号/g, "號");
     address = address.replace(/～/g, "~");
-    // address = address.replace(/F/g, "樓");
-    // address = address.replace(/Ｆ/g, "樓");
-    // address = address.replace(/f/g, "樓");
-    // address = address.replace(/ｆ/g, "樓");
-    // address = address.replace(/\./g, "、");
-    // address = address.replace(/ *\([^)]*\) */g, "");
     return address;
 };
 
-function number_change_words(address){
+let number_change_words = function(address){
     for (let i = 0; i < address.length; i++) {     
         if((address.charAt(i) == "段" && !isNaN(address.charAt(i-1))) ||(address.charAt(i) == "路" && !isNaN(address.charAt(i-1))) || (address.charAt(i) == "小" && !isNaN(address.charAt(i-1))) ){
             if (address.charAt(i-1) == 1){
@@ -82,7 +76,7 @@ function number_change_words(address){
     return address;
 };
 
-function word_change_number(address){
+let word_change_number = function(address){
     for (let i = 0; i < address.length; i++) {     
         if(address.charAt(i) == "號" && isNaN(address.charAt(i-1)) ){
             if (address.charAt(i-1) == "一"){
@@ -117,7 +111,7 @@ function word_change_number(address){
     return address;
 };
 
-let find_district = async function(address) {
+let find_address_district = async function(address) {
    
     let address_URI =encodeURI(address);
     let new_address
@@ -171,7 +165,7 @@ let find_district = async function(address) {
     return new_address;
 };
 
-function add_taipet_city(address){
+let address_add_taipet_city = function(address){
     if(address.includes("台北市")){
         address = address.replace("台北市", "臺北市");
     }
@@ -182,7 +176,7 @@ function add_taipet_city(address){
     return address;
 };
 
-let full_address = async function(address){
+let complete_the_address = async function(address){
     address = address.replace(/F/g, "樓");
     address = address.replace(/Ｆ/g, "樓");
     address = address.replace(/f/g, "樓");
@@ -190,10 +184,10 @@ let full_address = async function(address){
     address = address.replace(/Ｂ/g, "B");
     address = address.replace(/\./g, "、"); 
   
-    address = replace_full_and_symbol(address);
+    address = replace_fullwidth_and_symbol(address);
     address = number_change_words(address);
     address = word_change_number(address);
-    address = add_taipet_city(address);
+    address = address_add_taipet_city(address);
     address = address.replace(/ *\([^)]*\) */g, "");
 
     //把臺北市前面的郵遞區號拿掉
@@ -206,27 +200,26 @@ let full_address = async function(address){
     await sleep(1000); //太快會被禁
 
     if(!address.includes("區")){
-        address =await find_district(address);
+        address =await find_address_district(address);
     };
     
     return address;
 }
 
-
-let full_name = function(name){
+let complete_the_name = function(name){
     if(name.includes("台北")){
         name = name.replace("台北", "臺北");
     }
     if(name.includes("台灣")){
         name = name.replace("台灣", "臺灣");
     }
-    name = replace_full_and_symbol(name);
+    name = replace_fullwidth_and_symbol(name);
     name = number_change_words(name);
     name = word_change_number(name);
     return name;
 }
 
-let core_geocode_function = async function(map_data,category,search){
+let google_geocode_function = async function(map_data,category,search){
 
     //因為現在沒有經緯度協助判斷的話，會有經緯度不一樣但地址一樣的地點無法插入，只好全部先用轉換經緯度，經緯度地點不一樣當作判斷，畢竟地名不是可靠的變數可以當作參考值，雖然很浪費流量，但為了精準度只好選擇
 
@@ -318,7 +311,7 @@ let core_geocode_function = async function(map_data,category,search){
     }
 }
 
-let taipei_city_request = async function (url,category,place_icon,api_name,api_address,api_information,api_url,search){
+let taipei_city_request = async function (url,category,place_icon,api_name,api_address,api_information,search){
     request({
         url:url,
         method:"GET"
@@ -345,17 +338,14 @@ let taipei_city_request = async function (url,category,place_icon,api_name,api_a
                         continue;
                     }
                     
-                    map_list.address =await full_address(map_list.address);
-                    map_list.name = full_name(map_list.name);
+                    map_list.address =await complete_the_address(map_list.address);
+                    map_list.name = complete_the_name(map_list.name);
+
                     if (api_information !== null){
-                        map_list.information = data[i].information
+                        map_list.information = data[i].information;
                     }
             
-                    if (api_url !== null){
-                        map_list.url = data[i].url
-                    }
-
-                    core_geocode_function (map_list,category,search);
+                    google_geocode_function (map_list,category,search);
 
                 }   
             }
@@ -394,10 +384,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         }
 
 
-                        map_list.address =await full_address(map_list.address);
-                        map_list.name = full_name(map_list.name);
+                        map_list.address =await complete_the_address(map_list.address);
+                        map_list.name = complete_the_name(map_list.name);
 
-                        core_geocode_function (map_list,"博物館","name");
+                        google_geocode_function (map_list,"博物館","name");
 
                     }
                 };
@@ -431,10 +421,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         continue;
                     }
 
-                    map_list.address =await full_address(map_list.address);
-                    map_list.name = full_name(map_list.name);
+                    map_list.address =await complete_the_address(map_list.address);
+                    map_list.name = complete_the_name(map_list.name);
 
-                    core_geocode_function (map_list,"藝文館所","name");
+                    google_geocode_function (map_list,"藝文館所","name");
     
                 }   
             }
@@ -470,50 +460,50 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         continue;
                     }
 
-                    map_list.address =await full_address(map_list.address);
-                    map_list.name = full_name(map_list.name);
+                    map_list.address =await complete_the_address(map_list.address);
+                    map_list.name = complete_the_name(map_list.name);
 
-                    core_geocode_function (map_list,"文化資產","name");
+                    google_geocode_function (map_list,"文化資產","name");
 
                 }   
             }
     });
 
     //台北市資料大平台 環保旅店
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=adef2044-760f-40bd-8e13-a7fda6d011de","環保旅店","lodging","名稱","地址",null,null,"name");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=adef2044-760f-40bd-8e13-a7fda6d011de","環保旅店","lodging","名稱","地址",null,"name");
 
     //台北市資料大平台 臺北市電動機車充電地址及充電格位
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=c2b666e0-f848-4609-90cb-5e416435b93a","電動機車充電","charging","單位","地址",null,null,"name");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=c2b666e0-f848-4609-90cb-5e416435b93a","電動機車充電","charging","單位","地址",null,"name");
 
     //台北市資料大平台 臺北市社區資源回收站資訊
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=0ab06b17-3ac0-4a7b-9e64-66ef69bba697","社區資源回收站","recycle","回收站名稱","地址",null,null,"address");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=0ab06b17-3ac0-4a7b-9e64-66ef69bba697","社區資源回收站","recycle","回收站名稱","地址",null,"address");
 
     //台北市資料大平台 臺北市環境教育機構
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=9d6b643e-5d71-46e7-8368-eb0aaf907171","環境教育機構","education","機構名稱","機構地址",null,"機關網址","name");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=9d6b643e-5d71-46e7-8368-eb0aaf907171","環境教育機構","education","機構名稱","機構地址",null,"name");
 
     //台北市資料大平台 臺北市廢棄物處理場
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=13ac57a2-f4a1-4e9b-9372-9ce1c7f85df0","廢棄物處理場","other","Chinese_name","addr",null,null,"name");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=13ac57a2-f4a1-4e9b-9372-9ce1c7f85df0","廢棄物處理場","other","Chinese_name","addr",null,"name");
 
     //台北市資料大平台 臺北市拖吊場
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=24045907-b7c3-4351-b0b8-b93a54b55367","拖吊場","other","拖吊保管場名稱","地址",null,null,"name");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=24045907-b7c3-4351-b0b8-b93a54b55367","拖吊場","other","拖吊保管場名稱","地址",null,"name");
 
     //台北市資料大平台 臺北市各區公所聯絡資訊
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=a0484907-e5ce-4d5b-ac4a-42c1e7684326","區公所","government","name","address",null,null,"name");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=a0484907-e5ce-4d5b-ac4a-42c1e7684326","區公所","government","name","address",null,"name");
 
     //台北市資料大平台 臺北市休閒農場
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=2bbc419c-d774-4bcf-812b-b87b6fd15abb","休閒農場","farm","農場名稱","地址","農場主要特色簡介",null,"name");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=2bbc419c-d774-4bcf-812b-b87b6fd15abb","休閒農場","farm","農場名稱","地址","農場主要特色簡介","name");
 
     //台北市資料大平台 臺北市各區運動中心
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=e7c46724-3517-4ce5-844f-5a4404897b7d","運動中心","sport","name","addr",null,null,"name");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=e7c46724-3517-4ce5-844f-5a4404897b7d","運動中心","sport","name","addr",null,"name");
 
     //台北市資料大平台 臺北市居家護理所
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=77b20322-618d-4a1e-aaaa-bf42a363dcc9","護理所","therapy","機構名稱","地址",null,null,"name");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=77b20322-618d-4a1e-aaaa-bf42a363dcc9","護理所","therapy","機構名稱","地址",null,"name");
 
     //台北市資料大平台 臺北市預防接種合約院所  要放在醫院後面 因為裡面還有醫院別類
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=3063803c-8794-4d19-ab1c-3e602dd77506","診所","clinic","title","address_for_display",null,null,"name");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=3063803c-8794-4d19-ab1c-3e602dd77506","診所","clinic","title","address_for_display",null,"name");
 
     //台北市資料大平台 臺北市精神復健機構  
-    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=7ece5203-926a-47a6-a426-2599f1beded1","復健","rehabilitation","機構名稱","地址",null,null,"name");
+    taipei_city_request ("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=7ece5203-926a-47a6-a426-2599f1beded1","復健","rehabilitation","機構名稱","地址",null,"name");
 
     //台北市資料大平台 臺北市合法電子遊戲場業者清冊
     request({
@@ -543,10 +533,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         continue;
                     }
 
-                    map_list.address =await full_address(map_list.address);
-                    map_list.name = full_name(map_list.name);
+                    map_list.address =await complete_the_address(map_list.address);
+                    map_list.name = complete_the_name(map_list.name);
 
-                    core_geocode_function (map_list,"電子遊戲場","name");
+                    google_geocode_function (map_list,"電子遊戲場","name");
 
                 }   
             }
@@ -578,21 +568,21 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         continue;
                     }
 
-                    map_list.address =await full_address(map_list.address);
-                    map_list.name = full_name(map_list.name);
+                    map_list.address =await complete_the_address(map_list.address);
+                    map_list.name = complete_the_name(map_list.name);
 
                     if(data[i]["層級"] == "藥局"){
                         map_list.place_icon = "drugstore";
-                        core_geocode_function (map_list,"藥局","name");
+                        google_geocode_function (map_list,"藥局","name");
                     }else if (data[i]["層級"] == "牙科診所"){
                         map_list.place_icon = "dentist";
-                        core_geocode_function (map_list,"牙醫","name");
+                        google_geocode_function (map_list,"牙醫","name");
                     }else if (data[i]["層級"] == "診所"){
                         map_list.place_icon = "clinic";
-                        core_geocode_function (map_list,"診所","name");
+                        google_geocode_function (map_list,"診所","name");
                     }else{
                         map_list.place_icon = "hospital";
-                        core_geocode_function (map_list,"醫院","name");
+                        google_geocode_function (map_list,"醫院","name");
                     }
 
                 }   
@@ -626,10 +616,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                             continue;
                         }
 
-                        map_list.address =await full_address(map_list.address);
-                        map_list.name = full_name(map_list.name);
+                        map_list.address =await complete_the_address(map_list.address);
+                        map_list.name = complete_the_name(map_list.name);
                         
-                        core_geocode_function (map_list,"眼科","name");
+                        google_geocode_function (map_list,"眼科","name");
                     }
 
 
@@ -678,10 +668,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                             continue;
                         }
     
-                        map_list.address =await full_address(map_list.address);
-                        map_list.name = full_name(map_list.name);
+                        map_list.address =await complete_the_address(map_list.address);
+                        map_list.name = complete_the_name(map_list.name);
     
-                        core_geocode_function (map_list,"郵局","name");
+                        google_geocode_function (map_list,"郵局","name");
                     }
                 }   
             }
@@ -724,10 +714,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         continue;
                     }
     
-                    map_list.address =await full_address(map_list.address);
-                    map_list.name = full_name(map_list.name);
+                    map_list.address =await complete_the_address(map_list.address);
+                    map_list.name = complete_the_name(map_list.name);
     
-                    core_geocode_function (map_list,"健康服務中心","name");
+                    google_geocode_function (map_list,"健康服務中心","name");
                 
                 }   
             }
@@ -770,10 +760,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                     continue;
                 }
 
-                map_list.address =await full_address(map_list.address);
-                map_list.name = full_name(map_list.name);
+                map_list.address =await complete_the_address(map_list.address);
+                map_list.name = complete_the_name(map_list.name);
 
-                core_geocode_function (map_list,"學校","name");
+                google_geocode_function (map_list,"學校","name");
             
             }   
         }
@@ -816,10 +806,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                     continue;
                 }
 
-                map_list.address =await full_address(map_list.address);
-                map_list.name = full_name(map_list.name);
+                map_list.address =await complete_the_address(map_list.address);
+                map_list.name = complete_the_name(map_list.name);
 
-                core_geocode_function (map_list,"學校","name");
+                google_geocode_function (map_list,"學校","name");
             
             }   
         }
@@ -871,10 +861,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                     continue;
                 }
 
-                map_list.address =await full_address(map_list.address);
-                map_list.name = full_name(map_list.name);
+                map_list.address =await complete_the_address(map_list.address);
+                map_list.name = complete_the_name(map_list.name);
 
-                core_geocode_function (map_list,"學校","name");
+                google_geocode_function (map_list,"學校","name");
             
             }   
         }
@@ -1022,10 +1012,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                     continue;
                 }
 
-                map_list.address =await full_address(map_list.address);
-                map_list.name = full_name(map_list.name);
+                map_list.address =await complete_the_address(map_list.address);
+                map_list.name = complete_the_name(map_list.name);
                 
-                core_geocode_function (map_list,"學校","name");
+                google_geocode_function (map_list,"學校","name");
             
             }   
         }
@@ -1072,10 +1062,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                     continue;
                 }
 
-                map_list.address =await full_address(map_list.address);
-                map_list.name = full_name(map_list.name);
+                map_list.address =await complete_the_address(map_list.address);
+                map_list.name = complete_the_name(map_list.name);
                 
-                core_geocode_function (map_list,"夜市","name");
+                google_geocode_function (map_list,"夜市","name");
             
             }   
         }
@@ -1122,10 +1112,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         continue;
                     }
 
-                    map_list.address =await full_address(map_list.address);
-                    map_list.name = full_name(map_list.name);
+                    map_list.address =await complete_the_address(map_list.address);
+                    map_list.name = complete_the_name(map_list.name);
                     
-                    core_geocode_function (map_list,"電影院","name");
+                    google_geocode_function (map_list,"電影院","name");
                 
                 }   
             }
@@ -1160,10 +1150,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                     }
 
 
-                    map_list.address =await full_address(map_list.address);
-                    map_list.name = full_name(map_list.name);
+                    map_list.address =await complete_the_address(map_list.address);
+                    map_list.name = complete_the_name(map_list.name);
 
-                    core_geocode_function (map_list,"休閒農場","name");
+                    google_geocode_function (map_list,"休閒農場","name");
 
                 }
             };
@@ -1197,10 +1187,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         }
 
 
-                        map_list.address =await full_address(map_list.address);
-                        map_list.name = full_name(map_list.name);
+                        map_list.address =await complete_the_address(map_list.address);
+                        map_list.name = complete_the_name(map_list.name);
 
-                        core_geocode_function (map_list,"休閒農場","name");
+                        google_geocode_function (map_list,"休閒農場","name");
 
                     }
                 };
@@ -1234,10 +1224,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         }
 
 
-                        map_list.address =await full_address(map_list.address);
-                        map_list.name = full_name(map_list.name);
+                        map_list.address =await complete_the_address(map_list.address);
+                        map_list.name = complete_the_name(map_list.name);
 
-                        core_geocode_function (map_list,"休閒農場","name");
+                        google_geocode_function (map_list,"休閒農場","name");
 
                     }
                 };
@@ -1272,10 +1262,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         }
 
 
-                        map_list.address =await full_address(map_list.address);
-                        map_list.name = full_name(map_list.name);
+                        map_list.address =await complete_the_address(map_list.address);
+                        map_list.name = complete_the_name(map_list.name);
 
-                        core_geocode_function (map_list,"圖書館","name");
+                        google_geocode_function (map_list,"圖書館","name");
 
                     }
                 };
@@ -1309,10 +1299,10 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                             continue;
                         }
 
-                        map_list.address =await full_address(map_list.address);
-                        map_list.name = full_name(map_list.name);
+                        map_list.address =await complete_the_address(map_list.address);
+                        map_list.name = complete_the_name(map_list.name);
 
-                        core_geocode_function (map_list,"獨立書店","name");
+                        google_geocode_function (map_list,"獨立書店","name");
 
                     }
                 };
@@ -1396,16 +1386,14 @@ var on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         continue;
                     }
                     
-                    map_list.address =await full_address(map_list.address);
-                    map_list.name = full_name(map_list.name);
+                    map_list.address =await complete_the_address(map_list.address);
+                    map_list.name = complete_the_name(map_list.name);
                     console.log(map_list)
-                    core_geocode_function (map_list,"圖書館","name");
+                    google_geocode_function (map_list,"圖書館","name");
                 
                 }   
             }
     });
-
-
 
 
 });

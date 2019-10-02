@@ -80,13 +80,17 @@ app.post("/test", function (req, res) {
 
 
 
+
+
+
+
 //地圖上所有的點 及使用者收藏的點
 app.post("/api/map",async function (req, res) {
 
  
   if(req.header('Content-Type') != "application/json"){
     var error = {
-        "error": "Invalid request body."
+      "error": "Invalid request body."
     };
     res.send(error);
   }else{
@@ -106,10 +110,6 @@ app.post("/api/map",async function (req, res) {
       let select_all_user_place = await dao_map.select("user_map_place","user_name",select_user_result[0].name);
       data.user_places =select_all_user_place;
     }
-
-    // let select_all_place = await dao_map.select("map",null,"all places");
-    // data.places = select_all_place;
-    // res.send(data);
 
 
     //接著找公用地圖上所有的點，因為幾乎不會變動，所以這邊設置快取
@@ -154,7 +154,7 @@ app.post("/api/user/signup",async function(req,res){
       // create access token
       let hash_time = crypto.createHash('sha256');
       hash_time.update(String(Date.now()));
-      var access_token = crypto.randomBytes(48).toString('hex')+hash_time.digest('hex');     
+      let access_token = crypto.randomBytes(48).toString('hex')+hash_time.digest('hex');     
 
       let user_data={
           provider:"native",

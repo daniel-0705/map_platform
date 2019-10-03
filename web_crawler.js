@@ -2,7 +2,7 @@ const schedule = require('node-schedule');                          //node-sched
 const request = require('request');                                 // request 模組
 const cheerio = require("cheerio");                                   //爬蟲時，可以讓前端的東西變成 DOM 物件
 const axios = require('axios');                                    //讓 request 變成 promise 物件
-const mysql=require("./mysql_connection.js");                       // MySQL Initialization
+const mysql= require("./mysql_connection.js");                       // MySQL Initialization
 const dao_map = require("./dao/map.js")                             // dao_map.js 檔
 const googleMapsClient = require('@google/maps').createClient({     //google 可用 gecoding 功能
     key: 'AIzaSyAkK5NajaFKNXkYT2WsdB96edSWRo5kYhY',
@@ -43,7 +43,7 @@ let replace_fullwidth_and_symbol = function(address){
 
 let number_change_words = function(address){
     for (let i = 0; i < address.length; i++) {     
-        if((address.charAt(i) == "段" && !isNaN(address.charAt(i-1))) ||(address.charAt(i) == "路" && !isNaN(address.charAt(i-1))) || (address.charAt(i) == "小" && !isNaN(address.charAt(i-1))) ){
+        if((address.charAt(i) == "段" && !isNaN(address.charAt(i-1))) || (address.charAt(i) == "路" && !isNaN(address.charAt(i-1))) || (address.charAt(i) == "小" && !isNaN(address.charAt(i-1))) ){
             if (address.charAt(i-1) == 1){
                 address = address.substr(0, i-1) + '一' + address.substr(i)
             }
@@ -113,57 +113,26 @@ let word_change_number = function(address){
 
 let find_address_district = async function(address) {
    
-    let address_URI =encodeURI(address);
-    let new_address
+    let address_URI = encodeURI(address);
+    let new_address;
 
     await axios.get(`https://zip5.5432.tw/zip5json.py?adrs=${address_URI}&_=1569334120491`)
     .then(function (response) {
-        if(response.data.zipcode.substring(0,3).includes("100")){
-            new_address = [address.slice(0, 3),"中正區",address.slice(3)].join("");
-            return new_address;
-        }if(response.data.zipcode.substring(0,3).includes("103")){
-            new_address = [address.slice(0, 3),"大同區",address.slice(3)].join("");
-            return new_address;
-        }if(response.data.zipcode.substring(0,3).includes("104")){
-            new_address = [address.slice(0, 3),"中山區",address.slice(3)].join("");
-            return new_address;
-        }if(response.data.zipcode.substring(0,3).includes("105")){
-            new_address = [address.slice(0, 3),"松山區",address.slice(3)].join("");
-            return new_address;
-        }if(response.data.zipcode.substring(0,3).includes("106")){
-            new_address = [address.slice(0, 3),"大安區",address.slice(3)].join("");
-            return new_address;
-        }if(response.data.zipcode.substring(0,3).includes("108")){
-            new_address = [address.slice(0, 3),"萬華區",address.slice(3)].join("");
-            return new_address;
-        }if(response.data.zipcode.substring(0,3).includes("110")){
-            new_address = [address.slice(0, 3),"信義區",address.slice(3)].join("");
-            return new_address;
-        }if(response.data.zipcode.substring(0,3).includes("111")){
-            new_address = [address.slice(0, 3),"士林區",address.slice(3)].join("");
-            return new_address;
-        }if(response.data.zipcode.substring(0,3).includes("112")){
-            new_address = [address.slice(0, 3),"北投區",address.slice(3)].join("");
-            return new_address;
-        }if(response.data.zipcode.substring(0,3).includes("114")){
-            new_address = [address.slice(0, 3),"內湖區",address.slice(3)].join("");
-            return new_address;
-        }if(response.data.zipcode.substring(0,3).includes("115")){
-            new_address = [address.slice(0, 3),"南港區",address.slice(3)].join("");
-            return new_address;
-        }if(response.data.zipcode.substring(0,3).includes("116")){
-            new_address = [address.slice(0, 3),"文山區",address.slice(3)].join("");
-            return new_address;
-        }
+
+        let zip_code = ["100","103","104","105","106","108","110","111","112","114","115","116"];
+        let taipei_district = ["中正區","大同區","中山區","松山區","大安區","萬華區","信義區","士林區","北投區","內湖區","南港區","文山區"];
+        let district_of_address = taipei_district[zip_code.indexOf(response.data.zipcode.substring(0,3))];
+
+        new_address = [address.slice(0, 3),district_of_address,address.slice(3)].join("");
     })
     .catch(function (error) {
         console.log(error);
     })
     .finally(function () {
     });
-
     return new_address;
 };
+
 
 let address_add_taipet_city = function(address){
     if(address.includes("台北市")){
@@ -326,24 +295,7 @@ let taipei_city_government_request = async function (url,category,place_icon,api
 
             for(let i=0; i<data.length; i++){
 
-                let map_list={
-                    name:data[i][api_name],
-                    address:data[i][api_address],
-                    place_icon:place_icon
-                };
-
-                if (api_information !== null){
-                    map_list.information = data[i].information;
-                }
-                
-                if(address_skip_or_not(map_list.address)){
-                    continue;
-                }
-                
-                map_list.address =await complete_the_address(map_list.address);
-                map_list.name = complete_the_name(map_list.name);
-        
-                data_for_geocode_and_insert(map_list,category);
+                for_loop_insert_address_and_name(category,place_icon,data[i][api_name],data[i][api_address],data[i][api_information]);
 
             }   
         }
@@ -351,7 +303,7 @@ let taipei_city_government_request = async function (url,category,place_icon,api
 };
 
 
-let government_request = async function (url,category,location,taipei_city,place_icon,api_name,api_address, api_information){
+let government_request = async function (url,category,location,taipei_city,place_icon,api_name,api_address,api_information){
     request({
         url:url,
         method:"GET"
@@ -368,24 +320,9 @@ let government_request = async function (url,category,location,taipei_city,place
 
             for(let i=0; i<data.length; i++){
                 if (data[i][location].includes(taipei_city)){
-                    let map_list={
-                        name:data[i][api_name],
-                        address:data[i][api_address],
-                        place_icon:place_icon
-                    };
 
-                    if (api_information !== null){
-                        map_list.information = data[i].information;
-                    }
-                    
-                    if(address_skip_or_not(map_list.address)){
-                        continue;
-                    }
-                    
-                    map_list.address =await complete_the_address(map_list.address);
-                    map_list.name = complete_the_name(map_list.name);
-            
-                    data_for_geocode_and_insert(map_list,category);
+                    for_loop_insert_address_and_name(category,place_icon,data[i][api_name],data[i][api_address],data[i][api_information]);
+
                 }
             }   
         }
@@ -393,87 +330,87 @@ let government_request = async function (url,category,location,taipei_city,place
 };
 
 
+let normal_request = async function(url,cheerio){
+    let request_result;
 
-government_request("https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=M","獨立書店","cityName","臺北市","store","name","address","intro");
+    await axios.get(url)
+    .then(function (response) {
+
+        if(cheerio == "cheerio"){
+            let $ = cheerio.load(technology_high_school_request.data);
+        }else{
+            request_result = response;
+        }
+        
+    })
+    .catch(function (error) {
+        console.log(error);
+    })
+    .finally(function () {
+    });
+
+    return request_result;
+}
 
 
+let for_loop_insert_address_and_name = async function(category,place_icon,result_of_name,result_of_address,result_of_information){
+
+    let map_list={
+        name:result_of_name,
+        address:result_of_address,
+        place_icon:place_icon
+    };
+
+    if (result_of_information !== null){
+        map_list.information = result_of_information;
+    }
+    
+    if(address_skip_or_not(map_list.address)){
+        return;
+    }
+    
+    map_list.address =await complete_the_address(map_list.address);
+    map_list.name = complete_the_name(map_list.name);
+    
+    data_for_geocode_and_insert(map_list,category);
+
+      
+}
 
 
 let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
 
     // 政府資料開放平台 博物館
-    request({
-        url:"https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=H",
-        method:"GET"
-        },async function(error, response, body){
-            if(body.error){
-                console.log(body.error);
-            }else{
-                data = JSON.parse(body);
-     
-                for (let i = 0; i<data.length;i++){
-                    if (data[i].cityName.includes("臺北市")){
-                        
-                        let map_list={
-                            name:data[i].name,
-                            address:data[i].cityName+data[i].address,
-                            place_icon:"museum",
-                            information:data[i].ticketPrice
-                        };
+    let museum_request = await normal_request("https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=H");
 
-                        if(address_skip_or_not(map_list.address)){
-                            continue;
-                        }
+    museum_request = museum_request.data;
+    
+    for (let i = 0; i<museum_request.length; i++){
 
+        if (museum_request[i].cityName.includes("臺北市")){
 
-                        map_list.address =await complete_the_address(map_list.address);
-                        map_list.name = complete_the_name(map_list.name);
+            let data_address = museum_request[i].cityName+museum_request[i].address;
 
-                        data_for_geocode_and_insert(map_list,"博物館");
+            for_loop_insert_address_and_name("博物館","museum",museum_request[i].name,data_address,museum_request[i].ticketPrice);
 
-                    }
-                };
-            }
-    });
+        }
+
+    }
 
     //台北市資料大平台 藝文館所
     taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=dfad2ec4-fa19-4b2f-9efb-f6fe3456f469","藝文館所","museum_art","venues_name","address",null);
 
     //台北市資料大平台 文化資產
-    request({
-        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=d40ee29c-a538-4a87-84f0-f43acfa19a20",
-        method:"GET"
-        },async function(error, response, body){
-            if(body.error){
-                console.log(body.error);
-            }else{
-                let data = JSON.parse(body);
+    let culter_asset_request = await normal_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=d40ee29c-a538-4a87-84f0-f43acfa19a20");
+    culter_asset_request = culter_asset_request.data.result.results;
 
-                data = data.result.results;
-                
-                for (let i = 0; i<data.length;i++){
+    for (let i = 0; i<culter_asset_request.length; i++){
 
-                    data[i].building_brief = number_change_words(data[i].building_brief);
+        let data_address = culter_asset_request[i].belong_city_name+culter_asset_request[i].belong_address;
+        
+        for_loop_insert_address_and_name("文化資產","ruins",culter_asset_request[i].case_name,data_address,culter_asset_request[i].building_brief);
 
-                    let map_list={
-                        name:data[i].case_name,
-                        address:data[i].belong_city_name+data[i].belong_address,//去掉空格
-                        place_icon:"ruins",
-                        information:data[i].building_brief
-                    };
-
-                    if(address_skip_or_not(map_list.address)){
-                        continue;
-                    }
-
-                    map_list.address =await complete_the_address(map_list.address);
-                    map_list.name = complete_the_name(map_list.name);
-
-                    data_for_geocode_and_insert(map_list,"文化資產");
-
-                }   
-            }
-    });
+    }   
 
     //台北市資料大平台 環保旅店
     taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=adef2044-760f-40bd-8e13-a7fda6d011de","環保旅店","lodging","名稱","地址",null);
@@ -512,82 +449,52 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
     taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=7ece5203-926a-47a6-a426-2599f1beded1","復健","rehabilitation","機構名稱","地址",null);
 
     //台北市資料大平台 臺北市合法電子遊戲場業者清冊
-    request({
-        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=6a95357f-e76a-4cc0-84f6-27e550ced5e5",
-        method:"GET"
-        },async function(error, response, body){
-            if(body.error){
-                console.log(body.error);
-            }else{
-                let data = JSON.parse(body);
+    let video_arcade_request = await normal_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=6a95357f-e76a-4cc0-84f6-27e550ced5e5");
 
-                data = data.result.results;
-                
-                for (let i = 0; i<data.length;i++){
+    video_arcade_request = video_arcade_request.data.result.results;
 
-                    let map_list={
-                        name:data[i]["公司/商業名稱"],
-                        address:"臺北市"+data[i]["行政區"]+data[i]["營業場所地址"],
-                        place_icon:"game",
-                        information:data[i]["備註"]
-                    };
+    for (let i = 0; i<video_arcade_request.length; i++){
 
-                    if(address_skip_or_not(map_list.address)){
-                        continue;
-                    }
+        let data_address = "臺北市"+video_arcade_request[i]["行政區"]+video_arcade_request[i]["營業場所地址"];
 
-                    map_list.address =await complete_the_address(map_list.address);
-                    map_list.name = complete_the_name(map_list.name);
+        for_loop_insert_address_and_name("電子遊戲場","game",video_arcade_request[i]["公司/商業名稱"],data_address,video_arcade_request[i]["備註"]);
 
-                    data_for_geocode_and_insert(map_list,"電子遊戲場");
-
-                }   
-            }
-    });
+    } 
 
     //台北市資料大平台 戒菸合約醫事機構
-    request({
-        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=43f32f04-e57f-47f5-9658-2494311c0f86",
-        method:"GET"
-        },async function(error, response, body){
-            if(body.error){
-                console.log(body.error);
-            }else{
-                let data = JSON.parse(body);
+    let drug_dentist_clinic_hospital_request = await normal_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=43f32f04-e57f-47f5-9658-2494311c0f86");
 
-                data = data.result.results;
-                
-                for (let i = 0; i<data.length;i++){
+    drug_dentist_clinic_hospital_request = drug_dentist_clinic_hospital_request.data.result.results;
 
-                    let map_list={
-                        name:data[i]["院所名稱"],
-                        address:"臺北市"+data[i]["鄉鎮市區"]+data[i]["地址"]
-                    };
+    for (let i = 0; i<drug_dentist_clinic_hospital_request.length; i++){
 
-                    if(address_skip_or_not(map_list.address)){
-                        continue;
-                    }
+        let map_list={
+            name:drug_dentist_clinic_hospital_request[i]["院所名稱"],
+            address:"臺北市"+drug_dentist_clinic_hospital_request[i]["鄉鎮市區"]+drug_dentist_clinic_hospital_request[i]["地址"]
+        };
 
-                    map_list.address =await complete_the_address(map_list.address);
-                    map_list.name = complete_the_name(map_list.name);
+        if(address_skip_or_not(map_list.address)){
+            continue;
+        }
 
-                    if(data[i]["層級"] == "藥局"){
-                        map_list.place_icon = "drugstore";
-                        data_for_geocode_and_insert(map_list,"藥局");
-                    }else if (data[i]["層級"] == "牙科診所"){
-                        map_list.place_icon = "dentist";
-                        data_for_geocode_and_insert(map_list,"牙醫");
-                    }else if (data[i]["層級"] == "診所"){
-                        map_list.place_icon = "clinic";
-                        data_for_geocode_and_insert(map_list,"診所");
-                    }else{
-                        map_list.place_icon = "hospital";
-                        data_for_geocode_and_insert(map_list,"醫院");
-                    }
+        map_list.address =await complete_the_address(map_list.address);
+        map_list.name = complete_the_name(map_list.name);
 
-                }   
-            }
-    });
+        if(drug_dentist_clinic_hospital_request[i]["層級"] == "藥局"){
+            map_list.place_icon = "drugstore";
+            data_for_geocode_and_insert(map_list,"藥局");
+        }else if (drug_dentist_clinic_hospital_request[i]["層級"] == "牙科診所"){
+            map_list.place_icon = "dentist";
+            data_for_geocode_and_insert(map_list,"牙醫");
+        }else if (drug_dentist_clinic_hospital_request[i]["層級"] == "診所"){
+            map_list.place_icon = "clinic";
+            data_for_geocode_and_insert(map_list,"診所");
+        }else{
+            map_list.place_icon = "hospital";
+            data_for_geocode_and_insert(map_list,"醫院");
+        }
+
+    }  
     
     //台北市資料大平台 高度近視合約醫院
     government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=29fe058f-8ff8-48c2-b4b1-9948235d90db","眼科","地址","臺北市","eye","醫療院所","地址",null);
@@ -604,40 +511,7 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
     //政府資料開放平台 特色圖書館
     government_request("https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=K","圖書館","cityName","臺北市","library","name","address","intro");
 
-    //政府資料開放平台 獨立書店
-    request({
-        url:"https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=M",
-        method:"GET"
-            },async function(error, response, body){
-            if(body.error){
-                console.log(body.error);
-            }else{
-                let data = JSON.parse(body);
-            
-                for (let i = 0; i<data.length;i++){
-                    if (data[i].cityName.includes("臺北市")){
-                        
-                        let map_list={
-                            name:data[i].name,
-                            address:data[i].address,
-                            place_icon:"store",
-                            information:data[i].intro
-                        };
-
-                        if(address_skip_or_not(map_list.address)){
-                            continue;
-                        }
-
-                        map_list.address =await complete_the_address(map_list.address);
-                        map_list.name = complete_the_name(map_list.name);
-
-                        data_for_geocode_and_insert(map_list,"獨立書店");
-
-                    }
-                };
-            }
-    });
-
+    //政府資料開放平台 獨立書店 
     government_request("https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=M","獨立書店","cityName","臺北市","store","name","address","intro");
 
 
@@ -669,21 +543,7 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                 for (let i = 0; i<data_address_array.length;i++){
 
                     if(data_address_array[i].includes("臺北市")){
-                        
-                        let map_list={
-                            name:data_name_array[i],
-                            address:data_address_array[i],
-                            place_icon:"postal",
-                        };
-    
-                        if(address_skip_or_not(map_list.address)){
-                            continue;
-                        }
-    
-                        map_list.address =await complete_the_address(map_list.address);
-                        map_list.name = complete_the_name(map_list.name);
-    
-                        data_for_geocode_and_insert(map_list,"郵局");
+                        for_loop_insert_address_and_name("郵局","postal",data_name_array[i],data_address_array[i],null);
                     }
                 }   
             }
@@ -712,30 +572,15 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                 })
     
                 for (let i = 0; i<data_address_array.length;i++){
-                 
-                    let map_list={
-                        name:data_name_array[i],
-                        address:data_address_array[i],
-                        place_icon:"therapy",
-                    };
-    
-                    if(address_skip_or_not(map_list.address)){
-                        continue;
-                    }
-    
-                    map_list.address =await complete_the_address(map_list.address);
-                    map_list.name = complete_the_name(map_list.name);
-    
-                    data_for_geocode_and_insert(map_list,"健康服務中心");
-                
+                    for_loop_insert_address_and_name("健康服務中心","therapy",data_name_array[i],data_address_array[i],null);
                 }   
             }
     });
 
     //維基百科 普通型高級中等學校
     request({
-    url:"https://zh.wikipedia.org/wiki/%E4%B8%AD%E8%8F%AF%E6%B0%91%E5%9C%8B%E6%99%AE%E9%80%9A%E5%9E%8B%E9%AB%98%E7%B4%9A%E4%B8%AD%E7%AD%89%E5%AD%B8%E6%A0%A1%E5%88%97%E8%A1%A8#%E8%87%BA%E5%8C%97%E5%B8%82",
-    method:"GET"
+        url:"https://zh.wikipedia.org/wiki/%E4%B8%AD%E8%8F%AF%E6%B0%91%E5%9C%8B%E6%99%AE%E9%80%9A%E5%9E%8B%E9%AB%98%E7%B4%9A%E4%B8%AD%E7%AD%89%E5%AD%B8%E6%A0%A1%E5%88%97%E8%A1%A8#%E8%87%BA%E5%8C%97%E5%B8%82",
+        method:"GET"
         },async function(error, response, body){
         if(body.error){
             console.log(body.error);
@@ -754,31 +599,17 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                 };
             })
 
-            for (let i = 0; i<data_address_array.length;i++){
-             
-                let map_list={
-                    name:data_name_array[i],
-                    address:"臺北市"+data_address_array[i],
-                    place_icon:"school",
-                };
-
-                if(address_skip_or_not(map_list.address)){
-                    continue;
-                }
-
-                map_list.address =await complete_the_address(map_list.address);
-                map_list.name = complete_the_name(map_list.name);
-
-                data_for_geocode_and_insert(map_list,"學校");
-            
+            for (let i = 0; i<data_address_array.length; i++){
+                let data_address = "臺北市"+data_address_array[i];
+                for_loop_insert_address_and_name("學校","school",data_name_array[i],data_address,null);            
             }   
         }
     });
 
     //維基百科 技術型高級中等學校
     request({
-    url:"https://zh.wikipedia.org/wiki/%E4%B8%AD%E8%8F%AF%E6%B0%91%E5%9C%8B%E6%8A%80%E8%A1%93%E5%9E%8B%E9%AB%98%E7%B4%9A%E4%B8%AD%E7%AD%89%E5%AD%B8%E6%A0%A1%E5%88%97%E8%A1%A8#%E8%87%BA%E5%8C%97%E5%B8%82",
-    method:"GET"
+        url:"https://zh.wikipedia.org/wiki/%E4%B8%AD%E8%8F%AF%E6%B0%91%E5%9C%8B%E6%8A%80%E8%A1%93%E5%9E%8B%E9%AB%98%E7%B4%9A%E4%B8%AD%E7%AD%89%E5%AD%B8%E6%A0%A1%E5%88%97%E8%A1%A8#%E8%87%BA%E5%8C%97%E5%B8%82",
+        method:"GET"
         },async function(error, response, body){
         if(body.error){
             console.log(body.error);
@@ -798,30 +629,15 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
             })
 
             for (let i = 0; i<data_address_array.length;i++){
-             
-                let map_list={
-                    name:data_name_array[i],
-                    address:data_address_array[i],
-                    place_icon:"school",
-                };
-
-                if(address_skip_or_not(map_list.address)){
-                    continue;
-                }
-
-                map_list.address =await complete_the_address(map_list.address);
-                map_list.name = complete_the_name(map_list.name);
-
-                data_for_geocode_and_insert(map_list,"學校");
-            
+                for_loop_insert_address_and_name("學校","school",data_name_array[i],data_address_array[i],null); 
             }   
         }
     });
 
     //維基百科 宗教學校
     request({
-    url:"https://zh.wikipedia.org/wiki/%E5%8F%B0%E7%81%A3%E5%AE%97%E6%95%99%E5%AD%B8%E6%A0%A1%E5%88%97%E8%A1%A8#%E8%87%BA%E5%8C%97%E5%B8%82",
-    method:"GET"
+        url:"https://zh.wikipedia.org/wiki/%E5%8F%B0%E7%81%A3%E5%AE%97%E6%95%99%E5%AD%B8%E6%A0%A1%E5%88%97%E8%A1%A8#%E8%87%BA%E5%8C%97%E5%B8%82",
+        method:"GET"
         },async function(error, response, body){
         if(body.error){
             console.log(body.error);
@@ -831,197 +647,75 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
             let data_name_array = [];
             let data_address_array = [];
 
-            $('#mw-content-text > div > table:nth-child(8) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
-            })
+            let elemnt_selector_array= ['#mw-content-text > div > table:nth-child(8) > tbody > tr > td','#mw-content-text > div > table:nth-child(39) > tbody > tr > td'];
 
-            $('#mw-content-text > div > table:nth-child(39) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
+            elemnt_selector_array.map(item =>{
+                $(item).each((idx,el) => { 
+                    if(idx > 5 && idx % 5 == 1){
+                        data_name_array.push($(el).text())
+                    };
+                    if(idx > 5 && idx % 5 == 2){
+                        data_address_array.push($(el).text())
+                    };
+                })
             })
 
             for (let i = 0; i<data_address_array.length;i++){
-             
-                let map_list={
-                    name:data_name_array[i],
-                    address:data_address_array[i],
-                    place_icon:"school",
-                };
-
-                if(address_skip_or_not(map_list.address)){
-                    continue;
-                }
-
-                map_list.address =await complete_the_address(map_list.address);
-                map_list.name = complete_the_name(map_list.name);
-
-                data_for_geocode_and_insert(map_list,"學校");
-            
+                for_loop_insert_address_and_name("學校","school",data_name_array[i],data_address_array[i],null);
             }   
         }
     });
 
     //維基百科 國民中學
     request({
-    url:"https://zh.wikipedia.org/wiki/%E8%87%BA%E5%8C%97%E5%B8%82%E5%9C%8B%E6%B0%91%E4%B8%AD%E5%AD%B8%E5%88%97%E8%A1%A8",
-    method:"GET"
-        },async function(error, response, body){
-        if(body.error){
-            console.log(body.error);
-        }else{
-            let $ = cheerio.load(body); // 載入 body
-
-            let data_name_array = [];
-            let data_address_array = [];
-
-            $('#mw-content-text > div > table:nth-child(5) > tbody > tr> td').each((idx,el) => {
-                //console.log($(el).text(),idx) 
-                if(idx > 5 && idx % 5 == 1){
-                    //console.log($(el).text(),idx)
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    //console.log($(el).text(),idx)
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            $('#mw-content-text > div > table:nth-child(7) > tbody > tr > td').each((idx,el) => {
-                //console.log($(el).text(),idx) 
-                if(idx > 5 && idx % 5 == 1){
-                    //console.log($(el).text(),idx)
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    //console.log($(el).text(),idx)
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            $('#mw-content-text > div > table:nth-child(9) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            $('#mw-content-text > div > table:nth-child(11) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            $('#mw-content-text > div > table:nth-child(13) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            $('#mw-content-text > div > table:nth-child(15) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            $('#mw-content-text > div > table:nth-child(17) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            $('#mw-content-text > div > table:nth-child(19) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            $('#mw-content-text > div > table:nth-child(21) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            $('#mw-content-text > div > table:nth-child(23) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            $('#mw-content-text > div > table:nth-child(25) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            $('#mw-content-text > div > table:nth-child(27) > tbody > tr > td').each((idx,el) => { 
-                if(idx > 5 && idx % 5 == 1){
-                    data_name_array.push($(el).text())
-                };
-                if(idx > 5 && idx % 5 == 2){
-                    data_address_array.push($(el).text())
-                };
-            })
-
-            for (let i = 0; i<data_address_array.length;i++){
-             
-                let map_list={
-                    name:data_name_array[i],
-                    address:data_address_array[i],
-                    place_icon:"school",
-                };
-
-                if(address_skip_or_not(map_list.address)){
-                    continue;
-                }
-
-                map_list.address =await complete_the_address(map_list.address);
-                map_list.name = complete_the_name(map_list.name);
+        url:"https://zh.wikipedia.org/wiki/%E8%87%BA%E5%8C%97%E5%B8%82%E5%9C%8B%E6%B0%91%E4%B8%AD%E5%AD%B8%E5%88%97%E8%A1%A8",
+        method:"GET"
+            },async function(error, response, body){
+            if(body.error){
+                console.log(body.error);
+            }else{
+                let $ = cheerio.load(body); // 載入 body
+    
+                let data_name_array = [];
+                let data_address_array = [];
                 
-                data_for_geocode_and_insert(map_list,"學校");
-            
-            }   
-        }
-    });
+                let elemnt_selector_array= [
+                    '#mw-content-text > div > table:nth-child(5) > tbody > tr > td',
+                    '#mw-content-text > div > table:nth-child(7) > tbody > tr > td',
+                    '#mw-content-text > div > table:nth-child(9) > tbody > tr > td',
+                    '#mw-content-text > div > table:nth-child(11) > tbody > tr > td',
+                    '#mw-content-text > div > table:nth-child(13) > tbody > tr > td',
+                    '#mw-content-text > div > table:nth-child(15) > tbody > tr > td',
+                    '#mw-content-text > div > table:nth-child(17) > tbody > tr > td',
+                    '#mw-content-text > div > table:nth-child(19) > tbody > tr > td',
+                    '#mw-content-text > div > table:nth-child(21) > tbody > tr > td',
+                    '#mw-content-text > div > table:nth-child(23) > tbody > tr > td',
+                    '#mw-content-text > div > table:nth-child(25) > tbody > tr > td',
+                    '#mw-content-text > div > table:nth-child(27) > tbody > tr > td'
+                ];
+
+                elemnt_selector_array.map(item =>{
+                    $(item).each((idx,el) => { 
+                        if(idx > 5 && idx % 5 == 1){
+                            data_name_array.push($(el).text())
+                        };
+                        if(idx > 5 && idx % 5 == 2){
+                            data_address_array.push($(el).text())
+                        };
+                    })
+                })
+
+    
+                for (let i = 0; i<data_address_array.length;i++){
+                    for_loop_insert_address_and_name("學校","school",data_name_array[i],data_address_array[i],null);
+                }   
+            }
+        });
 
     //維基百科 夜市
     request({
-    url:"https://zh.wikipedia.org/wiki/%E8%87%BA%E7%81%A3%E5%A4%9C%E5%B8%82%E5%88%97%E8%A1%A8#%E8%87%BA%E5%8C%97%E5%B8%82",
-    method:"GET"
+        url:"https://zh.wikipedia.org/wiki/%E8%87%BA%E7%81%A3%E5%A4%9C%E5%B8%82%E5%88%97%E8%A1%A8#%E8%87%BA%E5%8C%97%E5%B8%82",
+        method:"GET"
         },async function(error, response, body){
         if(body.error){
             console.log(body.error);
@@ -1044,23 +738,8 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
             })
 
 
-            for (let i = 0; i<data_address_array.length;i++){
-             
-                let map_list={
-                    name:data_name_array[i],
-                    address:data_address_array[i],
-                    place_icon:"market",
-                };
-
-                if(address_skip_or_not(map_list.address)){
-                    continue;
-                }
-
-                map_list.address =await complete_the_address(map_list.address);
-                map_list.name = complete_the_name(map_list.name);
-                
-                data_for_geocode_and_insert(map_list,"夜市");
-            
+            for (let i = 0; i<data_address_array.length;i++){ 
+                for_loop_insert_address_and_name("夜市","market",data_name_array[i],data_address_array[i],null);      
             }   
         }
     });
@@ -1090,28 +769,12 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                     };
                 })
 
-
-                for (let i = 0; i<data_address_array.length;i++){
-                
-                    let map_list={
-                        name:data_name_array[i],
-                        address:data_address_array[i],
-                        place_icon:"movie",
-                    };
-
-                    if(address_skip_or_not(map_list.address)){
-                        continue;
-                    }
-
-                    map_list.address =await complete_the_address(map_list.address);
-                    map_list.name = complete_the_name(map_list.name);
-                    
-                    data_for_geocode_and_insert(map_list,"電影院");
-                
+                for (let i = 0; i<data_address_array.length;i++){ 
+                    for_loop_insert_address_and_name("電影院","movie",data_name_array[i],data_address_array[i],null);             
                 }   
             }
     })
-
+S
 
 
     //台北市立圖書館 圖書館
@@ -1165,7 +828,7 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                         if($(el).text().includes("分館") || $(el).text().includes("總館")){
                             data_name_array.push("臺北市立圖書館"+$(el).text())
                         }else{
-                        data_name_array.push($(el).text())
+                            data_name_array.push($(el).text())
                         }
                     };
                     if(idx % 2 == 1 && idx >45){
@@ -1174,29 +837,15 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                     };
                 })
 
-                
-
-                for (let i = 0; i<data_address_array.length;i++){
-                
-                    let map_list={
-                        name:data_name_array[i],
-                        address:data_address_array[i],
-                        place_icon:"library",
-                    };
-
-                    if(address_skip_or_not(map_list.address)){
-                        continue;
-                    }
-                    
-                    map_list.address =await complete_the_address(map_list.address);
-                    map_list.name = complete_the_name(map_list.name);
-                    console.log(map_list)
-                    data_for_geocode_and_insert(map_list,"圖書館");
-                
+                for (let i = 0; i<data_address_array.length;i++){     
+                    for_loop_insert_address_and_name("圖書館","library",data_name_array[i],data_address_array[i],null);     
                 }   
             }
     });
 });
+
+
+
 
 
 

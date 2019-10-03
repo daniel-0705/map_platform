@@ -14,8 +14,8 @@ const client = redis.createClient(REDIS_PORT);
 
 
 
-const NodeCache = require("node-cache"); // node-cache模組
-const myCache = new NodeCache({ stdTTL: 60, checkperiod: 0 }); // node-cache模組
+// const NodeCache = require("node-cache"); // node-cache模組
+// const myCache = new NodeCache({ stdTTL: 60, checkperiod: 0 }); // node-cache模組
 var bodyParser = require("body-parser"); // body-parser 模組
 var path = require("path"); // path 模組
 var multer = require("multer"); // multer 模組

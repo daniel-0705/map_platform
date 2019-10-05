@@ -1,5 +1,5 @@
-var express = require("express"); // express 模組
-var app = express(); // express 模組
+const express = require("express"); // express 模組
+const app = express(); // express 模組
 const crypto = require("crypto"); // crypto 模組
 const mysql = require("./mysql_connection.js"); // MySQL Initialization
 const crawler = require("./web_crawler.js"); // 爬蟲檔案

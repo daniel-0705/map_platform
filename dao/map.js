@@ -2,13 +2,13 @@ const mysql=require("../mysql_connection.js");                       // MySQL In
 
 let select_mysql = function(table_name,column_name,data){ 
     return new Promise(function(resolve, reject){
-
         if(column_name == null){
             mysql.con.query(`select * from ${table_name}`,function (err,result) {
                 if (err) {
                     console.log(`${data} select ${table_name} table failed`);
                     reject(err);
                 }else{
+                    console.log(result)
                     resolve(result);
                 }
             })

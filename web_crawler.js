@@ -9,103 +9,64 @@ const googleMapsClient = require('@google/maps').createClient({     //google 可
     Promise: Promise
 });
 
-
-
-
-
-
 let sleep = function(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
 };
 
 let replace_fullwidth_and_symbol = function(address){
+
     address = address.replace(/\s/g, "");
-    address = address.replace(/１/g, "1");
-    address = address.replace(/２/g, "2");
-    address = address.replace(/３/g, "3");
-    address = address.replace(/４/g, "4");
-    address = address.replace(/５/g, "5");
-    address = address.replace(/６/g, "6");
-    address = address.replace(/７/g, "7");
-    address = address.replace(/８/g, "8");
-    address = address.replace(/９/g, "9");
-    address = address.replace(/０/g, "0");
-    address = address.replace(/（/g, "(");
-    address = address.replace(/）/g, ")");
     address = address.replace(/\[/g, "(");
     address = address.replace(/\]/g, ")");
-    address = address.replace(/［/g, "(");
-    address = address.replace(/］/g, ")");
-    address = address.replace(/号/g, "號");
-    address = address.replace(/～/g, "~");
+
+    replace_array = ["１","２","３","４","５","６","７","８","９","０","（","）","［","］","号","～"];
+    alternative_array = ["1","2","3","4","5","6","7","8","9","0","(",")","(",")","號","~"]
+
+    for(let i = 0; i < address.length; i++) {
+        let word_idx = replace_array.indexOf(address.charAt(i));
+        if(word_idx !== -1){
+          
+            let regex = new RegExp(replace_array[word_idx])
+    
+            address = address.replace(regex, alternative_array[word_idx]);
+        }
+
+    }
     return address;
 };
 
 let number_change_words = function(address){
-    for (let i = 0; i < address.length; i++) {     
+
+    let word_array = ["一","二","三","四","五","六","七","八","九"];
+    let number_array = ["1","2","3","4","5","6","7","8","9"];
+
+    //若第一個字是小 那就會變成 undefined 小，所以從 1 開始
+    for (let i = 1; i < address.length; i++) {     
         if((address.charAt(i) == "段" && !isNaN(address.charAt(i-1))) || (address.charAt(i) == "路" && !isNaN(address.charAt(i-1))) || (address.charAt(i) == "小" && !isNaN(address.charAt(i-1))) ){
-            if (address.charAt(i-1) == 1){
-                address = address.substr(0, i-1) + '一' + address.substr(i)
-            }
-            if (address.charAt(i-1) == 2){
-                address = address.substr(0, i-1) + '二' + address.substr(i)
-            }
-            if (address.charAt(i-1) == 3){
-                address = address.substr(0, i-1) + '三' + address.substr(i)
-            }
-            if (address.charAt(i-1) == 4){
-                address = address.substr(0, i-1) + '四' + address.substr(i)
-            }
-            if (address.charAt(i-1) == 5){
-                address = address.substr(0, i-1) + '五' + address.substr(i)
-            }
-            if (address.charAt(i-1) == 6){
-                address = address.substr(0, i-1) + '六' + address.substr(i)
-            }
-            if (address.charAt(i-1) == 7){
-                address = address.substr(0, i-1) + '七' + address.substr(i)
-            }
-            if (address.charAt(i-1) == 8){
-                address = address.substr(0, i-1) + '八' + address.substr(i)
-            }
-            if (address.charAt(i-1) == 9){
-                address = address.substr(0, i-1) + '九' + address.substr(i)
-            }
+
+            let change_word = word_array[number_array.indexOf(address.charAt(i-1))];
+
+            address = address.substr(0, i-1) + change_word + address.substr(i);
         }
     }
     return address;
 };
 
 let word_change_number = function(address){
-    for (let i = 0; i < address.length; i++) {     
+
+    let word_array = ["一","二","三","四","五","六","七","八","九"];
+    let number_array = ["1","2","3","4","5","6","7","8","9"];
+
+    for (let i = 0; i < address.length; i++) { 
         if(address.charAt(i) == "號" && isNaN(address.charAt(i-1)) ){
-            if (address.charAt(i-1) == "一"){
-                address = address.substr(0, i-1) + '1' + address.substr(i)
+
+            if(word_array.indexOf(address.charAt(i-1)) == -1){
+                address = "error";
+                break;  //error 處理
             }
-            if (address.charAt(i-1) == '二'){
-                address = address.substr(0, i-1) + '2' + address.substr(i)
-            }
-            if (address.charAt(i-1) == '三'){
-                address = address.substr(0, i-1) + '3' + address.substr(i)
-            }
-            if (address.charAt(i-1) == '四'){
-                address = address.substr(0, i-1) + '4' + address.substr(i)
-            }
-            if (address.charAt(i-1) == '五'){
-                address = address.substr(0, i-1) + '5' + address.substr(i)
-            }
-            if (address.charAt(i-1) == '六'){
-                address = address.substr(0, i-1) + '6' + address.substr(i)
-            }
-            if (address.charAt(i-1) == '七'){
-                address = address.substr(0, i-1) + '7' + address.substr(i)
-            }
-            if (address.charAt(i-1) == '八'){
-                address = address.substr(0, i-1) + '8' + address.substr(i)
-            }
-            if (address.charAt(i-1) == '九'){
-                address = address.substr(0, i-1) + '9' + address.substr(i)
-            }
+
+            let change_word = number_array[word_array.indexOf(address.charAt(i-1))];
+            address = address.substr(0, i-1) + change_word + address.substr(i);
         }
     }
     return address;
@@ -133,7 +94,6 @@ let find_address_district = async function(address) {
     return new_address;
 };
 
-
 let address_add_taipet_city = function(address){
     if(address.includes("台北市")){
         address = address.replace("台北市", "臺北市");
@@ -146,34 +106,40 @@ let address_add_taipet_city = function(address){
 };
 
 let complete_the_address = async function(address){
+    
     address = address.replace(/F/g, "樓");
     address = address.replace(/Ｆ/g, "樓");
     address = address.replace(/f/g, "樓");
     address = address.replace(/ｆ/g, "樓");
     address = address.replace(/Ｂ/g, "B");
-    address = address.replace(/\./g, "、"); 
-  
+    address = address.replace(/\./g, "、");
+    address = address.replace(/號號/g, "號");
+    
     address = replace_fullwidth_and_symbol(address);
     address = number_change_words(address);
     address = word_change_number(address);
+    if(address == "error"){
+        return "error";  //error 處理
+    }
+
     address = address_add_taipet_city(address);
     address = address.replace(/ *\([^)]*\) */g, "");
-
+    
     //把臺北市前面的郵遞區號拿掉
     for(let i = 0 ; i<address.length ; i++){
         if(address.charAt(i) == "臺"){
             address = address.substring(i, address.length);
         }
     }
-
-    await sleep(2000); //太快會被禁 官方建議1-2秒
-
     if(!address.includes("區")){
+        await sleep(2000); //太快會被禁 官方建議1-2秒
         address =await find_address_district(address);
     };
-    
     return address;
 }
+
+
+
 
 let complete_the_name = function(name){
     if(name.includes("台北")){
@@ -182,18 +148,18 @@ let complete_the_name = function(name){
     if(name.includes("台灣")){
         name = name.replace("台灣", "臺灣");
     }
+
     name = replace_fullwidth_and_symbol(name);
     name = number_change_words(name);
     name = word_change_number(name);
     return name;
 }
 
-let check_address_update_or_insert =async function(select_condition,map_data,category){
 
+let check_address_update_or_insert =async function(select_condition,map_data,category){
     if(select_condition == "name"){
         //若地名一樣的話(雖然不是很準但至少完全一樣)，可以略過轉經緯度的步驟，直接更新資料，
-        let select_map_name_result = await dao_map.select ("map","name",map_data.name);
-    
+        let select_map_name_result = await dao_map.select("map","name",map_data.name);
         if(select_map_name_result.length > 0){
             if(!select_map_name_result[0].category.includes(category)){
                 map_data.category=select_map_name_result[0].category+category;
@@ -221,9 +187,6 @@ let check_address_update_or_insert =async function(select_condition,map_data,cat
             let insert_map_result = await dao_map.insert("map",map_data,map_data.name);
         }
     }
-
-
-
 }
 
 let is_name_in_taipei_city_or_empty = function(geocode_result){
@@ -236,19 +199,18 @@ let data_for_geocode_and_insert = async function(map_data,category){
 
 
     //若地名一樣的話(雖然不是很準但至少完全一樣)，可以略過轉經緯度的步驟，直接更新資料
-    let check_address_result = await check_address_update_or_insert("name",map_data,category)
+    let check_address_result =await check_address_update_or_insert("name",map_data,category)
     if(check_address_result == "update"){
         return;
     }
 
     //先用地名去轉經緯度
-    let geocode_result = await geocode_function(map_data.name);
+    let geocode_result =await geocode_function(map_data.name);
 
     //如果地名轉失敗，用地址轉經緯度
     if(is_name_in_taipei_city_or_empty(geocode_result)){
         console.log(map_data.name+" 名稱搜尋不到，改換地址搜尋");
-
-        geocode_result = await geocode_function(map_data.address);
+        geocode_result =await geocode_function(map_data.address);
     }
 
     map_data.longitude=geocode_result[0].geometry.location.lng;
@@ -278,70 +240,65 @@ let geocode_function =async function(name_or_address){
 
 
 let address_skip_or_not = function(address){
-    return ((!address.includes("路") && !address.includes("段") && !address.includes("號")&& !address.includes("街")) || address.length > 50 || address.length < 5)
+    return ((!address.includes("路") && !address.includes("段") && !address.includes("號")&& !address.includes("街")) || address == "error" || address.length > 50 || address.length < 5)
 }
 
-let taipei_city_government_request = async function (url,category,place_icon,api_name,api_address, api_information){
-    request({
-        url:url,
-        method:"GET"
-    },async function(error, response, body){
-        if(body.error){
-            console.log(body.error);
-        }else{
-            let data = JSON.parse(body);
+let taipei_city_government_request = function(address_data){
 
-            data = data.result.results;
+    axios.get(address_data.url)
+    .then(function (response) {
 
-            for(let i=0; i<data.length; i++){
-
-                for_loop_insert_address_and_name(category,place_icon,data[i][api_name],data[i][api_address],data[i][api_information]);
-
-            }   
-        }
-    });
-};
-
-
-let government_request = async function (url,category,location,taipei_city,place_icon,api_name,api_address,api_information){
-    request({
-        url:url,
-        method:"GET"
-    },async function(error, response, body){
-        if(body.error){
-            console.log(body.error);
-        }else{
-            let data = JSON.parse(body);
+        data = response.data.result.results;
+        
+        for(let i=0; i<data.length; i++){
             
-            if(data.result){
-                //為了台北市政府資料平台而設定的
-                data = data.result.results;
-            }
+            for_loop_insert_address_and_name(address_data.category,address_data.place_icon,data[i][address_data.place_name],data[i][address_data.place_address],data[i][address_data.place_information]);
 
-            for(let i=0; i<data.length; i++){
-                if (data[i][location].includes(taipei_city)){
-
-                    for_loop_insert_address_and_name(category,place_icon,data[i][api_name],data[i][api_address],data[i][api_information]);
-
-                }
-            }   
-        }
+        }   
+    })
+    .catch(function (error) {
+        console.log(error);
+    })
+    .finally(function () {
     });
+
+};
+
+let government_request = function(address_data){
+
+    axios.get(address_data.url)
+    .then(function (response) {
+
+        data = response.data;
+            
+        if(data.result){
+            //為了台北市政府資料平台而設定的
+            data = data.result.results;
+        }
+
+        for(let i=0; i<data.length; i++){
+            if (data[i][address_data.location].includes(address_data.taipei_city)){
+
+                for_loop_insert_address_and_name(address_data.category,address_data.place_icon,data[i][address_data.place_name],data[i][address_data.place_address],data[i][address_data.place_information]);
+
+            }
+        }   
+    })
+    .catch(function (error) {
+        console.log(error);
+    })
+    .finally(function () {
+    });
+
 };
 
 
-let normal_request = async function(url,cheerio){
+let normal_request = async function(url){
     let request_result;
 
     await axios.get(url)
     .then(function (response) {
-
-        if(cheerio == "cheerio"){
-            let $ = cheerio.load(technology_high_school_request.data);
-        }else{
-            request_result = response;
-        }
-        
+        request_result = response;
     })
     .catch(function (error) {
         console.log(error);
@@ -360,25 +317,120 @@ let for_loop_insert_address_and_name = async function(category,place_icon,result
         address:result_of_address,
         place_icon:place_icon
     };
-
+   
     if (result_of_information !== null){
         map_list.information = result_of_information;
     }
     
+    map_list.address = await complete_the_address(map_list.address);
+    map_list.name = complete_the_name(map_list.name);
+    
     if(address_skip_or_not(map_list.address)){
         return;
     }
-    
-    map_list.address =await complete_the_address(map_list.address);
-    map_list.name = complete_the_name(map_list.name);
-    
+
     data_for_geocode_and_insert(map_list,category);
 
-      
 }
 
 
-let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
+let A = async function (){
+
+    //台北市資料大平台 臺北市環境教育機構
+    let environmental_education = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=9d6b643e-5d71-46e7-8368-eb0aaf907171",
+        category:"環境教育機構",
+        place_icon:"education",
+        place_name:"機構名稱",
+        place_address:"機構地址",
+        place_information:null
+    }
+    taipei_city_government_request(environmental_education);
+
+    //台北市資料大平台 臺北市社區資源回收站資訊 //沒有反應 待調查
+    // let recycle_community ={
+    //     url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=0ab06b17-3ac0-4a7b-9e64-66ef69bba697",
+    //     category:"社區資源回收站",
+    //     place_icon:"recycle",
+    //     place_name:"回收站名稱",
+    //     place_address:"地址",
+    //     place_information:null
+    // }
+    // taipei_city_government_request(recycle_community);
+
+    //台北市資料大平台 臺北市電動機車充電地址及充電格位
+    let moto_charge = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=c2b666e0-f848-4609-90cb-5e416435b93a",
+        category:"電動機車充電",
+        place_icon:"charging",
+        place_name:"單位",
+        place_address:"地址",
+        place_information:null
+    };
+    taipei_city_government_request(moto_charge);
+
+
+
+
+}
+
+A()
+
+
+let leisure_farm_update_on_schedule = schedule.scheduleJob('* * * 4 */1 *', async function(){
+
+    //台北市資料大平台 臺北市休閒農場
+    let taipei_leisure_farm = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=2bbc419c-d774-4bcf-812b-b87b6fd15abb",
+        category:"休閒農場",
+        place_icon:"farm",
+        place_name:"農場名稱",
+        place_address:"地址",
+        place_information:"農場主要特色簡介"
+    };
+    taipei_city_government_request(taipei_leisure_farm);
+
+    //政府資料開放平台 休閒農業 更新接在臺北休閒農場後面
+    let attractions_leisure_farm = {
+        url:"http://data.coa.gov.tw/Service/OpenData/ODwsv/ODwsvAttractions.aspx",
+        category:"休閒農場",
+        location:"City",
+        taipei_city:"臺北市",
+        place_icon:"farm",
+        place_name:"Name",
+        place_address:"Address",
+        place_information:"Introduction"
+    };
+    government_request(attractions_leisure_farm);
+    
+    //政府資料開放平台 休閒農業 更新接在臺北休閒農場後面 只有多一個
+    let outdoor_edu_leisure_farm = {
+        url:"http://data.coa.gov.tw/Service/OpenData/ODwsv/ODwsvOutdoorEdu.aspx",
+        category:"休閒農場",
+        location:"County",
+        taipei_city:"台北市",
+        place_icon:"farm",
+        place_name:"FarmNm_CH",
+        place_address:"Address_CH",
+        place_information:null
+    };
+    government_request(outdoor_edu_leisure_farm);
+
+    //政府資料開放平台 休閒農業 更新接在臺北休閒農場後面 只有多一個
+    let permit_agri_leisure_farm = {
+        url:"http://data.coa.gov.tw/Service/OpenData/ODwsv/ODwsvPermitAgri.aspx",
+        category:"休閒農場",
+        location:"CountyName",
+        taipei_city:"臺北市",
+        place_icon:"farm",
+        place_name:"AgriMainName",
+        place_address:"AgriMainAdrs",
+        place_information:null
+    };
+    government_request(permit_agri_leisure_farm);
+});
+
+let on_schedule = schedule.scheduleJob('0 0 0 1 0 *', async function(){
 
     // 政府資料開放平台 博物館
     let museum_request = await normal_request("https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=H");
@@ -398,7 +450,15 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
     }
 
     //台北市資料大平台 藝文館所
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=dfad2ec4-fa19-4b2f-9efb-f6fe3456f469","藝文館所","museum_art","venues_name","address",null);
+    let art_and_culture_hall = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=dfad2ec4-fa19-4b2f-9efb-f6fe3456f469",
+        category:"藝文館所",
+        place_icon:"museum_art",
+        place_name:"venues_name",
+        place_address:"address",
+        place_information:"intro"
+    };
+    taipei_city_government_request(art_and_culture_hall);
 
     //台北市資料大平台 文化資產
     let culter_asset_request = await normal_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=d40ee29c-a538-4a87-84f0-f43acfa19a20");
@@ -413,40 +473,126 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
     }   
 
     //台北市資料大平台 環保旅店
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=adef2044-760f-40bd-8e13-a7fda6d011de","環保旅店","lodging","名稱","地址",null);
+    let environmental_hotel = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=adef2044-760f-40bd-8e13-a7fda6d011de",
+        category:"環保旅店",
+        place_icon:"lodging",
+        place_name:"名稱",
+        place_address:"地址",
+        place_information:null
+    };
+    taipei_city_government_request(environmental_hotel);
 
     //台北市資料大平台 臺北市電動機車充電地址及充電格位
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=c2b666e0-f848-4609-90cb-5e416435b93a","電動機車充電","charging","單位","地址",null);
+    let moto_charge = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=c2b666e0-f848-4609-90cb-5e416435b93a",
+        category:"電動機車充電",
+        place_icon:"charging",
+        place_name:"單位",
+        place_address:"地址",
+        place_information:null
+    };
+    taipei_city_government_request(moto_charge);
 
-    //台北市資料大平台 臺北市社區資源回收站資訊
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=0ab06b17-3ac0-4a7b-9e64-66ef69bba697","社區資源回收站","recycle","回收站名稱","地址",null);
+    //台北市資料大平台 臺北市社區資源回收站資訊 //沒有反應 待調查
+    let recycle_community ={
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=0ab06b17-3ac0-4a7b-9e64-66ef69bba697",
+        category:"社區資源回收站",
+        place_icon:"recycle",
+        place_name:"回收站名稱",
+        place_address:"地址",
+        place_information:null
+    }
+    taipei_city_government_request(recycle_community);
 
     //台北市資料大平台 臺北市環境教育機構
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=9d6b643e-5d71-46e7-8368-eb0aaf907171","環境教育機構","education","機構名稱","機構地址",null);
+    let environmental_education = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=9d6b643e-5d71-46e7-8368-eb0aaf907171",
+        category:"環境教育機構",
+        place_icon:"education",
+        place_name:"機構名稱",
+        place_address:"機構地址",
+        place_information:null
+    }
+    taipei_city_government_request(environmental_education);
 
     //台北市資料大平台 臺北市廢棄物處理場
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=13ac57a2-f4a1-4e9b-9372-9ce1c7f85df0","廢棄物處理場","other","Chinese_name","addr",null);
+    let waste_disposal_site = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=13ac57a2-f4a1-4e9b-9372-9ce1c7f85df0",
+        category:"廢棄物處理場",
+        place_icon:"other",
+        place_name:"Chinese_name",
+        place_address:"addr",
+        place_information:null
+    }
+    taipei_city_government_request(waste_disposal_site);
 
     //台北市資料大平台 臺北市拖吊場
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=24045907-b7c3-4351-b0b8-b93a54b55367","拖吊場","other","拖吊保管場名稱","地址",null);
+    let towing_field = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=24045907-b7c3-4351-b0b8-b93a54b55367",
+        category:"拖吊場",
+        place_icon:"other",
+        place_name:"拖吊保管場名稱",
+        place_address:"地址",
+        place_information:null
+    }
+    taipei_city_government_request(towing_field);
 
     //台北市資料大平台 臺北市各區公所聯絡資訊
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=a0484907-e5ce-4d5b-ac4a-42c1e7684326","區公所","government","name","address",null);
+    let district_office = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=a0484907-e5ce-4d5b-ac4a-42c1e7684326",
+        category:"區公所",
+        place_icon:"government",
+        place_name:"name",
+        place_address:"address",
+        place_information:null
+    }
+    taipei_city_government_request(district_office);
 
-    //台北市資料大平台 臺北市休閒農場
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=2bbc419c-d774-4bcf-812b-b87b6fd15abb","休閒農場","farm","農場名稱","地址","農場主要特色簡介");
 
     //台北市資料大平台 臺北市各區運動中心
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=e7c46724-3517-4ce5-844f-5a4404897b7d","運動中心","sport","name","addr",null);
+    let sports_center = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=e7c46724-3517-4ce5-844f-5a4404897b7d",
+        category:"運動中心",
+        place_icon:"sport",
+        place_name:"name",
+        place_address:"addr",
+        place_information:null
+    }
+    taipei_city_government_request(sports_center);
 
     //台北市資料大平台 臺北市居家護理所
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=77b20322-618d-4a1e-aaaa-bf42a363dcc9","護理所","therapy","機構名稱","地址",null);
+    let nursing_facility = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=77b20322-618d-4a1e-aaaa-bf42a363dcc9",
+        category:"護理所",
+        place_icon:"therapy",
+        place_name:"機構名稱",
+        place_address:"地址",
+        place_information:null
+    }
+    taipei_city_government_request(nursing_facility);
 
     //台北市資料大平台 臺北市預防接種合約院所  要放在醫院後面 因為裡面還有醫院別類
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=3063803c-8794-4d19-ab1c-3e602dd77506","診所","clinic","title","address_for_display",null);
+    let inoculation_hotel = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=3063803c-8794-4d19-ab1c-3e602dd77506",
+        category:"診所",
+        place_icon:"clinic",
+        place_name:"title",
+        place_address:"address_for_display",
+        place_information:null
+    }
+    taipei_city_government_request(inoculation_hotel);
 
-    //台北市資料大平台 臺北市精神復健機構  
-    taipei_city_government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=7ece5203-926a-47a6-a426-2599f1beded1","復健","rehabilitation","機構名稱","地址",null);
+    //台北市資料大平台 臺北市精神復健機構
+    let rehabilitation_institute = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=7ece5203-926a-47a6-a426-2599f1beded1",
+        category:"復健",
+        place_icon:"rehabilitation",
+        place_name:"機構名稱",
+        place_address:"地址",
+        place_information:null
+    }
+    taipei_city_government_request(rehabilitation_institute);
 
     //台北市資料大平台 臺北市合法電子遊戲場業者清冊
     let video_arcade_request = await normal_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=6a95357f-e76a-4cc0-84f6-27e550ced5e5");
@@ -497,22 +643,43 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
     }  
     
     //台北市資料大平台 高度近視合約醫院
-    government_request("https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=29fe058f-8ff8-48c2-b4b1-9948235d90db","眼科","地址","臺北市","eye","醫療院所","地址",null);
-
-    //政府資料開放平台 休閒農業 更新接在臺北休閒農場後面
-    government_request("http://data.coa.gov.tw/Service/OpenData/ODwsv/ODwsvAttractions.aspx","休閒農場","City","臺北市","farm","Name","Address","Introduction");
-    
-    //政府資料開放平台 休閒農業 更新接在臺北休閒農場後面 只有多一個
-    government_request("http://data.coa.gov.tw/Service/OpenData/ODwsv/ODwsvOutdoorEdu.aspx","休閒農場","County","台北市","farm","FarmNm_CH","Address_CH",null);
-
-    //政府資料開放平台 休閒農業 更新接在臺北休閒農場後面 只有多一個
-    government_request("http://data.coa.gov.tw/Service/OpenData/ODwsv/ODwsvPermitAgri.aspx","休閒農場","CountyName","臺北市","farm","AgriMainName","AgriMainAdrs",null);
+    let myopia_hospital = {
+        url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=29fe058f-8ff8-48c2-b4b1-9948235d90db",
+        category:"眼科",
+        location:"地址",
+        taipei_city:"臺北市",
+        place_icon:"eye",
+        place_name:"醫療院所",
+        place_address:"地址",
+        place_information:null
+    };
+    government_request(myopia_hospital);
 
     //政府資料開放平台 特色圖書館
-    government_request("https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=K","圖書館","cityName","臺北市","library","name","address","intro");
+    let special_library = {
+        url:"https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=K",
+        category:"圖書館",
+        location:"cityName",
+        taipei_city:"臺北市",
+        place_icon:"library",
+        place_name:"name",
+        place_address:"address",
+        place_information:"intro"
+    };
+    government_request(special_library);
 
-    //政府資料開放平台 獨立書店 
-    government_request("https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=M","獨立書店","cityName","臺北市","store","name","address","intro");
+    //政府資料開放平台 獨立書店
+    let indie_book_store = {
+        url:"https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=M",
+        category:"獨立書店",
+        location:"cityName",
+        taipei_city:"臺北市",
+        place_icon:"store",
+        place_name:"name",
+        place_address:"address",
+        place_information:"intro"
+    };
+    government_request(indie_book_store);
 
 
 
@@ -726,13 +893,10 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
             let data_address_array = [];
 
             $('#mw-content-text > div > table:nth-child(10) > tbody > tr > td').each((idx,el) => {
-                //console.log($(el).text(),idx) 
                 if(idx % 4 == 0){
-                    //console.log($(el).text(),idx)
                     data_name_array.push($(el).text())
                 };
                 if(idx % 4 == 1){
-                    //console.log($(el).text(),idx)
                     data_address_array.push($(el).text())
                 };
             })
@@ -758,13 +922,10 @@ let on_schedule = schedule.scheduleJob('0 0 0 1 1 */1', async function(){
                 let data_address_array = [];
 
                 $('#mw-content-text > div > table:nth-child(6) > tbody > tr > td').each((idx,el) => {
-                    //console.log($(el).text(),idx) 
                     if(idx % 6 == 0){
-                        //console.log($(el).text(),idx)
                         data_name_array.push($(el).text())
                     };
                     if(idx % 6 == 4){
-                        //console.log($(el).text(),idx)
                         data_address_array.push($(el).text())
                     };
                 })
@@ -798,33 +959,25 @@ S
                 let data_address_array = [];
                 
                 $('td').each((idx,el) => {
-                    //console.log($(el).text(),idx) 
                     if(idx % 5 == 0 && idx <40){
-                        //console.log($(el).text(),idx)
                         data_name_array.push($(el).text())
                     };
                     if(idx % 5 == 1 && idx <40){
-                        //console.log($(el).text(),idx)
                         data_address_array.push($(el).text())
                     };
                 })
 
                 $('#table_2 > tbody > tr > td').each((idx,el) => {
-                    //console.log($(el).text(),idx) 
                     if(idx % 16 == 0){
-                        //console.log($(el).text(),idx)
                         data_name_array.push("臺北市立圖書館"+$(el).text())
                     };
                     if(idx % 16 == 2){
-                        //console.log($(el).text(),idx)
                         data_address_array.push($(el).text())
                     };
                 })
 
                 $('td > a').each((idx,el) => {
-                    //console.log($(el).text(),idx) 
                     if(idx % 2 == 0 && idx >45){
-                        //console.log($(el).text(),idx)
                         if($(el).text().includes("分館") || $(el).text().includes("總館")){
                             data_name_array.push("臺北市立圖書館"+$(el).text())
                         }else{
@@ -832,7 +985,6 @@ S
                         }
                     };
                     if(idx % 2 == 1 && idx >45){
-                        //console.log($(el).text(),idx)
                         data_address_array.push($(el).text())
                     };
                 })
@@ -843,9 +995,6 @@ S
             }
     });
 });
-
-
-
 
 
 

@@ -115,10 +115,8 @@ function set_header() {
     }else if(document.getElementById("password").value == '' ){
         alert("! 請輸入密碼");
     }else{
-        var xhr = new XMLHttpRequest();
-        //使用HTTP POST请求与服务器交互数据
+        let xhr = new XMLHttpRequest();
         xhr.open("POST", "api/user/signin");
-        //设置发送数据的请求格式
         xhr.setRequestHeader('Content-Type', 'application/json');
         
         xhr.send(JSON.stringify({
@@ -136,7 +134,7 @@ function set_header() {
                     let user_data = JSON.parse(xhr.response);
                     console.log(user_data);
                     localStorage.setItem("access_token",user_data.data.access_token);
-                    window.location.href="/";
+                    window.location.href="/main_map.html";
                 }
                 
             }

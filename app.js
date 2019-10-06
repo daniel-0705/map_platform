@@ -27,7 +27,7 @@ app.use("/", express.static("public"));
 // 為了可以讀取header裡面的內容
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(check_header_type);   //middleware
+
 
 
 let check_header_type = function (req,res,next){
@@ -43,7 +43,7 @@ let check_header_type = function (req,res,next){
   }
 }
 
-
+app.use(check_header_type);   //middleware
 
 
 

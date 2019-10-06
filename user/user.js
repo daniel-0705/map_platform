@@ -88,7 +88,7 @@ router.post("/signin",async function(req,res){
         // });
 
         axios.get(fb)
-        .then(function (response) {
+        .then(async function (response) {
     
             response = response.data;
 

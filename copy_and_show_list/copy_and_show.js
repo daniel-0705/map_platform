@@ -4,8 +4,6 @@ const dao_map = require("../dao/map.js"); // dao_map.js檔
 
 
 
-
-
 // 顯示其他使用者的一個清單裡的所有地點 show places of one user and one list result 
 router.post("/show/list",async function(req,res){
     
@@ -54,11 +52,11 @@ router.post("/copy",async function(req,res){
     //確認使用者的身分
     let select_user_result = await dao_map.select("user","access_token",list_data.data.access_token)
     if(select_user_result == 0){
-    let error = {
-        "error": "!查無此使用者，請重新註冊"
-    };
-    res.send(error);
-    return;
+        let error = {
+            "error": "! 查無此使用者，請重新註冊"
+        };
+        res.send(error);
+        return;
     }
 
 

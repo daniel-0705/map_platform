@@ -14,8 +14,6 @@ const client = redis.createClient(REDIS_PORT);
 
 
 
-
-
 //地圖上所有的點 及使用者收藏的點
 router.post("/map",async function (req, res) {
 

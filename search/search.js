@@ -3,11 +3,8 @@ const router = express.Router();  //建立 router 物件
 const dao_map = require("../dao/map.js"); // dao_map.js檔
 
 
-
-
 //search other public lists in map
 router.post("/list",async function(req,res){
-  
   
     function removeDuplicates(array, key) {
         let lookup = {};
@@ -56,7 +53,7 @@ router.post("/list",async function(req,res){
     res.send(final_result);
 
   
-  });
+});
   
 //search place in map
 router.post("/place",async function(req,res){
@@ -66,12 +63,12 @@ router.post("/place",async function(req,res){
         let lookup = {};
         let result = [];
         for(let i=0; i<array.length; i++) {
-        if(!lookup[array[i][key]]){
-            lookup[array[i][key]] = true;
-            result.push(array[i]);
+            if(!lookup[array[i][key]]){
+                lookup[array[i][key]] = true;
+                result.push(array[i]);
+            }
         }
-    }
-    return result;
+        return result;
     }
 
     function replace_full_and_symbol(address){

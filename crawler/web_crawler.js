@@ -249,6 +249,10 @@ let health_update_on_schedule = schedule.scheduleJob('* * * 3 */1 *', async func
             continue;
         }
 
+        if(map_list.name == "error"){
+            continue;
+        }
+
         map_list.address =await crawler.complete_the_address(map_list.address);
         map_list.name = crawler.complete_the_name(map_list.name);
 

@@ -118,7 +118,7 @@ let complete_the_address = async function(address){
     address = number_change_words(address);
     address = word_change_number(address);
     if(address == "error"){
-        return ;  //error 處理
+        return "error";  //error 處理
     }
     
     address = address_add_taipet_city(address);
@@ -150,7 +150,7 @@ let complete_the_name = function(name){
     name = number_change_words(name);
     name = word_change_number(name);
     if(name == "error"){
-        return ;  //error 處理
+        return "error";  //error 處理
     }
     return name;
 }
@@ -164,7 +164,8 @@ let check_address_update_or_insert =async function(select_condition,map_data,cat
             if(!select_map_name_result[0].category.includes(category)){
                 map_data.category=select_map_name_result[0].category+category;
             }
-            let update_map_result = await dao_map.update("map","name",map_data.name,map_data,map_data.name);
+            //update_map_result 
+            await dao_map.update("map","name",map_data.name,map_data,map_data.name);
             return "update";
         }
         return "for_geocode";
@@ -179,12 +180,14 @@ let check_address_update_or_insert =async function(select_condition,map_data,cat
                 map_data.category=select_map_address_result[0].category+category;
             }
 
-            let update_map_address_result = await dao_map.update_3("map","address",map_data.address,"longitude",map_data.longitude,"latitude",map_data.latitude,map_data,map_data.name);
+            //update_map_address_result
+            await dao_map.update_3("map","address",map_data.address,"longitude",map_data.longitude,"latitude",map_data.latitude,map_data,map_data.name);
 
         }else{
             map_data.category=category;
 
-            let insert_map_result = await dao_map.insert("map",map_data,map_data.name);
+            //insert_map_result 
+            await dao_map.insert("map",map_data,map_data.name);
         }
     }
 }
@@ -244,7 +247,7 @@ let geocode_function =async function(name_or_address){
 
 
 let address_skip_or_not = function(address){
-    return ((!address.includes("路") && !address.includes("段") && !address.includes("號")&& !address.includes("街")) || address.length > 50 || address.length < 5 )
+    return ((!address.includes("路") && !address.includes("段") && !address.includes("號")&& !address.includes("街")) || address.length > 50 || address.length < 5 || address == "error")
 }
 
 let taipei_city_government_request = function(address_data){
@@ -345,6 +348,10 @@ let for_loop_insert_address_and_name = async function(address_and_name_data){
     map_list.name = complete_the_name(map_list.name);
     
     if(address_skip_or_not(map_list.address)){
+        return;
+    }
+
+    if(map_list.name == "error"){
         return;
     }
 

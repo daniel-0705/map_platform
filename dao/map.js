@@ -18,7 +18,6 @@ let select_mysql = function(table_name,column_name,data){
                     console.log(`${data} select ${table_name} table failed`);
                     reject(err);
                 }else{
-                    console.log(`成功`);
                     resolve(result);
                 }
             })

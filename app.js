@@ -33,9 +33,10 @@ app.use(bodyParser.json());
 
 
 let check_header_type = function (req,res,next){
+  console.log(123,req)
   if(req.header('Content-Type') != "application/json"){
-    var error = {
-      "error": "Invalid request body."
+    let error = {
+      "error":"Invalid request body."
     };
     res.send(error);
   }else{

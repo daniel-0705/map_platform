@@ -12,6 +12,7 @@ nav{
 
 .main{
     position: relative;
+    background-image: linear-gradient(to top, #534a3a, #655844, #79664e, #8d7459, #a38264);
 }
 
 .public_map{
@@ -319,6 +320,7 @@ input{
 
 .no_public_list{
     padding-left:15px;
+    color: #FAEBD7;
 }
 
 
@@ -333,15 +335,16 @@ input{
 .search_explain{
     font-size: 16px;
     margin: 0px 0px 5px 15px;
+    color: #FAEBD7;
 }
 
-.search_explain_img_1{
+/* .search_explain_img_1{
     margin: 5px 0px 0px 12px;
 }
 
 .search_explain_img_2{
     margin: 5px 0px 0px 14px;
-}
+} */
 
 .public_list_container{
     padding: 5px 0px 5px 15px;
@@ -352,7 +355,7 @@ input{
 
 .public_list_container:hover{
     padding: 5px 0px 5px 15px;
-    background-color: rgba(128,128,128,0.3);
+    background-color: rgba(128,128,128,0.7);
 }
 
 .public_list_icon{
@@ -468,7 +471,8 @@ input{
 
 .my_list_explain{
     font-size: 16px;
-    margin:5px 0px 5px 15px;
+    margin:5px 0px 5px 30px;
+    color: #FAEBD7;
 }
 
 .my_list_explain_arrow{
@@ -938,7 +942,7 @@ input{
 }
 
 .place_container:hover{
-    background-color: rgba(128,128,128,0.3);
+    background-color: rgba(128,128,128,0.7);
 }
 
 

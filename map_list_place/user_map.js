@@ -83,7 +83,11 @@ router.put("/list",async function(req,res){
 
     let select_update_list = await dao_map.select_2("user_map_list","list_id",user_list_data.list_id,"user_name",user_list_data.user_name);
     console.log(select_update_list);
-    res.send({success:"update OK",data:select_update_list});
+
+    let select_all_user_place = await dao_map.select("user_map_place","user_name",user_list_data.user_name);
+
+
+    res.send({success:"update OK",data:select_all_user_place});
     
    
     

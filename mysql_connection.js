@@ -1,5 +1,5 @@
 // MySQL Initialization
-const mysql=require("mysql");
+const mysql = require("mysql");
 
 let connection = mysql.createConnection({
     host: "localhost",
@@ -17,7 +17,7 @@ connection.connect(function(err) {
     console.log('connecting database success');
 });
 
-module.exports={
+module.exports = {
 	core:mysql,
 	con:connection
 };

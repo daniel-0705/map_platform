@@ -11,6 +11,7 @@ const bodyParser = require("body-parser"); // body-parser 模組
 const router = express.Router();  //建立 router 物件
 
 const map_list_place = require("./map_list_place/map.js");
+const user_map_list_place = require("./map_list_place/user_map.js");
 const user = require("./user/user.js");
 const search = require("./search/search.js");
 const copy_list = require("./copy_and_show_list/copy_list.js");
@@ -32,7 +33,6 @@ app.use(bodyParser.json());
 
 
 let check_header_type = function (req,res,next){
-  console.log(999,req.body)
   if(req.header('Content-Type') != "application/json"){
     var error = {
       "error": "Invalid request body."
@@ -56,6 +56,7 @@ let check_user_status = async function (req,res,next){
     return;
   }else{
     console.log("使用者身分 OK");
+    req.user = select_user_result;
     next();
   }
 }
@@ -70,11 +71,13 @@ app.use(check_header_type);   //middleware
 
 
 // 分出去的 router
-app.use('/api', map_list_place);
-app.use('/api/user',user);
-app.use('/api/user/map_list/search', search);
-app.use('/api/user/map_list/copy',check_user_status,copy_list);
-app.use('/api/user/map_list', show_list);
+app.use('/api/map', map_list_place);
+app.use('/api/map_list/user', check_user_status, user_map_list_place);
+app.use('/api/user', user);
+app.use('/api/map_list/search', search);
+app.use('/api/map_list/copy', check_user_status, copy_list);
+app.use('/api/map_list/show', show_list);
+
 
 app.listen(3000, function () {
   console.log("Server is running in http://localhost:3000/")

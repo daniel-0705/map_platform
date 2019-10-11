@@ -5,7 +5,7 @@ function user_status(){
     if(localStorage.getItem("access_token") == null){
         user_state[2].innerHTML = "Sign in"
     }else{
-        user_state[2].innerHTML = "Log out";
+        user_state[2].innerHTML = "Logout";
     }
 }
 
@@ -17,7 +17,7 @@ function signin_or_out(){
     }else{
         localStorage.removeItem("access_token")
 
-        user_state[2].innerHTML = "Log out"
+        user_state[2].innerHTML = "Logout"
 
         window.location.href="/";
     }

@@ -27,7 +27,7 @@ function set_header() {
                     alert(user_data.error)
                 }else{
                     localStorage.setItem("access_token",user_data.data.access_token);
-                    document.location.href="/main_map.html";
+                    document.location.href = "/main_map.html";
                 }
                 
             }

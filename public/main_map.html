@@ -132,7 +132,7 @@
         console.log(list_data)
 
         let xhr = new XMLHttpRequest();
-        xhr.open("post", "/api/user/map_list/place");  
+        xhr.open("delete", "/api/map_list/user/place");  
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.send(JSON.stringify(list_data));
 
@@ -216,12 +216,11 @@
         console.log(place_data)
 
         let xhr = new XMLHttpRequest();
-        xhr.open("post", "/api/user/map_list/place");  
+        xhr.open("post", "/api/map_list/user/place");  
         xhr.setRequestHeader('Content-Type', 'application/json');
 
         if(e.innerHTML == "收藏"){
           let list_data = {
-            type:"create",
             data:place_data
           }
           xhr.send(JSON.stringify(list_data));
@@ -375,12 +374,11 @@
         //有使用者 token 才執行下列動作
         if(localStorage.getItem("access_token")){
           let xhrt= new XMLHttpRequest();
-          xhrt.open("post", "/api/user/map_list/result");  
+          xhrt.open("post", "/api/map_list/user/result");  
           xhrt.setRequestHeader('Content-Type', 'application/json');
           
 
           let list_data ={
-            type :"select",
             data : {access_token:localStorage.getItem("access_token")}
           };
 
@@ -462,11 +460,10 @@
 
 
         let xhr = new XMLHttpRequest();
-        xhr.open("post", "/api/user/map_list/place");  
+        xhr.open("post", "/api/map_list/user/place/show");  
         xhr.setRequestHeader('Content-Type', 'application/json');
 
         let list_data = {
-          type:"select",
           data:list
         }
 
@@ -616,7 +613,7 @@
       
       function render_collection_list_or_not(list){
         let xhrt= new XMLHttpRequest();
-        xhrt.open("post", "/api/user/map_list/result");  
+        xhrt.open("post", "/api/map_list/user/result");  
         xhrt.setRequestHeader('Content-Type', 'application/json');
 
         xhrt.send(JSON.stringify(list));
@@ -861,11 +858,10 @@
         }
 
         let xhr = new XMLHttpRequest();
-        xhr.open("post", "/api/user/map_list");  
+        xhr.open("post", "/api/map_list/user/list");  
         xhr.setRequestHeader('Content-Type', 'application/json');
         
         let list_data = {
-          type:"create",
           data:insert_list
         }
 
@@ -912,11 +908,10 @@
 
         let xhr = new XMLHttpRequest();
 
-        xhr.open("post", "/api/user/map_list");  
+        xhr.open("put", "/api/map_list/user/list");  
         xhr.setRequestHeader('Content-Type', 'application/json');
 
         let list_data = {
-          type:"update",
           data:update_list
         }
         console.log(list_data)
@@ -1011,11 +1006,10 @@
 
         let xhr = new XMLHttpRequest();
 
-        xhr.open("post", "/api/user/map_list");  
+        xhr.open("delete", "/api/map_list/user/list");  
         xhr.setRequestHeader('Content-Type', 'application/json');
         
         let list_data = {
-          type:"delete",
           data:delete_list
         }
         console.log(list_data)
@@ -1079,11 +1073,10 @@
 
         let xhr = new XMLHttpRequest();
 
-        xhr.open("post", "/api/user/map_list");  
+        xhr.open("put", "/api/map_list/user/list/appear");  
         xhr.setRequestHeader('Content-Type', 'application/json');
 
         let list_data = {
-          type:"update_appear",
           data:update_list
         }
         console.log(list_data)
@@ -1168,7 +1161,7 @@
           }
 
           let xhr = new XMLHttpRequest();
-          xhr.open("post", "/api/user/map_list/show/list");  
+          xhr.open("post", "/api/map_list/show/list");  
           xhr.setRequestHeader('Content-Type', 'application/json');
           
           let list_data = {
@@ -1312,7 +1305,7 @@
         console.log(copy_list);
 
         let xhr = new XMLHttpRequest();
-        xhr.open("post", "/api/user/map_list/copy");  
+        xhr.open("post", "/api/map_list/copy");  
         xhr.setRequestHeader('Content-Type', 'application/json');
         
         let list_data = {
@@ -1622,7 +1615,7 @@
 
       let xhr = new XMLHttpRequest();
 
-      xhr.open("post", "/api/user/map_list/search/list");  
+      xhr.open("post", "/api/map_list/search/list");  
       xhr.setRequestHeader('Content-Type', 'application/json');
       
       let list_data = {
@@ -1701,7 +1694,7 @@
 
         let xhr = new XMLHttpRequest();
 
-        xhr.open("post", "/api/user/map_list/search/place");  
+        xhr.open("post", "/api/map_list/search/place");  
         xhr.setRequestHeader('Content-Type', 'application/json');
         
         let place_data = {

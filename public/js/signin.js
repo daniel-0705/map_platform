@@ -26,9 +26,9 @@ function checkLoginState() {
         console.log(response.authResponse.accessToken);
         
         var xhrt = new XMLHttpRequest();
-        //使用HTTP POST请求与服务器交互数据
+        
         xhrt.open("POST", "api/user/signin");
-        //设置发送数据的请求格式
+        
         xhrt.setRequestHeader('Content-Type', 'application/json');
         
         xhrt.send(JSON.stringify({ 
@@ -37,7 +37,7 @@ function checkLoginState() {
             })
         );
 
-        xhrt.onreadystatechange=function() {
+        xhrt.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 console.log("26848");
                 console.log(xhrt.response);
@@ -47,7 +47,7 @@ function checkLoginState() {
                     let user_data = JSON.parse(xhrt.response);
                     console.log(user_data);
                     localStorage.setItem("access_token",user_data.data.access_token);
-                    window.location.href="/";
+                    window.location.href = "/";
                 }
                 
             }
@@ -125,7 +125,7 @@ function set_header() {
             "password": document.getElementById("password").value})
         );
 
-        xhr.onreadystatechange=function() {
+        xhr.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
             console.log(xhr.response)
                 if(xhr.response == "error"){

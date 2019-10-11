@@ -198,17 +198,17 @@ let delete_3_conditions_mysql = function(table_name,column_name_1,data_1,column_
 
 
 module.exports={
-    select:select_mysql,
-    select_2:select_2_conditions_mysql,
-    select_3:select_3_conditions_mysql,
-    select_last_insert_id:select_last_insert_id_mysql,
-    select_order_by:select_order_by_mysql,
-    fuzzy_select:fuzzy_search,
-    fuzzy_search_place:fuzzy_search_place,
-    insert:insert_mysql,
-    update:update_mysql,
-    update_2:update_2_conditions_mysql,
-    update_3:update_3_conditions_mysql,
-    delete:delete_mysql,
-    delete_3:delete_3_conditions_mysql
+    select : select_mysql,
+    select_2 : select_2_conditions_mysql,
+    select_3 : select_3_conditions_mysql,
+    select_last_insert_id : select_last_insert_id_mysql,
+    select_order_by : select_order_by_mysql,
+    fuzzy_select : fuzzy_search,
+    fuzzy_search_place : fuzzy_search_place,
+    insert : insert_mysql,
+    update : update_mysql,
+    update_2 : update_2_conditions_mysql,
+    update_3 : update_3_conditions_mysql,
+    delete : delete_mysql,
+    delete_3 : delete_3_conditions_mysql
 };

@@ -156,7 +156,7 @@ let complete_the_name = function(name){
 }
 
 
-let check_address_update_or_insert =async function(select_condition,map_data,category){
+let check_address_update_or_insert = async function(select_condition,map_data,category){
     if(select_condition == "name"){
         //若地名一樣的話(雖然不是很準但至少完全一樣)，可以略過轉經緯度的步驟，直接更新資料，
         let select_map_name_result = await dao_map.select("map","name",map_data.name);
@@ -184,7 +184,7 @@ let check_address_update_or_insert =async function(select_condition,map_data,cat
             await dao_map.update_3("map","address",map_data.address,"longitude",map_data.longitude,"latitude",map_data.latitude,map_data,map_data.name);
 
         }else{
-            map_data.category=category;
+            map_data.category = category;
 
             //insert_map_result 
             await dao_map.insert("map",map_data,map_data.name);

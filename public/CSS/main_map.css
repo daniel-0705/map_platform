@@ -30,7 +30,7 @@ nav{
 
 #open_bar,#close_bar,#open_search_bar{
     position: absolute;
-    background-color: rgba(177, 96, 21, 0.781);
+    background-color: rgba(112, 26, 13, 0.746);
     cursor:pointer;
     z-index: 8;
     transition: margin-left .5s;
@@ -43,8 +43,9 @@ nav{
 #close_bar{
     top:160px;
     background-image: url("/img/delete.png");
+    background-size: 25px 25px;
     background-repeat: no-repeat;
-    background-size: cover;
+    /* background-size: cover; */
     background-position: center;
 }
 
@@ -55,8 +56,9 @@ nav{
 #open_bar{
     top:110px;
     background-image: url("/img/play.png");
+    background-size: 25px 25px;
     background-repeat: no-repeat;
-    background-size: cover;
+    /* background-size: cover; */
     background-position: center;
 }
 
@@ -67,8 +69,9 @@ nav{
 #open_search_bar{
     top:60px;
     background-image: url("/img/search.png");
+    background-size: 25px 25px;
     background-repeat: no-repeat;
-    background-size: cover;
+    /* background-size: cover; */
     background-position: center;
 }
 
@@ -81,19 +84,19 @@ nav{
 
 .search_list_and_place {
     height: 100%;
-    width: 300px;
+    width: 0px;
     position: fixed;
     position: absolute;
     overflow-x: hidden;
     transition: 0.5s;
-    background-color: rgb(230, 208, 157);
+    background-image: linear-gradient(to top, #534a3a, #655844, #79664e, #8d7459, #a38264);
     padding-top: 60px;
     box-sizing: border-box;
 }
 
 .search_list_and_place_bar{
     height: 60px;
-    background-color: rgb(240, 230, 207);
+    /* background-color: rgb(240, 230, 207); */
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -321,7 +324,7 @@ input{
 
 .search_list_and_place_result{
     height: calc(100% - 60px) ;
-    background-color: #EFF154;
+    /* background-color: #EFF154; */
     overflow-y: auto;
     overflow-x:hidden;
     position: relative;
@@ -373,8 +376,7 @@ input{
     white-space: nowrap;
     margin-right:10px;
     font-family: 'Noto Sans TC', sans-serif;
-    color: black;
-    font-weight: bold;
+    color: wheat;
 }
 
 
@@ -386,7 +388,7 @@ input{
     white-space: nowrap;
     text-align:left;
     font-family: 'Noto Sans TC', sans-serif;
-    color: gray;
+    color: white;
     font-weight: 100;
     
 }
@@ -396,6 +398,7 @@ input{
     font-size: 10px;
     margin-right:5px;
     line-height: 13px;
+    color: white;
 }
 
 .list_copy_number_img{
@@ -411,11 +414,11 @@ input{
 
 .user_own_list {
     height: 100%;
-    width: 0px;
+    width: 300px;
     position: fixed;
     position: absolute;
     transition: 0.5s;
-    background-color: rgb(230, 208, 157);
+    background-image: linear-gradient(to top, #534a3a, #655844, #79664e, #8d7459, #a38264);
     z-index: 3;
     padding-top: 60px;
     box-sizing: border-box;
@@ -423,7 +426,7 @@ input{
 
 .user_own_list_title{
     height: 60px;
-    background-color: rgb(173, 145, 80);
+    /* background-color: rgb(173, 145, 80); */
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -434,7 +437,7 @@ input{
 
 .user_own_list_content{
     height: calc(100% - 60px) ;
-    background-color: rgb(182, 150, 75);
+    /* background-color: rgb(182, 150, 75); */
     overflow-y: auto;
     position: relative;
     /* overflow-x: hidden; */
@@ -444,7 +447,8 @@ input{
     font-family: "sans";
     text-align: center;
     height: 30px;
-    font-size: 25px; 
+    font-size: 25px;
+    color:#FAEBD7;
 }
 
 .creat_new_list{
@@ -493,6 +497,7 @@ input{
     line-height: 25px;
     width: 180px;
     margin-right: 10px;
+    color: #FAEBD7;
 }
 
 .user_list_name:hover{
@@ -657,11 +662,12 @@ input{
     transition: 0.5s;
     padding-top: 60px;
     box-sizing: border-box;
+    background-image: linear-gradient(to top, #534a3a, #655844, #79664e, #8d7459, #a38264);
 }
 
 .a_list_name{
     height: 60px;
-    background-color: rgb(182, 182, 69);
+    /* background-color: rgb(182, 182, 69); */
     display: flex;
     align-items: center;
 }
@@ -669,7 +675,7 @@ input{
 .a_list_content{
     height: calc(100% - 60px) ;
     box-sizing: content-box;
-    background-color: orange;
+    /* background-color: orange; */
     overflow-y: auto;
 }
 
@@ -699,6 +705,7 @@ input{
 .a_list_explain{
     font-size: 16px;
     margin:5px 0px 5px 15px;
+    color: #FAEBD7;
 }
 
 
@@ -724,6 +731,7 @@ input{
     overflow : hidden;
     text-overflow : ellipsis;
     white-space: nowrap;
+    color: #FAEBD7;
 }
 
 .a_public_list_title{
@@ -734,6 +742,7 @@ input{
     text-overflow : ellipsis;
     white-space: nowrap;
     z-index: 4;
+    color: #FAEBD7;
 }
 
 .a_public_list_title:hover{
@@ -744,6 +753,7 @@ input{
 .no_content_in_list{
     font-size: 16px;
     margin:5px 0px 5px 15px;
+    color: #FAEBD7;
 }
 
 
@@ -775,6 +785,7 @@ input{
     white-space: nowrap;
     cursor:pointer;
     width: 255px;
+    color: #FAEBD7;
 }
 
 .user_place_name:hover{
@@ -813,7 +824,7 @@ input{
     position: absolute;
     overflow-x: hidden;
     transition: 0.5s;
-    background-color: rgb(230, 208, 157);
+    background-image: linear-gradient(to top, #534a3a, #655844, #79664e, #8d7459, #a38264);
     z-index: 4;
     padding-top: 60px;
     box-sizing: border-box;
@@ -821,7 +832,7 @@ input{
 
 .a_place_name{
     height: 60px;
-    background-color: rgb(173, 145, 80);
+    /* background-color: rgb(173, 145, 80); */
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -830,7 +841,7 @@ input{
 
 .a_place_content{
     height: calc(100% - 60px);
-    background-color: rgb(151, 134, 95);
+    /* background-color: rgb(151, 134, 95); */
     overflow-y: auto;
 }
 
@@ -842,7 +853,7 @@ input{
 
 .a_public_list_content{
     height: calc(100% - 60px);
-    background-color: rgb(151, 134, 95);
+    /* background-color: rgb(151, 134, 95); */
     overflow-y: auto;
 }
 
@@ -851,6 +862,7 @@ input{
     overflow : hidden;
     text-overflow : ellipsis;
     white-space: nowrap;
+    color: #FAEBD7;
 
 }
 
@@ -865,10 +877,16 @@ input{
 
 
 .list_cotainer > button{
+    font-family: 'Noto Sans TC', sans-serif;
     margin-right: 10px;
     -webkit-border-radius: 40px;
     border: none;
-    background-color: antiquewhite
+    background-color: antiquewhite;
+    cursor:pointer;
+}
+
+.list_cotainer > button:hover{
+    background-color: rgb(192, 156, 110);
 }
 
 
@@ -887,6 +905,7 @@ input{
     margin-right: 10px;
     line-height: 30px;
     cursor:pointer;
+    color: #FAEBD7;
 }
 
 .list_cotainer > p:hover{
@@ -943,7 +962,7 @@ input{
 }
 
 .public_place_name,.public_place_address{
-    color: black;
+    color: wheat;
     font-size: 10px;
     font-family: 'Noto Sans TC', sans-serif;
     letter-spacing: 0px;
@@ -951,10 +970,7 @@ input{
 }
 
 .public_place_address{
-    color: gray;
+    color: white;
     font-weight: 100;
 }
 
-.public_place_name{
-    font-weight: bold;
-}

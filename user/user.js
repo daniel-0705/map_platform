@@ -3,7 +3,7 @@ const router = express.Router();  //建立 router 物件
 const dao_map = require("../dao/map.js"); // dao_map.js檔
 const crypto = require("crypto"); // crypto 模組
 const axios = require('axios');   //讓 request 變成 promise 物件
-const mysql=require("../mysql_connection.js");                       // MySQL Initialization
+const mysql = require("../mysql_connection.js");                       // MySQL Initialization
 
 
 
@@ -26,7 +26,7 @@ router.post("/signup",async function(req,res){
     hash_time.update(String(Date.now()));
     let access_token = crypto.randomBytes(48).toString('hex')+hash_time.digest('hex');     
 
-    let user_data={
+    let user_data = {
         provider:"native",
         name:req.body.name,
         email:req.body.email,
@@ -95,7 +95,7 @@ router.post("/signin",async function(req,res){
     
             response = response.data;
 
-            let user_data={
+            let user_data = {
                 provider:"facebook",
                 name:response.name,
                 email:response.email,
@@ -169,7 +169,7 @@ router.post("/signin",async function(req,res){
                     return;
                 }
 
-                let user_data={
+                let user_data = {
                     email:req.body.email,
                     password:crypto_passord,
                     access_token:new_access_token

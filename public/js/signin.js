@@ -24,34 +24,6 @@ function checkLoginState() {
     FB.getLoginStatus(function(response) {
         statusChangeCallback(response);
         console.log(response.authResponse.accessToken);
-        
-        // var xhrt = new XMLHttpRequest();
-        
-        // xhrt.open("POST", "api/user/signin");
-        
-        // xhrt.setRequestHeader('Content-Type', 'application/json');
-        
-        // xhrt.send(JSON.stringify({ 
-        //     "provider": "facebook",
-        //     "access_token": response.authResponse.accessToken
-        //     })
-        // );
-
-        // xhrt.onreadystatechange = function() {
-        //     if (this.readyState == 4 && this.status == 200) {
-        //         console.log("26848");
-        //         console.log(xhrt.response);
-        //         if(XMLHttpRequestEventTarget.response == "error"){
-        //             alert("! 找不到此使用者資訊，請重新註冊");
-        //         }else{
-        //             let user_data = JSON.parse(xhrt.response);
-        //             console.log(user_data);
-        //             localStorage.setItem("access_token",user_data.data);
-        //             window.location.href = "/";
-        //         }
-                
-        //     }
-        // }
 
         let data ={
             "provider": "facebook",
@@ -122,41 +94,6 @@ function testAPI() {
         
 
 //sign in function         
-
-// function set_header() {
-
-//     if(document.getElementById("email").value == ""){
-//         alert("! 請輸入電子郵件地址");
-//     }else if(document.getElementById("password").value == '' ){
-//         alert("! 請輸入密碼");
-//     }else{
-//         let xhr = new XMLHttpRequest();
-//         xhr.open("POST", "api/user/signin");
-//         xhr.setRequestHeader('Content-Type', 'application/json');
-        
-//         xhr.send(JSON.stringify({
-//             "provider": "native",
-//             "email": document.getElementById("email").value, 
-//             "password": document.getElementById("password").value})
-//         );
-
-//         xhr.onreadystatechange = function() {
-//             if (this.readyState == 4 && this.status == 200) {
-//             console.log(xhr.response)
-//                 if(xhr.response == "error"){
-//                     alert("! 找不到此使用者資訊，請重新註冊");
-//                 }else{
-//                     let user_data = JSON.parse(xhr.response);
-//                     console.log(user_data);
-//                     localStorage.setItem("access_token",user_data.data);
-//                     window.location.href="/main_map.html";
-//                 }
-                
-//             }
-//         }
-//     }
-// }
-
 
 function set_header() {
 

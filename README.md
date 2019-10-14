@@ -160,8 +160,6 @@ Website URL: https://www.daniel0705.com
 - User can manage personal lists by hiding or displaying, to see these in map clearly
 ---
 
-## [API Doc](https://github.com/daniel-0705/map_platform/blob/master/Doc/API%20Doc.md)
----
 
 ## Contact
 

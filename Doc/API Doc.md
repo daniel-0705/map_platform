@@ -50,7 +50,7 @@ daniel0705.com
 | longitude | String | Place longitude. |
 | latitude | String | Place latitude. |
 | information | String | Place information.|
-| place_is_exist | Number | Place exists or not|
+| place_is_exist | Number | Place exists or not.|
 
 * `List Object`
 
@@ -62,7 +62,7 @@ daniel0705.com
 | list_name | String | List name. |
 | list_icon | String | List icon. |
 | appear_list | String | List appears or not. |
-| copy_number | Number | Frequences of copies |
+| copy_number | Number | Frequences of copies. |
 
 
 
@@ -150,9 +150,9 @@ daniel0705.com
 
 | Field | Type | Description |
 | :---: | :---: | :---: |
-| category | String | `"true"` or `"false"` for public or private list|
-| list_name | String | List name |
-| list_icon | String | List color |
+| category | String | `"true"` or `"false"` for public or private list.|
+| list_name | String | List name. |
+| list_icon | String | List color. |
 
 * **Request Body Example:**
 
@@ -216,9 +216,9 @@ daniel0705.com
 
 | Field | Type | Description |
 | :---: | :---: | :---: |
-| list_id | Number | List id|
-| category | String | `"true"` or `"false"` for public or private list|
-| list_icon | String | List color |
+| list_id | Number | List id.|
+| category | String | `"true"` or `"false"` for public or private list.|
+| list_icon | String | List color. |
 
 * **Request Body Example:**
 
@@ -299,9 +299,9 @@ daniel0705.com
 
 | Field | Type | Description |
 | :---: | :---: | :---: |
-| list_id | Number | List id|
-| list_name | String | List name |
-| appear_list | String | `"true"` or `"false"` for displaying or hiding list |
+| list_id | Number | List id.|
+| list_name | String | List name. |
+| appear_list | String | `"true"` or `"false"` for displaying or hiding list. |
 
 * **Request Body Example:**
 
@@ -370,8 +370,8 @@ daniel0705.com
 
 | Field | Type | Description |
 | :---: | :---: | :---: |
-| list_id | Number | List id|
-| list_name | String | List name |
+| list_id | Number | List id.|
+| list_name | String | List name. |
 
 * **Request Body Example:**
 
@@ -451,9 +451,9 @@ daniel0705.com
 
 | Field | Type | Description |
 | :---: | :---: | :---: |
-| list_name | String | List name |
-| place_name | String | Place name |
-| place_order | Number | Place order |
+| list_name | String | List name. |
+| place_name | String | Place name. |
+| place_order | Number | Place order. |
 
 * **Request Body Example:**
 
@@ -532,7 +532,7 @@ daniel0705.com
 
 | Field | Type | Description |
 | :---: | :---: | :---: |
-| list_name | String | List name |
+| list_name | String | List name. |
 
 * **Request Body Example:**
 
@@ -609,9 +609,9 @@ daniel0705.com
 
 | Field | Type | Description |
 | :---: | :---: | :---: |
-| list_name | String | List name |
-| place_name | String | Place name |
-| place_order | Number | Place order |
+| list_name | String | List name. |
+| place_name | String | Place name. |
+| place_order | Number | Place order. |
 
 * **Request Body Example:**
 
@@ -806,7 +806,7 @@ or
 | provider | String | Only accept `native` or `facebook`. |
 | email | String | Required if provider set to `native`. |
 | password | String | Required if provider set to `native`. |
-| access_token | String | Access token from facebook. Required if provider set to `facebook` |
+| access_token | String | Access token from facebook. Required if provider set to `facebook`. |
 
 
 * **Request Body Example:**

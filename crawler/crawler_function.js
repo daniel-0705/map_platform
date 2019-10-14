@@ -1,8 +1,9 @@
 const axios = require('axios');                                    //讓 request 變成 promise 物件
 // const mysql= require("./mysql_connection.js");                       // MySQL Initialization
-const dao_map = require("../dao/map.js")                             // dao_map.js 檔
+const dao_map = require("../dao/map.js");                             // dao_map.js 檔
+require('dotenv').config(); //環境變數
 const googleMapsClient = require('@google/maps').createClient({     //google 可用 gecoding 功能
-    key: 'AIzaSyAkK5NajaFKNXkYT2WsdB96edSWRo5kYhY',
+    key: process.env.GOOGLE_KEY,
     Promise: Promise
 });
 

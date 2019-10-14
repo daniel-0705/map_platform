@@ -1,10 +1,12 @@
 // MySQL Initialization
 const mysql = require("mysql");
+require('dotenv').config(); //環境變數
 
+ 
 let connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "94720705",
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
     database: "mapbook",
     multipleStatements: true
 });
@@ -14,7 +16,7 @@ connection.connect(function(err) {
         console.log('connecting database error');
         return;
     }
-    //console.log('connecting database success');
+    console.log('connecting database success');
 });
 
 module.exports = {

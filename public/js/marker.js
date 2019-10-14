@@ -98,7 +98,7 @@ function select_list(e){
 
     let list_data ={
       data : {
-        access_token:localStorage.getItem("access_token"),
+        // access_token:localStorage.getItem("access_token"),
         place_name:a_place_title.innerHTML
       }
     };
@@ -130,7 +130,7 @@ function delete_place_function(list_data){
     user_markers[marker_order].setMap(null); //把使用者先前存的的地標隱藏
 
     let select_place ={
-      access_token : localStorage.getItem("access_token"),
+      // access_token : localStorage.getItem("access_token"),
       list_name : list_data.data.list_name
     }
     //使用者按下移除後，會顯現收藏的清單名稱及內容
@@ -147,7 +147,7 @@ function delete_user_place(e){
   // console.log(e.parentElement.parentElement.parentElement.children[0].children[1].innerHTML);
 
   let place_data ={
-    access_token : localStorage.getItem("access_token"),
+    // access_token : localStorage.getItem("access_token"),
     list_name : e.parentElement.parentElement.parentElement.children[0].children[1].innerHTML,
     place_name : e.parentElement.children[0].innerHTML,
     place_order : e.parentElement.children[0].id.split("_")[2]
@@ -168,7 +168,7 @@ function store_place_in_list(e){
   let a_place_name = document.getElementById("a_place_name")
 
   let place_data ={
-    access_token : localStorage.getItem("access_token"),
+    // access_token : localStorage.getItem("access_token"),
     list_name : e.parentElement.children[1].innerHTML,
     place_name : e.parentElement.parentElement.parentElement.children[0].children[0].innerHTML,
     place_order : e.parentElement.parentElement.parentElement.children[0].children[0].id
@@ -183,6 +183,7 @@ function store_place_in_list(e){
     }
 
     ajax("post", "/api/map_list/user/place",list_data,function(response_data){
+      response_data = response_data.data;
       console.log(response_data);
       //新增收藏地點
       let marker = new google.maps.Marker({
@@ -299,185 +300,13 @@ function store_place_in_list(e){
 
     e.innerHTML = "收藏";
   }
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  // let xhr = new XMLHttpRequest();
-  // xhr.open("post", "/api/map_list/user/place");  
-  // xhr.setRequestHeader('Content-Type', 'application/json');
-
-  // if(e.innerHTML == "收藏"){
-  //   let list_data = {
-  //     data:place_data
-  //   }
-  //   xhr.send(JSON.stringify(list_data));
-
-
-  //   xhr.onreadystatechange=function() {
-  //     if (this.readyState == 4 && this.status == 200) {
-  //       let user_place_data = JSON.parse(xhr.response);
-  //       if(user_place_data.error){
-  //         alert(user_place_data.error);
-  //       }else{  
-  //         console.log(user_place_data);
-  //         //新增收藏地點
-  //         let marker = new google.maps.Marker({
-  //           position:{lat: Number(user_place_data[0].latitude), lng: Number(user_place_data[0].longitude)},
-  //           icon: {
-  //             url: `/img/${user_place_data[0].list_icon}.png`
-  //           },
-  //           animation: google.maps.Animation.DROP,
-  //           zIndex: 100000,
-  //           map:map
-  //         });
-          
-  //         let user_place_index = user_markers.length
-          
-  //         //資訊是空的時候，不要顯示 null
-  //         if(user_place_data[0].information == null){
-  //           user_place_data[0].information="";
-  //         }
-
-  //         marker.content = `
-  //           <div class = "infowindow_container">
-  //             <h1 class ="infowindow_title" id=${user_place_data[0].place_order}>${user_place_data[0].place_name}</h1>
-  //             <p class ="infowindow_content" id = ${user_place_index}>${user_place_data[0].information}</p>
-  //             <br>
-  //             <buttom class = "choice_list" id =${user_place_data[0].latitude}_${user_place_data[0].longitude} style="cursor:pointer" onclick="select_list(this)">已收藏</buttom>
-  //           </div>
-  //           `;
-  //         infoWindow = new google.maps.InfoWindow();
-
-  //         let a_place_title = document.getElementsByClassName("a_place_title")[0];
-  //         e.id = user_place_index;  //判斷使用者新增的地點是排第幾個，方便之後 set null
-
-  //         //定義每個地標屬於的清單
-  //         marker.list = user_place_data[0].list_name
-  //         //定義每個地標屬於的地名
-  //         marker.name = user_place_data[0].place_name;
-
-  //         oms.addMarker(marker);
-  //         google.maps.event.addListener(marker, 'spider_click', function (e) { 
-
-  //           infoWindow.setContent(this.content);
-  //           infoWindow.open(this.getMap(), this);
-
-  //           close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
-  //         });
-
-  //         infoWindow.close();
-  //         google.maps.event.addListener(map, 'click', function () { 
-  //           infoWindow.close();
-
-  //           close_a_place_slidebar(); //使用者點擊其他地方時關掉地點收藏的畫面
-  //         });
-
-  //         //使用者按下收藏後，會顯現收藏的清單名稱及內容
-  //         let new_a_list_name = document.getElementsByClassName("a_list_title")[0];
-  //         new_a_list_name.innerHTML=user_place_data[0].list_name;
-  //         delete_child_element("a_list_content");
-  //         render_a_list_all_place_name(place_data);
-          
-          
-  //         user_markers.push(marker);
-  //         markers[user_place_data[0].place_order].setMap(null); //把原本的地標 隱藏
-
-  //       }
-  //     }
-  //   }
-  //   e.innerHTML = "移除";
-  // }else{
-  //   let list_data = {
-  //     type:"delete",
-  //     data:place_data
-  //   }
-  //   xhr.send(JSON.stringify(list_data));
-
-  //   xhr.onreadystatechange=function() {
-  //     if (this.readyState == 4 && this.status == 200) {
-  //       let user_place_data = JSON.parse(xhr.response);
-  //       if(user_place_data.error){
-  //         alert(user_place_data.error);
-  //       }else{
-  //         console.log(user_place_data);
-  //         console.log(place_data)
-  //         if(user_place_data.check_place_is_exist == 0){
-  //           markers[place_data.place_order].setMap(map); //把原本的地標 調回來
-  //         }
-
-  //         //區別移除的點是當下存的還是之前存的
-  //         if (e.id == ""){
-  //           console.log("先前存的的地點")
-
-  //           //為了在搜尋列 顯示地點名稱時知道順序 所以只好用迴圈的方式找出該地名的順序
-  //           let marker_order;
-  //           for (let j =0 ; j <user_markers.length; j++){
-  //             // console.log(place_data.place_name)
-  //             // console.log(user_markers[j])
-  //             if(user_markers[j].name == place_data.place_name){
-  //               marker_order = j;
-  //               console.log(marker_order)
-  //             }
-  //           }
-
-  //           user_markers[marker_order].setMap(null); //把使用者先前存的的地標隱藏
-  //           //使用者按下移除後，會顯現收藏的清單名稱及內容
-  //           delete_child_element("a_list_content");
-  //           render_a_list_all_place_name(place_data);
-
-  //           infoWindow.close();  //做完動作後要把地標視窗關掉
-  //         }else{
-  //           console.log("當下存的地點")
-  //           user_markers[e.id].setMap(null); //把使用者當下存的地標隱藏
-
-  //           //使用者按下移除後，會顯現收藏的清單名稱及內容
-  //           delete_child_element("a_list_content");
-  //           render_a_list_all_place_name(place_data);
-
-  //           infoWindow.close(); //做完動作後要把地標視窗關掉
-  //         }
-  //       }
-  //     }
-  //   }
-  //   e.innerHTML = "收藏";
-  // }
 }
 
 function render_map_and_user_all_place(){
 
-  let list_data = {
-    data:{
-      access_token : localStorage.getItem("access_token")
-    }
-  }
-
-
-  ajax("post", "/api/map",list_data,function(response_data){
+  ajax("get", "/api/map",null,function(response_data){
     
-    console.log(response_data);
+    console.log(123,response_data);
     infoWindow = new google.maps.InfoWindow();
     oms = new OverlappingMarkerSpiderfier(map, {
       markersWontMove: true,
@@ -546,7 +375,7 @@ function render_map_and_user_all_place(){
 }
 
 function render_user_all_place (user_all_place){
-  console.log("仔顯示使用者地點",user_all_place)
+  console.log("顯示使用者地點",user_all_place)
   for (let i = 0 ; i<user_all_place.length ;i++){
           
     let marker = new google.maps.Marker({
@@ -623,8 +452,8 @@ function delete_a_list(){
   
   let delete_list ={
     list_id : a_list_title.id,
-    list_name : a_list_title.innerHTML,
-    access_token : localStorage.getItem("access_token")
+    list_name : a_list_title.innerHTML
+    // access_token : localStorage.getItem("access_token")
   }
   let list_data = {
     data:delete_list
@@ -677,8 +506,8 @@ function appear_list_or_not(e){
   let update_list ={
     list_id : list_id,
     list_name :list_name,
-    appear_list : e.checked,
-    access_token : localStorage.getItem("access_token")
+    appear_list : e.checked
+    // access_token : localStorage.getItem("access_token")
   }
 
   let list_data = {
@@ -748,8 +577,8 @@ function send_edit_list_name(){
   let update_list ={
     list_id : document.getElementsByClassName("a_list_title")[0].id,
     category : document.querySelector('input[name="edit_category"]:checked').value,
-    list_icon : document.querySelector('input[name="edit_pattern"]:checked').value,
-    access_token : localStorage.getItem("access_token")
+    list_icon : document.querySelector('input[name="edit_pattern"]:checked').value
+    // access_token : localStorage.getItem("access_token")
   }
 
   if(document.getElementsByClassName("a_list_title")[0].innerHTML != document.getElementsByName("list_name_edit")[0].value){
@@ -819,7 +648,7 @@ function show_and_open_public_list(e){
       document.getElementById("close_bar").style.marginLeft = "300px";
       document.getElementById("open_search_bar").style.marginLeft = "300px";
 
-      console.log(response_data);
+      console.log(999,response_data);
 
       //let a_public_list_name = document.getElementById("a_public_list_name");
 
@@ -835,7 +664,7 @@ function show_and_open_public_list(e){
       let parent_place = document.getElementsByClassName("a_public_list_content")[0];
 
 
-      if(response_data.user_list_place.length == 0){
+      if(response_data.data.length == 0){
         let new_place_name = document.createElement("p");
         new_place_name.className = "no_content_in_list"
         new_place_name.innerHTML = "噢不，該使用者尚未收藏地點";
@@ -854,21 +683,21 @@ function show_and_open_public_list(e){
         return;
       }
       
-      for(let i =0; i<response_data.user_list_place.length ; i++){     
+      for(let i =0; i<response_data.data.length ; i++){     
         let new_place_name = document.createElement("p");
         new_place_name.className = "user_place_name";
-        new_place_name.innerHTML = response_data.user_list_place[i].place_name;
-        new_place_name.id = response_data.user_list_place[i].longitude+"_"+response_data.user_list_place[i].latitude+"_"+response_data.user_list_place[i].place_order
+        new_place_name.innerHTML = response_data.data[i].place_name;
+        new_place_name.id = response_data.data[i].longitude+"_"+response_data.data[i].latitude+"_"+response_data.data[i].place_order
         new_place_name.setAttribute("onClick", "change_center_to_place(this)");
         parent_place.appendChild(new_place_name);
       }
 
 
       infoWindow = new google.maps.InfoWindow();
-      for(let i =0 ; i< response_data.user_list_place.length;i++){
+      for(let i =0 ; i< response_data.data.length;i++){
         //顯示公開的使用者的收藏地點
         let marker = new google.maps.Marker({
-          position:{lat: Number(response_data.user_list_place[i].latitude), lng: Number(response_data.user_list_place[i].longitude)},
+          position:{lat: Number(response_data.data[i].latitude), lng: Number(response_data.data[i].longitude)},
           icon: {
           url: `/img/point.png`
           },
@@ -878,14 +707,14 @@ function show_and_open_public_list(e){
         });
 
         //資訊是空的時候，不要顯示 null
-        if(response_data.user_list_place[i].information == null){
-          response_data.user_list_place[i].information="";
+        if(response_data.data[i].information == null){
+          response_data.data[i].information="";
         }
 
         marker.content = `
           <div class = "infowindow_container">
-            <h1 class ="infowindow_title">${response_data.user_list_place[i].place_name}</h1>
-            <p class ="infowindow_content">${response_data.user_list_place[i].information}</p>
+            <h1 class ="infowindow_title">${response_data.data[i].place_name}</h1>
+            <p class ="infowindow_content">${response_data.data[i].information}</p>
           </div>
         `;
 
@@ -929,7 +758,7 @@ function copy_other_list(e){
   console.log(a_public_list_name);
 
   let copy_list={
-    access_token : localStorage.getItem("access_token"),
+    // access_token : localStorage.getItem("access_token"),
     list_id : a_public_list_name.id,
     list_name : a_public_list_name.innerHTML
   }
@@ -942,7 +771,7 @@ function copy_other_list(e){
 
 
   ajax("post", "/api/map_list/copy",list_data,function(response_data){
-    console.log(response_data);
+    console.log(123,response_data);
     alert("複製成功");
     delete_child_element("user_own_list_content");
     render_user_all_lists_name();

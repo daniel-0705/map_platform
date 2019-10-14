@@ -13,7 +13,7 @@ router.post("/",async function(req,res){
 
     if(list_data.list_name.includes("(複製)")){
         let error = {
-            "error": "! 請先編輯您手上的複製清單，再進行複製"
+            "error": "! 請先編輯您手上的複製清單，再進行複製。"
         };
         res.send(error);
         return;
@@ -45,7 +45,7 @@ router.post("/",async function(req,res){
             
             if (select_copy_list_in_user != 0){
                 let error = {
-                    "error": "! 複製清單名稱與您的清單名稱重複，請更改名稱"
+                    "error": "! 複製清單名稱與您的清單名稱重複，請更改名稱。"
                 };
                 res.send(error);
                 return;
@@ -118,7 +118,7 @@ router.post("/",async function(req,res){
         catch(err) {
             //console.log(err);
             mysql.con.rollback(function(){console.log(`交易取消`)});
-            res.send({error:"! 系統出現錯誤，請重新整理"});
+            res.send({error:"! 系統出現錯誤，請重新整理。"});
         }
     });
 

@@ -12,6 +12,7 @@ function render_user_all_lists_name(){
       };
 
       ajax("post", "/api/map_list/user/result",list_data,function(response_data){
+        response_data = response_data.data;
         console.log("顯示使用者所有清單",response_data);
 
         delete_child_element("user_own_list_content");
@@ -127,56 +128,58 @@ function render_a_list_all_place_name(list){
  
 function render_collection_list_or_not(list){
     
-    ajax("post", "/api/map_list/user/result",list,function(response_data){
-        console.log(response_data);
+  ajax("post", "/api/map_list/user/result",list,function(response_data){
+    response_data = response_data.data;
+    console.log(response_data);
 
-        let a_place_content = document.getElementsByClassName("a_place_content")[0];
+    let a_place_content = document.getElementsByClassName("a_place_content")[0];
 
-        if(response_data.length ==0){
-            let a_place_explain = document.createElement("p");
-            a_place_explain.className = "a_place_explain";
-            a_place_explain.innerHTML = "噢不，目前沒有清單可以收藏";
-            a_place_content.appendChild(a_place_explain);
+    if(response_data.length ==0){
+        let a_place_explain = document.createElement("p");
+        a_place_explain.className = "a_place_explain";
+        a_place_explain.innerHTML = "噢不，目前沒有清單可以收藏";
+        a_place_content.appendChild(a_place_explain);
 
-            let a_place_explain_1 = document.createElement("p");
-            a_place_explain_1.className = "a_place_explain";
-            a_place_explain_1.innerHTML = "趕緊建立一個新的清單吧";
-            a_place_content.appendChild(a_place_explain_1);
+        let a_place_explain_1 = document.createElement("p");
+        a_place_explain_1.className = "a_place_explain";
+        a_place_explain_1.innerHTML = "趕緊建立一個新的清單吧";
+        a_place_content.appendChild(a_place_explain_1);
 
 
-        }else{
-            for (let i = 0 ;i<response_data.length;i++){
-                //製作每一個 list 的內容 p
-                let list_cotainer = document.createElement("div");
-                list_cotainer.className = "list_cotainer"
-                a_place_content.appendChild(list_cotainer);
+    }else{
+        for (let i = 0 ;i<response_data.length;i++){
+            //製作每一個 list 的內容 p
+            let list_cotainer = document.createElement("div");
+            list_cotainer.className = "list_cotainer";
+            a_place_content.insertBefore(list_cotainer,a_place_content.childNodes[0]);
+            //a_place_content.appendChild(list_cotainer);
 
-                let list_icon = document.createElement("img");
-                list_icon.src = `/img/${response_data[i].list_icon}.png`
-                list_cotainer.appendChild(list_icon);
+            let list_icon = document.createElement("img");
+            list_icon.src = `/img/${response_data[i].list_icon}.png`
+            list_cotainer.appendChild(list_icon);
 
-            
-                let new_list_name = document.createElement("p");
-                new_list_name.className = "user_list";
-                new_list_name.id = `${response_data[i].list_id}`;
-                new_list_name.setAttribute("onClick", "open_a_list(this)");
-                new_list_name.innerHTML = response_data[i].list_name;
-                list_cotainer.appendChild(new_list_name);
+        
+            let new_list_name = document.createElement("p");
+            new_list_name.className = "user_list";
+            new_list_name.id = `${response_data[i].list_id}`;
+            new_list_name.setAttribute("onClick", "open_a_list(this)");
+            new_list_name.innerHTML = response_data[i].list_name;
+            list_cotainer.appendChild(new_list_name);
 
-                let collection_button = document.createElement("button");
-                collection_button.className = "collection_button";
-                if(response_data[i].check_place_is_exist == "true"){
-                collection_button.innerHTML = "移除";
-                }else{
-                collection_button.innerHTML = "收藏";
-                }
-                collection_button.setAttribute("onClick", "store_place_in_list(this)");
-                list_cotainer.appendChild(collection_button);
-            
+            let collection_button = document.createElement("button");
+            collection_button.className = "collection_button";
+            if(response_data[i].check_place_is_exist == "true"){
+            collection_button.innerHTML = "移除";
+            }else{
+            collection_button.innerHTML = "收藏";
             }
+            collection_button.setAttribute("onClick", "store_place_in_list(this)");
+            list_cotainer.appendChild(collection_button);
+        
         }
+    }
 
-    })
+  })
 }
 
 function close_slidebar() {
@@ -215,7 +218,7 @@ function send_list_name(){
       category : document.querySelector('input[name="category"]:checked').value,
       list_name : document.getElementsByName("list_name")[0].value,
       list_icon : document.querySelector('input[name="pattern"]:checked').value,
-      access_token : localStorage.getItem("access_token")
+      // access_token : localStorage.getItem("access_token")
     }
 
     if (insert_list.list_name == "" || insert_list.list_name == undefined){
@@ -234,7 +237,7 @@ function send_list_name(){
       render_user_all_lists_name();
       close_list_input_and_edit();
       reset_input();
-    })
+    });
 }
 
 function open_a_list(e) {
@@ -261,7 +264,7 @@ function open_a_list(e) {
     user_a_list_icon.src = e.parentElement.children[0].src;
 
     let select_place ={
-      access_token : localStorage.getItem("access_token"),
+      // access_token : localStorage.getItem("access_token"),
       list_name : e.innerHTML
     }
     console.log(select_place);

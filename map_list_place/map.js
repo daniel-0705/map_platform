@@ -15,17 +15,15 @@ const client = redis.createClient(REDIS_PORT);
 
 
 //地圖上所有的點 及使用者收藏的點
-router.post("/",async function (req, res) {
+router.get("/",async function (req, res) {
 
-    let list_data = req.body.data;
-
-    console.log(list_data);
+    //console.log(list_data);
 
     let data ={};
     let all_place_data;
 
     //這段先判斷使用者有無登入，有的話找出使用者收藏的地點
-    let select_user_result = await dao_map.select("user","access_token",list_data.access_token)
+    let select_user_result = await dao_map.select("user","access_token",req.token)
     //console.log(select_user_result.length == 0)
 
     if(select_user_result.length !== 0){

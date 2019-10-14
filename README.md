@@ -96,6 +96,7 @@ Website URL: https://www.daniel0705.com
 ## Demonstration
 
 ### Main Page
+<p align="center">
  <img src="https://media.giphy.com/media/XckIQhnOrJ7IizlVDT/giphy.gif" width="800">
 </p>
 

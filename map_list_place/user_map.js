@@ -11,7 +11,7 @@ const dao_map = require("../dao/map.js"); // dao_map.js檔
 
 
 
-//user insert update list
+//user insert list
 router.post("/list",async function(req,res){
     console.log("新增清單")
 
@@ -69,7 +69,7 @@ router.put("/list",async function(req,res){
 
         if(select_user_insert_list.length >0){
         let error = {
-            "error": "! 清單名稱重複，請重新命名"
+            "error": "! 清單名稱重複，請重新命名。"
         };
         res.send(error);
         return;
@@ -152,7 +152,7 @@ router.delete("/list",async function(req,res){
 
     if(select_user_delete_list.length == 0){
         let error = {
-            "error": "List is not existing."
+            "error": "! 清單不存在。"
         };
         res.send(error);
         return;
@@ -199,8 +199,8 @@ router.post("/place",async function(req,res){
     console.log(select_user_insert_place);
     
     if(select_user_insert_place.length >0){
-        var error = {
-        "error": "此地點已收藏"
+        let error = {
+            "error": "! 此地點已收藏。"
         };
         res.send(error);
         return;
@@ -231,7 +231,7 @@ router.post("/place",async function(req,res){
     let select_user_last_place = await dao_map.select("user_map_place","No",last_place_id[0]["LAST_INSERT_ID()"]);
 
     //console.log(select_user_last_place)
-    res.send(select_user_last_place);
+    res.send({data:select_user_last_place});
 
 
 
@@ -243,7 +243,7 @@ router.post("/place/show",async function(req,res){
     let list_data = req.body.data;
     let user_data = req.user[0];
 
-    console.log("顯示清單地點",list_data);
+    console.log("顯示清單地點。",list_data);
 
 
     let user_list_data = {
@@ -266,7 +266,7 @@ router.delete("/place",async function(req,res){
     let list_data = req.body.data;
     let user_data = req.user[0];
 
-    console.log(list_data);
+    //console.log(list_data);
 
     let user_list_data = {
         user_name : user_data.name,
@@ -274,7 +274,7 @@ router.delete("/place",async function(req,res){
         place_name : list_data.place_name
     }
 
-    console.log(user_list_data);
+    //console.log(user_list_data);
 
     // delete_user_list_name
     await dao_map.delete_3("user_map_place","user_name",user_list_data.user_name,"list_name",user_list_data.list_name,"place_name",user_list_data.place_name,user_list_data.place_name);
@@ -316,7 +316,7 @@ router.post("/result",async function(req,res){
 
     console.log(select_all_list)
 
-    res.send(select_all_list);
+    res.send({data:select_all_list});
 
 
 });

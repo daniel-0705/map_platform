@@ -85,7 +85,8 @@ let full_search = function(search_word){
 
 
 
+
 module.exports={
     removeDuplicates:removeDuplicates,
-    full_search:full_search
+    full_search:full_search,
 };

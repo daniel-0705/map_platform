@@ -41,7 +41,7 @@ router.post("/list",async function(req,res){
         }
     } 
 
-    res.send(final_result);
+    res.send({data:final_result});
 
   
 });
@@ -102,7 +102,7 @@ router.post("/place",async function(req,res){
         }
     } 
 
-    res.send(final_result);
+    res.send({data:final_result});
 
 
 });

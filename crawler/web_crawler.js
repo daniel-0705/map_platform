@@ -10,27 +10,6 @@ const crawler = require("../crawler/crawler_function.js")                       
 
 
 
-let A = async function (){
-
-///台北市資料大平台 臺北市休閒農場
-let taipei_leisure_farm = {
-    url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=2bbc419c-d774-4bcf-812b-b87b6fd15abb",
-    category:"休閒農場",
-    place_icon:"farm",
-    place_name:"農場名稱",
-    place_address:"地址",
-    place_information:"農場主要特色簡介"
-};
-crawler.taipei_city_government_request(taipei_leisure_farm);
-
-}  
-
-
-
-
-
-A()
-
 
 let leisure_farm_update_on_schedule = schedule.scheduleJob('* * * 1 */1 *', async function(){
 

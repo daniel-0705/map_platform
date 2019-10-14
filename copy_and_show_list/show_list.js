@@ -17,8 +17,8 @@ router.post("/list",async function(req,res){
     let find_list_user = await dao_map.select_2("user_map_list","list_id",list_data.list_id,"list_name",list_data.list_name)
 
     if(find_list_user.length == 0){
-        var error = {
-            "error": "! 該清單已被刪除，無法顯示，請再重新搜尋"
+        let error = {
+            "error": "! 該清單已被刪除，無法顯示，請再重新搜尋。"
         };
         res.send(error);
         return;
@@ -30,8 +30,8 @@ router.post("/list",async function(req,res){
 
     console.log(one_list_result);
     res.send({
-        user_list:find_list_user,
-        user_list_place:one_list_result});
+        // user_list:find_list_user,
+        data:one_list_result});
     
   
 });

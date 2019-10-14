@@ -33,7 +33,7 @@ app.use(bodyParser.json());
 
 
 let check_header_type = function (req,res,next){
-  console.log(123,req)
+  //console.log(123,req)
   if(req.header('Content-Type') != "application/json"){
     let error = {
       "error":"Invalid request body."
@@ -47,11 +47,35 @@ let check_header_type = function (req,res,next){
 
 let check_user_status = async function (req,res,next){
   console.log(111,req.body)
+  console.log(963,req.headers.authorization);
+  let user_token;
+
+  if(req.headers.authorization == null){ 
+    let error = {
+      "error": "! 查無此使用者，請重新註冊。"
+    };
+    res.send(error);
+    return;
+  }else{
+    let user_Bearer_token = req.headers.authorization;
+    user_Bearer_token = user_Bearer_token.split(" ");
+
+    if(user_Bearer_token[0] != "Bearer"  ){
+      let error = {
+        "error": "not a Bearer token"
+      };
+      res.send(error);
+      return;
+    }else{
+      user_token =user_Bearer_token[1];
+    }
+  }
+
   //確認使用者的身分
-  let select_user_result = await dao_map.select("user","access_token",req.body.data.access_token)
+  let select_user_result = await dao_map.select("user","access_token",user_token)
   if(select_user_result == 0){
     let error = {
-      "error": "! 查無此使用者，請重新註冊"
+      "error": "! 查無此使用者，請重新註冊。"
     };
     res.send(error);
     return;
@@ -62,9 +86,24 @@ let check_user_status = async function (req,res,next){
   }
 }
 
+let check_user_in_main_page = async function (req,res,next){
+  console.log(111,req.body);
+  console.log(963,req.headers.authorization);
+  let user_Bearer_token = req.headers.authorization;
+  user_Bearer_token = user_Bearer_token.split(" ");
 
+  if(user_Bearer_token[0] != "Bearer"  ){
+    let error = {
+      "error": "not a Bearer token"
+    };
+    res.send(error);
+    return;
+  }else{
+    req.token =user_Bearer_token[1];
+    next();
+  }
 
-
+}
     
 
 app.use(check_header_type);   //middleware
@@ -72,7 +111,7 @@ app.use(check_header_type);   //middleware
 
 
 // 分出去的 router
-app.use('/api/map', map_list_place);
+app.use('/api/map',check_user_in_main_page, map_list_place);
 app.use('/api/map_list/user', check_user_status, user_map_list_place);
 app.use('/api/user', user);
 app.use('/api/map_list/search', search);
@@ -83,5 +122,4 @@ app.use('/api/map_list/show', show_list);
 app.listen(3000, function () {
   console.log("Server is running in http://localhost:3000/")
 })
-
 

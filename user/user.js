@@ -67,12 +67,12 @@ router.post("/signup",async function(req,res){
                 console.log('success!');
             });
 
-            res.send({data:user_data});
+            res.send({data:user_data.access_token});
         }
         catch(err) {
             //console.log(err);
             mysql.con.rollback(function(){console.log(`交易取消`)});
-            res.send({error:"! 系統出現錯誤，請重新整理"});
+            res.send({error:"! 系統出現錯誤，請重新整理。"});
         }
     });
   
@@ -127,13 +127,13 @@ router.post("/signin",async function(req,res){
                         }
                         console.log('success!');
                     });
-                    res.send({data:user_data});
+                    res.send({data:user_data.access_token});
 
                 }
                 catch(err) {
                     //console.log(err);
                     mysql.con.rollback(function(){console.log(`交易取消`)});
-                    res.send({error:"! 系統出現錯誤，請重新整理"});
+                    res.send({error:"! 系統出現錯誤，請重新整理。"});
                 }
             });
 
@@ -163,7 +163,7 @@ router.post("/signin",async function(req,res){
         
                 if(check_user_data.length == 0){
                     let error = {
-                        "error": "! 查無此使用者，請重新註冊"
+                        "error": "! 查無此使用者，請重新註冊。"
                     };
                     res.send(error);
                     return;
@@ -186,12 +186,12 @@ router.post("/signin",async function(req,res){
                     console.log('success!');
                 });
     
-                res.send({data:user_data});
+                res.send({data:user_data.access_token});
             }
             catch(err) {
                 //console.log(err);
                 mysql.con.rollback(function(){console.log(`交易取消`)});
-                res.send({error:"! 系統出現錯誤，請重新整理"});
+                res.send({error:"! 系統出現錯誤，請重新整理。"});
             }
         });
 

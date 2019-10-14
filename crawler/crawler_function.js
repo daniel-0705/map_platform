@@ -53,8 +53,8 @@ let number_change_words = function(address){
 
 let word_change_number = function(address){
 
-    let word_array = ["一","二","三","四","五","六","七","八","九"];
-    let number_array = ["1","2","3","4","5","6","7","8","9"];
+    let word_array = ["一","二","三","四","五","六","七","八","九","壹","貳","參","肆","伍","陸","柒","捌","玖"];
+    let number_array = ["1","2","3","4","5","6","7","8","9","1","2","3","4","5","6","7","8","9"];
 
     for (let i = 0; i < address.length; i++) { 
         if(address.charAt(i) == "號" && isNaN(address.charAt(i-1)) ){
@@ -78,12 +78,18 @@ let find_address_district = async function(address) {
 
     await axios.get(`https://zip5.5432.tw/zip5json.py?adrs=${address_URI}&_=1569334120491`)
     .then(function (response) {
+        
+        if(response.data.zipcode == ""){
+            new_address = "error";
+            return;
+        }
 
         let zip_code = ["100","103","104","105","106","108","110","111","112","114","115","116"];
         let taipei_district = ["中正區","大同區","中山區","松山區","大安區","萬華區","信義區","士林區","北投區","內湖區","南港區","文山區"];
         let district_of_address = taipei_district[zip_code.indexOf(response.data.zipcode.substring(0,3))];
 
         new_address = [address.slice(0, 3),district_of_address,address.slice(3)].join("");
+
     })
     .catch(function (error) {
         console.log(error);
@@ -120,7 +126,6 @@ let complete_the_address = async function(address){
     if(address == "error"){
         return "error";  //error 處理
     }
-    
     address = address_add_taipet_city(address);
     address = address.replace(/ *\([^)]*\) */g, "");
     
@@ -134,6 +139,7 @@ let complete_the_address = async function(address){
         await sleep(2000); //太快會被禁 官方建議1-2秒
         address =await find_address_district(address);
     };
+    console.log("最後",address)
     return address;
 }
 
@@ -323,11 +329,11 @@ let normal_request = async function(url){
         request_result = response;
     })
     .catch(function (error) {
-        console.log(error);
+        console.log(typeof error.response.status);
+        request_result = error.response.status
     })
     .finally(function () {
     });
-
     return request_result;
 }
 

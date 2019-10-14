@@ -17,7 +17,7 @@ Website URL: https://www.daniel0705.com
   - [Point of Interest and Address Search](#Point-of-Interest-and-Address-Search)
   - [Create and Edit List](#Create-and-Edit-List)
   - [Hide and Display List](#Hide-and-Display-List)
-- [API Doc](#Contact)
+- [API Doc](https://github.com/daniel-0705/map_platform/blob/master/Doc/API%20Doc.md)
 - [Contact](#Contact)
 
 ## Technologies
@@ -160,7 +160,7 @@ Website URL: https://www.daniel0705.com
 - User can manage personal lists by hiding or displaying, to see these in map clearly
 ---
 
-## [API Doc]()
+## [API Doc](https://github.com/daniel-0705/map_platform/blob/master/Doc/API%20Doc.md)
 ---
 
 ## Contact

@@ -7,7 +7,8 @@ const googleMapsClient = require('@google/maps').createClient({     //google 可
     Promise: Promise
 });
 const crawler = require("../crawler/crawler_function.js")                             // crawler_function.js 檔
-
+const express = require("express"); // express 模組
+const app = express(); // express 模組
 
 
 
@@ -770,3 +771,8 @@ let play_on_schedule = schedule.scheduleJob('* * * 27 */1 *', async function(){
 
 });
 
+
+
+app.listen(8000, function () {
+    console.log("Server is running in http://localhost:8000/")
+})

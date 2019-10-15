@@ -12,8 +12,7 @@ const app = express(); // express 模組
 
 
 
-let leisure_farm_update_on_schedule = schedule.scheduleJob('* */1 * * * *', async function(){
-    console.log("gogo")
+let leisure_farm_update_on_schedule = schedule.scheduleJob('* * * 1 */1 *', async function(){
     //台北市資料大平台 臺北市休閒農場
     let taipei_leisure_farm = {
         url:"https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=2bbc419c-d774-4bcf-812b-b87b6fd15abb",

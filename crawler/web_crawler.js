@@ -12,7 +12,7 @@ const app = express(); // express 模組
 
 
 
-let leisure_farm_update_on_schedule = schedule.scheduleJob('* * * 1 */1 *', async function(){
+let leisure_farm_update_on_schedule = schedule.scheduleJob('* 1 * * * *', async function(){
 
     //台北市資料大平台 臺北市休閒農場
     let taipei_leisure_farm = {

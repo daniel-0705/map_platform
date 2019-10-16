@@ -27,18 +27,17 @@ router.post("/signup",async function(req,res){
     let access_token = crypto.randomBytes(48).toString('hex')+hash_time.digest('hex');     
 
     let user_data = {
-        provider:"native",
-        name:req.body.name,
-        email:req.body.email,
-        password:hash_password.digest('hex'),
-        access_token:access_token
+        provider: "native",
+        name: req.body.name,
+        email: req.body.email,
+        password: hash_password.digest('hex'),
+        access_token: access_token
     };
 
     mysql.con.beginTransaction(async function(err) {
         try {
             if (err) { 
-                console.log(err);
-                throw err
+                throw err;
             }
             
             let check_user_name_result = await dao_map.select("user","name",user_data.name);
@@ -64,13 +63,11 @@ router.post("/signup",async function(req,res){
                         throw err;
                     });
                 }
-                console.log('success!');
             });
 
             res.send({data:user_data.access_token});
         }
         catch(err) {
-            //console.log(err);
             mysql.con.rollback(function(){console.log(`交易取消`)});
             res.send({error:"! 系統出現錯誤，請重新整理。"});
         }
@@ -87,8 +84,8 @@ router.post("/signin",async function(req,res){
     let new_access_token = crypto.randomBytes(48).toString('hex')+hash_fb_time.digest('hex');
 
     if(req.body.provider == "facebook"){
-        let user_fb_token =req.body.access_token;
-        let fb_url =`https://graph.facebook.com/v3.3/me?fields=email,name,picture.width(400).height(500)&access_token=${user_fb_token}`;
+        let user_fb_token = req.body.access_token;
+        let fb_url = `https://graph.facebook.com/v3.3/me?fields=email,name,picture.width(400).height(500)&access_token=${user_fb_token}`;
 
         axios.get(fb_url)
         .then(async function (response) {
@@ -96,18 +93,17 @@ router.post("/signin",async function(req,res){
             response = response.data;
 
             let user_data = {
-                provider:"facebook",
-                name:response.name,
-                email:response.email,
-                password:"0",
-                access_token:new_access_token
+                provider: "facebook",
+                name: response.name,
+                email: response.email,
+                password: "0",
+                access_token: new_access_token
             };
 
             mysql.con.beginTransaction(async function(err) {
                 try {
                     if (err) { 
-                        console.log(err);
-                        throw err
+                        throw err;
                     }
                     
                     let check_user_data = await dao_map.select_2("user","email",user_data.email,"provider","facebook");
@@ -125,13 +121,11 @@ router.post("/signin",async function(req,res){
                         if (err) {
                             throw err;
                         }
-                        console.log('success!');
                     });
-                    res.send({data:user_data.access_token});
+                    res.send({data: user_data.access_token});
 
                 }
                 catch(err) {
-                    //console.log(err);
                     mysql.con.rollback(function(){console.log(`交易取消`)});
                     res.send({error:"! 系統出現錯誤，請重新整理。"});
                 }
@@ -155,8 +149,7 @@ router.post("/signin",async function(req,res){
         mysql.con.beginTransaction(async function(err) {
             try {
                 if (err) { 
-                    console.log(err);
-                    throw err
+                    throw err;
                 }
                 
                 let check_user_data = await dao_map.select_3("user","email",req.body.email,"password",crypto_passord,"provider","native");
@@ -170,9 +163,9 @@ router.post("/signin",async function(req,res){
                 }
 
                 let user_data = {
-                    email:req.body.email,
-                    password:crypto_passord,
-                    access_token:new_access_token
+                    email: req.body.email,
+                    password: crypto_passord,
+                    access_token: new_access_token
                 };
 
                 //可能 facebook native 會有相同信箱， 因此要用 email provider 綁定條件
@@ -183,26 +176,16 @@ router.post("/signin",async function(req,res){
                     if (err) {
                         throw err;
                     }
-                    console.log('success!');
                 });
     
-                res.send({data:user_data.access_token});
+                res.send({data: user_data.access_token});
             }
             catch(err) {
-                //console.log(err);
                 mysql.con.rollback(function(){console.log(`交易取消`)});
                 res.send({error:"! 系統出現錯誤，請重新整理。"});
             }
         });
-
-
-
-            
-        
-    
     }
-
-
 });
 
 

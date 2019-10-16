@@ -19,18 +19,17 @@ function ajax (method,url,data,callback){
       if(response_data.error){
         alert(response_data.error);
       }else{
-        console.log(response_data);
-        callback(response_data)
+        callback(response_data);
       }             
     }
   }
 }
 
 function delete_child_element(parent_element){
-    let parent_place = document.getElementsByClassName(parent_element)[0];
-    while (parent_place.hasChildNodes()) {
-      parent_place.removeChild(parent_place.lastChild);
-    }
+  let parent_place = document.getElementsByClassName(parent_element)[0];
+  while(parent_place.hasChildNodes()){
+    parent_place.removeChild(parent_place.lastChild);
+  }
 }
 
     

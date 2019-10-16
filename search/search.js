@@ -23,7 +23,6 @@ router.post("/list",async function(req,res){
         
         //從字串中刪除最後一個字開始找
         let positive_word = search_word.slice(0, -i-1);
-        console.log(i,positive_word)
         let positive_fuzzy_select_list = await dao_map.fuzzy_select("user_map_list","list_name",positive_word,"copy_number",10);
         positive_fuzzy_select_list.map(item =>{search_list_result.push(item)});
         
@@ -41,7 +40,7 @@ router.post("/list",async function(req,res){
         }
     } 
 
-    res.send({data:final_result});
+    res.send({data: final_result});
 
   
 });
@@ -68,7 +67,6 @@ router.post("/place",async function(req,res){
 
         //將重複的結果剃除
         final_result = search.removeDuplicates(search_place_result, 'map_id');
-        //console.log(i);
         //當最後結果超過特定數字就停止迴圈
         if(final_result.length>5){
             break;
@@ -76,26 +74,18 @@ router.post("/place",async function(req,res){
 
         //從字串中刪除最後一個字開始找
         let positive_word = search_word.slice(0, -i-1);
-        console.log(positive_word)
         let positive_fuzzy_select_name = await dao_map.fuzzy_search_place("map","name",positive_word,5);
         positive_fuzzy_select_name.map(item =>{search_place_result.push(item)});
         let positive_fuzzy_select_address = await dao_map.fuzzy_search_place("map","address",positive_word,3);
         positive_fuzzy_select_address.map(item =>{search_place_result.push(item)});
 
-
-
         //從字串中刪除第一個字開始找
         let negative_word = search_word.substring(i+1);
-        console.log(negative_word)
         let negative_fuzzy_select_name = await dao_map.fuzzy_search_place("map","name",positive_word,5);
         negative_fuzzy_select_name.map(item =>{search_place_result.push(item)});
-        // let negative_fuzzy_select_address = await dao_map.fuzzy_search_place("map","address",positive_word,3);
-        // negative_fuzzy_select_address.map(item =>{search_place_result.push(item)});
-
         
         //將重複的結果剃除
         final_result = search.removeDuplicates(search_place_result, 'map_id');
-        //console.log(i);
         //當最後結果超過特定數字就停止迴圈
         if(final_result.length>5){
             break;

@@ -3,13 +3,6 @@ nav{
     z-index: 5;
 }
 
-
-
-
-
-
-
-
 .main{
     position: relative;
     background-image: linear-gradient(to top, #534a3a, #655844, #79664e, #8d7459, #a38264);
@@ -46,7 +39,6 @@ nav{
     background-image: url("/img/delete.png");
     background-size: 25px 25px;
     background-repeat: no-repeat;
-    /* background-size: cover; */
     background-position: center;
 }
 
@@ -59,7 +51,6 @@ nav{
     background-image: url("/img/play.png");
     background-size: 25px 25px;
     background-repeat: no-repeat;
-    /* background-size: cover; */
     background-position: center;
 }
 
@@ -72,7 +63,6 @@ nav{
     background-image: url("/img/search.png");
     background-size: 25px 25px;
     background-repeat: no-repeat;
-    /* background-size: cover; */
     background-position: center;
 }
 
@@ -97,7 +87,6 @@ nav{
 
 .search_list_and_place_bar{
     height: 60px;
-    /* background-color: rgb(240, 230, 207); */
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -156,24 +145,10 @@ input{
 .button-cover
 {
     height: 60px;
-    /* margin: 20px; */
-    /* background-color: #fff;
-    box-shadow: 0 10px 20px -8px #c5d6d6; */
     border-radius: 4px;
 }
 
-/* .button-cover:before
-{
-    counter-increment: button-counter;
-    content: counter(button-counter);
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    color: #d7e3e3;
-    font-size: 12px;
-    line-height: 1;
-    padding: 5px;
-} */
+
 
 .button-cover, .knobs, .layer
 {
@@ -241,7 +216,6 @@ input{
     width: 20px;
     height: 10px;
     font-size: 10px;
-    /* font-weight: bold; */
     text-align: center;
     line-height: 1;
     padding: 9px 4px;
@@ -256,7 +230,6 @@ input{
     width: 20px;
     height: 10px;
     font-size: 10px;
-    /* font-weight: bold; */
     text-align: center;
     line-height: 1;
     padding: 9px 4px;
@@ -326,7 +299,6 @@ input{
 
 .search_list_and_place_result{
     height: calc(100% - 60px) ;
-    /* background-color: #EFF154; */
     overflow-y: auto;
     overflow-x:hidden;
     position: relative;
@@ -337,14 +309,6 @@ input{
     margin: 0px 0px 5px 15px;
     color: #FAEBD7;
 }
-
-/* .search_explain_img_1{
-    margin: 5px 0px 0px 12px;
-}
-
-.search_explain_img_2{
-    margin: 5px 0px 0px 14px;
-} */
 
 .public_list_container{
     padding: 5px 0px 5px 15px;
@@ -408,7 +372,6 @@ input{
    height: 15px;
    width: 15px; 
    margin-right:5px;
-   /* margin-top: 3px; */
 }
 
 
@@ -429,7 +392,6 @@ input{
 
 .user_own_list_title{
     height: 60px;
-    /* background-color: rgb(173, 145, 80); */
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -439,11 +401,9 @@ input{
 
 
 .user_own_list_content{
-    height: calc(100% - 60px) ;
-    /* background-color: rgb(182, 150, 75); */
+    height: calc(100% - 60px);
     overflow-y: auto;
     position: relative;
-    /* overflow-x: hidden; */
 }
 
 .my_list{
@@ -671,7 +631,6 @@ input{
 
 .a_list_name{
     height: 60px;
-    /* background-color: rgb(182, 182, 69); */
     display: flex;
     align-items: center;
 }
@@ -679,7 +638,6 @@ input{
 .a_list_content{
     height: calc(100% - 60px) ;
     box-sizing: content-box;
-    /* background-color: orange; */
     overflow-y: auto;
 }
 
@@ -741,7 +699,6 @@ input{
 .a_public_list_title{
     cursor:pointer;
     width: 208px;
-    /* height: 30px; */
     overflow : hidden;
     text-overflow : ellipsis;
     white-space: nowrap;
@@ -836,7 +793,6 @@ input{
 
 .a_place_name{
     height: 60px;
-    /* background-color: rgb(173, 145, 80); */
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -845,7 +801,6 @@ input{
 
 .a_place_content{
     height: calc(100% - 60px);
-    /* background-color: rgb(151, 134, 95); */
     overflow-y: auto;
 }
 
@@ -857,7 +812,6 @@ input{
 
 .a_public_list_content{
     height: calc(100% - 60px);
-    /* background-color: rgb(151, 134, 95); */
     overflow-y: auto;
 }
 
@@ -931,7 +885,6 @@ input{
     top:30px;
     -webkit-border-radius: 20px;
     width: 300px;
-    /* display: none; */
 }
 
 .place_container{

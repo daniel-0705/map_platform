@@ -1,5 +1,4 @@
 const axios = require('axios');                                    //讓 request 變成 promise 物件
-// const mysql= require("./mysql_connection.js");                       // MySQL Initialization
 const dao_map = require("../dao/map.js");                             // dao_map.js 檔
 require('dotenv').config(); //環境變數
 const googleMapsClient = require('@google/maps').createClient({     //google 可用 gecoding 功能
@@ -20,17 +19,16 @@ let replace_fullwidth_and_symbol = function(address){
     address = address.replace(/\]/g, ")");
 
     replace_array = ["１","２","３","４","５","６","７","８","９","０","（","）","［","］","号","～"];
-    alternative_array = ["1","2","3","4","5","6","7","8","9","0","(",")","(",")","號","~"]
+    alternative_array = ["1","2","3","4","5","6","7","8","9","0","(",")","(",")","號","~"];
 
-    for(let i = 0; i < address.length; i++) {
+    for(let i = 0; i < address.length; i++){
         let word_idx = replace_array.indexOf(address.charAt(i));
         if(word_idx !== -1){
-          
-            let regex = new RegExp(replace_array[word_idx])
+        
+            let regex = new RegExp(replace_array[word_idx]);
     
             address = address.replace(regex, alternative_array[word_idx]);
         }
-
     }
     return address;
 };
@@ -41,8 +39,8 @@ let number_change_words = function(address){
     let number_array = ["1","2","3","4","5","6","7","8","9"];
 
     //若第一個字是小 那就會變成 undefined 小，所以從 1 開始
-    for (let i = 1; i < address.length; i++) {     
-        if((address.charAt(i) == "段" && !isNaN(address.charAt(i-1))) || (address.charAt(i) == "路" && !isNaN(address.charAt(i-1))) || (address.charAt(i) == "小" && !isNaN(address.charAt(i-1))) ){
+    for(let i = 1; i < address.length; i++){     
+        if((address.charAt(i) == "段" && !isNaN(address.charAt(i-1))) || (address.charAt(i) == "路" && !isNaN(address.charAt(i-1))) || (address.charAt(i) == "小" && !isNaN(address.charAt(i-1)))){
 
             let change_word = word_array[number_array.indexOf(address.charAt(i-1))];
 
@@ -57,8 +55,8 @@ let word_change_number = function(address){
     let word_array = ["一","二","三","四","五","六","七","八","九","壹","貳","參","肆","伍","陸","柒","捌","玖"];
     let number_array = ["1","2","3","4","5","6","7","8","9","1","2","3","4","5","6","7","8","9"];
 
-    for (let i = 0; i < address.length; i++) { 
-        if(address.charAt(i) == "號" && isNaN(address.charAt(i-1)) ){
+    for(let i = 0; i < address.length; i++){ 
+        if(address.charAt(i) == "號" && isNaN(address.charAt(i-1))){
 
             if(word_array.indexOf(address.charAt(i-1)) == -1){
                 address = "error";
@@ -78,7 +76,7 @@ let find_address_district = async function(address) {
     let new_address;
 
     await axios.get(`https://zip5.5432.tw/zip5json.py?adrs=${address_URI}&_=1569334120491`)
-    .then(function (response) {
+    .then(function(response){
         
         if(response.data.zipcode == ""){
             new_address = "error";
@@ -92,10 +90,10 @@ let find_address_district = async function(address) {
         new_address = [address.slice(0, 3),district_of_address,address.slice(3)].join("");
 
     })
-    .catch(function (error) {
+    .catch(function (error){
         console.log(error);
     })
-    .finally(function () {
+    .finally(function (){
     });
     return new_address;
 };
@@ -138,12 +136,10 @@ let complete_the_address = async function(address){
     }
     if(!address.includes("區")){
         await sleep(2000); //太快會被禁 官方建議1-2秒
-        address =await find_address_district(address);
+        address = await find_address_district(address);
     };
-    console.log("最後",address)
     return address;
 }
-
 
 let complete_the_name = function(name){
     if(name.includes("台北")){
@@ -169,7 +165,7 @@ let check_address_update_or_insert = async function(select_condition,map_data,ca
         let select_map_name_result = await dao_map.select("map","name",map_data.name);
         if(select_map_name_result.length > 0){
             if(!select_map_name_result[0].category.includes(category)){
-                map_data.category=select_map_name_result[0].category+category;
+                map_data.category = select_map_name_result[0].category + category;
             }
             //update_map_result 
             await dao_map.update("map","name",map_data.name,map_data,map_data.name);
@@ -184,7 +180,7 @@ let check_address_update_or_insert = async function(select_condition,map_data,ca
         if(select_map_address_result.length>0){
 
             if(!select_map_address_result[0].category.includes(category)){
-                map_data.category=select_map_address_result[0].category+category;
+                map_data.category = select_map_address_result[0].category + category;
             }
 
             //update_map_address_result
@@ -200,7 +196,7 @@ let check_address_update_or_insert = async function(select_condition,map_data,ca
 }
 
 let is_name_in_taipei_city_or_empty = function(geocode_result){
-   return (geocode_result.length == 0 || (!geocode_result[0].formatted_address.includes("Taipei") || geocode_result[0].formatted_address.includes("New")))
+   return (geocode_result.length == 0 || (!geocode_result[0].formatted_address.includes("Taipei") || geocode_result[0].formatted_address.includes("New")));
 }
 
 let data_for_geocode_and_insert = async function(map_data,category){
@@ -209,33 +205,32 @@ let data_for_geocode_and_insert = async function(map_data,category){
 
 
     //若地名一樣的話(雖然不是很準但至少完全一樣)，可以略過轉經緯度的步驟，直接更新資料
-    let check_address_result =await check_address_update_or_insert("name",map_data,category)
+    let check_address_result = await check_address_update_or_insert("name",map_data,category)
     if(check_address_result == "update"){
         return;
     }
 
     //先用地名去轉經緯度
-    let geocode_result =await geocode_function(map_data.name);
+    let geocode_result = await geocode_function(map_data.name);
 
     //如果地名轉失敗，用地址轉經緯度
     if(is_name_in_taipei_city_or_empty(geocode_result)){
-        console.log(map_data.name+" 名稱搜尋不到，改換地址搜尋");
-        geocode_result =await geocode_function(map_data.address);
+        geocode_result = await geocode_function(map_data.address);
     }
 
     if(geocode_result.length == 0){
         return;  //error 處理
     }
 
-    map_data.longitude=geocode_result[0].geometry.location.lng;
-    map_data.latitude=geocode_result[0].geometry.location.lat;
+    map_data.longitude = geocode_result[0].geometry.location.lng;
+    map_data.latitude = geocode_result[0].geometry.location.lat;
 
     check_address_update_or_insert("address",map_data,category);
    
 }
 
 
-let geocode_function =async function(name_or_address){
+let geocode_function = async function(name_or_address){
 
     let result;
 
@@ -254,34 +249,34 @@ let geocode_function =async function(name_or_address){
 
 
 let address_skip_or_not = function(address){
-    return ((!address.includes("路") && !address.includes("段") && !address.includes("號")&& !address.includes("街")) || address.length > 50 || address.length < 5 || address == "error")
+    return ((!address.includes("路") && !address.includes("段") && !address.includes("號") && !address.includes("街")) || address.length > 50 || address.length < 5 || address == "error");
 }
 
 let taipei_city_government_request = function(address_data){
 
     axios.get(address_data.url)
-    .then(function (response) {
+    .then(function (response){
 
         data = response.data.result.results;
         
         for(let i=0; i<data.length; i++){
             
             let address_and_name_data = {
-                category:address_data.category,
-                place_icon:address_data.place_icon,
-                place_name:data[i][address_data.place_name],
-                place_address:data[i][address_data.place_address],
-                place_information:data[i][address_data.place_information]
+                category: address_data.category,
+                place_icon: address_data.place_icon,
+                place_name: data[i][address_data.place_name],
+                place_address: data[i][address_data.place_address],
+                place_information: data[i][address_data.place_information]
             };
 
             for_loop_insert_address_and_name(address_and_name_data);
 
         }   
     })
-    .catch(function (error) {
+    .catch(function (error){
         console.log(error);
     })
-    .finally(function () {
+    .finally(function (){
     });
 
 };
@@ -289,7 +284,7 @@ let taipei_city_government_request = function(address_data){
 let government_request = function(address_data){
 
     axios.get(address_data.url)
-    .then(function (response) {
+    .then(function (response){
         data = response.data;
             
         if(data.result){
@@ -301,11 +296,11 @@ let government_request = function(address_data){
             if (data[i][address_data.location].includes(address_data.taipei_city)){
 
                 let address_and_name_data = {
-                    category:address_data.category,
-                    place_icon:address_data.place_icon,
-                    place_name:data[i][address_data.place_name],
-                    place_address:data[i][address_data.place_address],
-                    place_information:data[i][address_data.place_information]
+                    category: address_data.category,
+                    place_icon: address_data.place_icon,
+                    place_name: data[i][address_data.place_name],
+                    place_address: data[i][address_data.place_address],
+                    place_information: data[i][address_data.place_information]
                 };
 
                 for_loop_insert_address_and_name(address_and_name_data);
@@ -313,10 +308,10 @@ let government_request = function(address_data){
             }
         }   
     })
-    .catch(function (error) {
+    .catch(function (error){
         console.log(error);
     })
-    .finally(function () {
+    .finally(function (){
     });
 
 };
@@ -326,14 +321,13 @@ let normal_request = async function(url){
     let request_result;
 
     await axios.get(url)
-    .then(function (response) {
+    .then(function (response){
         request_result = response;
     })
-    .catch(function (error) {
-        console.log(typeof error.response.status);
+    .catch(function (error){
         request_result = error.response.status
     })
-    .finally(function () {
+    .finally(function (){
     });
     return request_result;
 }
@@ -342,9 +336,9 @@ let normal_request = async function(url){
 let for_loop_insert_address_and_name = async function(address_and_name_data){
 
     let map_list={
-        name:address_and_name_data.place_name,
-        address:address_and_name_data.place_address,
-        place_icon:address_and_name_data.place_icon
+        name: address_and_name_data.place_name,
+        address: address_and_name_data.place_address,
+        place_icon: address_and_name_data.place_icon
     };
    
     if (address_and_name_data.place_information !== null){
@@ -372,12 +366,13 @@ let for_loop_insert_address_and_name = async function(address_and_name_data){
 
 
 module.exports={
-    taipei_city_government_request:taipei_city_government_request,
-    government_request:government_request,
-    for_loop_insert_address_and_name:for_loop_insert_address_and_name,
-    normal_request:normal_request,
-    address_skip_or_not:address_skip_or_not,
-    complete_the_address:complete_the_address,
-    complete_the_name:complete_the_name,
-    data_for_geocode_and_insert:data_for_geocode_and_insert
+    taipei_city_government_request: taipei_city_government_request,
+    government_request: government_request,
+    for_loop_insert_address_and_name: for_loop_insert_address_and_name,
+    normal_request: normal_request,
+    address_skip_or_not: address_skip_or_not,
+    complete_the_address: complete_the_address,
+    complete_the_name: complete_the_name,
+    data_for_geocode_and_insert: data_for_geocode_and_insert,
+    replace_fullwidth_and_symbol: replace_fullwidth_and_symbol
 };

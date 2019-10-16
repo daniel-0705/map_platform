@@ -3,7 +3,7 @@ function user_status(){
     let user_state = document.querySelectorAll("li > a");
 
     if(localStorage.getItem("access_token") == null){
-        user_state[2].innerHTML = "Sign in"
+        user_state[2].innerHTML = "Sign in";
     }else{
         user_state[2].innerHTML = "Logout";
     }
@@ -15,9 +15,9 @@ function signin_or_out(){
     if(localStorage.getItem("access_token") == null){
         window.location.href="/signin.html";
     }else{
-        localStorage.removeItem("access_token")
+        localStorage.removeItem("access_token");
 
-        user_state[2].innerHTML = "Logout"
+        user_state[2].innerHTML = "Logout";
 
         window.location.href="/";
     }

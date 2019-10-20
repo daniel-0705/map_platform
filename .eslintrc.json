@@ -1,13 +1,18 @@
 {
+    "extends": [
+        "airbnb-base",
+        "prettier",
+        "plugin:prettier/recommended"
+    ],
+    "plugins": [
+        "prettier"
+    ],
     "env": {
         "browser": true,
         "commonjs": true,
         "es6": true,
         "node": true
     },
-    "extends": [
-        "standard"
-    ],
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly"
@@ -16,6 +21,13 @@
         "ecmaVersion": 2018
     },
     "rules": {
-        "quotes": [2,"double", { "avoidEscape": true }]
+        "quotes": [
+            "error",
+            "double"
+        ],
+        "prettier/prettier": [
+            "error"
+        ],
+        "tabWidth": 4
     }
 }

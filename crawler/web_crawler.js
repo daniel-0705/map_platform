@@ -66,112 +66,109 @@ const leisure_farm_update_on_schedule = schedule.scheduleJob("* * * 1 */1 *", as
     crawler.government_request(permit_agri_leisure_farm);
 });
 
-const library_and_book_store_update_on_schedule = schedule.scheduleJob(
-    "* * * 2 */1 *",
-    async function () {
-        // 台北市立圖書館 圖書館
-        axios({
-            method: "get",
-            url:
-                "https://tpml.gov.taipei/News_Content.aspx?n=5319E72A2B31CC90&sms=CFFFC938B352678A&s=E997B413EC53833C",
-            headers: {
-                "User-Agent":
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36",
-                Accept: "*/*",
-                "Cache-Control": "no-cache",
-                Host: "tpml.gov.taipei",
-                Connection: "keep-alive"
-            }
-        })
-            .then(function (response) {
-                const $ = cheerio.load(response.data); // 載入 body
+const library_and_book_store_update_on_schedule = schedule.scheduleJob("* * * 2 */1 *", async function () {
+    // 台北市立圖書館 圖書館
+    axios({
+        method: "get",
+        url:
+            "https://tpml.gov.taipei/News_Content.aspx?n=5319E72A2B31CC90&sms=CFFFC938B352678A&s=E997B413EC53833C",
+        headers: {
+            "User-Agent":
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36",
+            Accept: "*/*",
+            "Cache-Control": "no-cache",
+            Host: "tpml.gov.taipei",
+            Connection: "keep-alive"
+        }
+    })
+        .then(function (response) {
+            const $ = cheerio.load(response.data); // 載入 body
 
-                const data_name_array = [];
-                const data_address_array = [];
+            const data_name_array = [];
+            const data_address_array = [];
 
-                $("td").each((idx, el) => {
-                    if (idx % 5 == 0 && idx < 40) {
+            $("td").each((idx, el) => {
+                if (idx % 5 == 0 && idx < 40) {
+                    data_name_array.push($(el).text());
+                }
+                if (idx % 5 == 1 && idx < 40) {
+                    data_address_array.push($(el).text());
+                }
+            });
+
+            $("#table_2 > tbody > tr > td").each((idx, el) => {
+                if (idx % 16 == 0) {
+                    data_name_array.push(`臺北市立圖書館${$(el).text()}`);
+                }
+                if (idx % 16 == 2) {
+                    data_address_array.push($(el).text());
+                }
+            });
+
+            $("td > a").each((idx, el) => {
+                if (idx % 2 == 0 && idx > 45) {
+                    if (
+                        $(el)
+                            .text()
+                            .includes("分館") ||
+                        $(el)
+                            .text()
+                            .includes("總館")
+                    ) {
+                        data_name_array.push(`臺北市立圖書館${$(el).text()}`);
+                    } else {
                         data_name_array.push($(el).text());
                     }
-                    if (idx % 5 == 1 && idx < 40) {
-                        data_address_array.push($(el).text());
-                    }
-                });
-
-                $("#table_2 > tbody > tr > td").each((idx, el) => {
-                    if (idx % 16 == 0) {
-                        data_name_array.push(`臺北市立圖書館${$(el).text()}`);
-                    }
-                    if (idx % 16 == 2) {
-                        data_address_array.push($(el).text());
-                    }
-                });
-
-                $("td > a").each((idx, el) => {
-                    if (idx % 2 == 0 && idx > 45) {
-                        if (
-                            $(el)
-                                .text()
-                                .includes("分館") ||
-                            $(el)
-                                .text()
-                                .includes("總館")
-                        ) {
-                            data_name_array.push(`臺北市立圖書館${$(el).text()}`);
-                        } else {
-                            data_name_array.push($(el).text());
-                        }
-                    }
-                    if (idx % 2 == 1 && idx > 45) {
-                        data_address_array.push($(el).text());
-                    }
-                });
-
-                for (let i = 0; i < data_address_array.length; i++) {
-                    const address_and_name_data = {
-                        category: "圖書館",
-                        place_icon: "library",
-                        place_name: data_name_array[i],
-                        place_address: data_address_array[i],
-                        place_information: null
-                    };
-                    crawler.for_loop_insert_address_and_name(address_and_name_data);
                 }
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .finally(function () { });
+                if (idx % 2 == 1 && idx > 45) {
+                    data_address_array.push($(el).text());
+                }
+            });
 
-        // 政府資料開放平台 獨立書店
-        const indie_book_store = {
-            url:
-                "https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=M",
-            category: "獨立書店",
-            location: "cityName",
-            taipei_city: "臺北市",
-            place_icon: "store",
-            place_name: "name",
-            place_address: "address",
-            place_information: "intro"
-        };
-        crawler.government_request(indie_book_store);
+            for (let i = 0; i < data_address_array.length; i++) {
+                const address_and_name_data = {
+                    category: "圖書館",
+                    place_icon: "library",
+                    place_name: data_name_array[i],
+                    place_address: data_address_array[i],
+                    place_information: null
+                };
+                crawler.for_loop_insert_address_and_name(address_and_name_data);
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+        .finally(function () { });
 
-        // 政府資料開放平台 特色圖書館
-        const special_library = {
-            url:
-                "https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=K",
-            category: "圖書館",
-            location: "cityName",
-            taipei_city: "臺北市",
-            place_icon: "library",
-            place_name: "name",
-            place_address: "address",
-            place_information: "intro"
-        };
-        crawler.government_request(special_library);
-    }
-);
+    // 政府資料開放平台 獨立書店
+    const indie_book_store = {
+        url:
+            "https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=M",
+        category: "獨立書店",
+        location: "cityName",
+        taipei_city: "臺北市",
+        place_icon: "store",
+        place_name: "name",
+        place_address: "address",
+        place_information: "intro"
+    };
+    crawler.government_request(indie_book_store);
+
+    // 政府資料開放平台 特色圖書館
+    const special_library = {
+        url:
+            "https://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=K",
+        category: "圖書館",
+        location: "cityName",
+        taipei_city: "臺北市",
+        place_icon: "library",
+        place_name: "name",
+        place_address: "address",
+        place_information: "intro"
+    };
+    crawler.government_request(special_library);
+});
 
 const health_update_on_schedule = schedule.scheduleJob("* * * 3 */1 *", async function () {
     // 台北市資料大平台 臺北市居家護理所
@@ -468,7 +465,7 @@ const school_update_on_schedule = schedule.scheduleJob("* * * 4 */1 *", async fu
         .finally(function () { });
 });
 
-const living_update_on_schedule = schedule.scheduleJob("* * * 25 */1 *", async function () {
+const living_update_on_schedule = schedule.scheduleJob("* * * 20 */1 *", async function () {
     // 政府資料開放平台 旅館民宿
     let hotel_and_homestay_request = await crawler.normal_request(
         "https://gis.taiwan.net.tw/XMLReleaseALL_public/hotel_C_f.json"
@@ -503,7 +500,7 @@ const living_update_on_schedule = schedule.scheduleJob("* * * 25 */1 *", async f
     crawler.taipei_city_government_request(environmental_hotel);
 });
 
-const other_update_on_schedule = schedule.scheduleJob("* * * 26 */1 *", async function () {
+const other_update_on_schedule = schedule.scheduleJob("* * * 21 */1 *", async function () {
     // 台北市資料大平台 臺北市電動機車充電地址及充電格位
     const moto_charge = {
         url:
@@ -634,7 +631,7 @@ const other_update_on_schedule = schedule.scheduleJob("* * * 26 */1 *", async fu
         .finally(function () { });
 });
 
-const play_on_schedule = schedule.scheduleJob("* * * 27 */1 *", async function () {
+const play_on_schedule = schedule.scheduleJob("* * * 22 */1 *", async function () {
     // 台北市資料大平台 文化資產
     let culter_asset_request = await crawler.normal_request(
         "https://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=d40ee29c-a538-4a87-84f0-f43acfa19a20"

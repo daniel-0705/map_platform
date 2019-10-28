@@ -19,6 +19,8 @@ router.get("/", async function (req, res) {
     if (select_user_result.length !== 0) {
         const select_all_user_place = await dao_map.select("user_map_place", "user_name", select_user_result[0].name);
         data.user_places = select_all_user_place;
+    } else {
+        data.user_places = [];
     }
 
     // 接著找公用地圖上所有的點，因為幾乎不會變動，所以這邊設置快取

@@ -152,6 +152,8 @@ function delete_place_function(list_data) {
                 marker_order = j;
             }
         }
+        console.log("list_data", list_data)
+        console.log("response_data", response_data)
         console.log(marker_order)
         user_markers[marker_order].setMap(null); // 把使用者先前存的的地標隱藏
 

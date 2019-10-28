@@ -152,9 +152,7 @@ function delete_place_function(list_data) {
                 marker_order = j;
             }
         }
-        console.log("list_data", list_data)
-        console.log("response_data", response_data)
-        console.log(marker_order)
+
         user_markers[marker_order].setMap(null); // 把使用者先前存的的地標隱藏
 
         const select_place = {
@@ -373,8 +371,6 @@ function render_map_and_user_all_place() {
 }
 
 function render_user_all_place(user_all_place) {
-    console.log("user_all_place", user_all_place)
-    console.log("user_all_place.length", user_all_place.length)
     for (let i = 0; i < user_all_place.length; i++) {
         const marker = new google.maps.Marker({
             position: {

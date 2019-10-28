@@ -235,7 +235,7 @@ router.delete("/place", async function (req, res) {
 router.post("/result", async function (req, res) {
     const list_data = req.body;
     const user_data = req.user[0];
-    console.log(123, user_data)
+
     const select_place_in_list = await dao_map.select_2_conditions("user_map_place", "user_name", user_data.name, "place_name", list_data.data.place_name);
 
     const select_all_list = await dao_map.select_order_by("user_map_list", "user_name", user_data.name, "list_id");

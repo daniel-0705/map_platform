@@ -113,7 +113,7 @@ router.post("/", async function (req, res) {
             mysql.con.rollback(function () {
                 console.log("交易取消");
             });
-            console.log(147, err)
+
             res.send({
                 error: "! 系統出現錯誤，請重新整理。"
             });

@@ -373,7 +373,8 @@ function render_map_and_user_all_place() {
 }
 
 function render_user_all_place(user_all_place) {
-    console.log("user_all_place", user_all_place, user_all_place.length)
+    console.log("user_all_place", user_all_place)
+    console.log("user_all_place.length", user_all_place.length)
     for (let i = 0; i < user_all_place.length; i++) {
         const marker = new google.maps.Marker({
             position: {

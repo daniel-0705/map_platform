@@ -145,6 +145,7 @@ function delete_place_function(list_data) {
         // 為了在搜尋列 顯示地點名稱時知道順序 所以只好用迴圈的方式找出該地名的順序
         let marker_order;
         for (let j = 0; j < user_markers.length; j++) {
+            console.log("user_markers", user_markers)
             if (
                 user_markers[j].name == list_data.data.place_name &&
                 user_markers[j].list == list_data.data.list_name

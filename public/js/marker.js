@@ -368,6 +368,8 @@ function render_map_and_user_all_place() {
                 marker.setVisible(false); // 先隱藏 看不到地標
             }
         }
+        console.log("response_data", response_data)
+        console.log("response_data.user_places", response_data.user_places)
         render_user_all_place(response_data.user_places);
     });
 }

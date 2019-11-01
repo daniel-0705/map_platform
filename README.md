@@ -9,6 +9,7 @@ Website URL: https://www.daniel0705.com
 - [Technologies](#Technologies)
 - [Architecture](#Architecture)
 - [Database Schema](#Database-Schema)
+- [Data Pipeline](#Data-Pipeline)
 - [Main Features](#Main-Features)
 - [Demonstration](#Demonstration)
   - [Main Page](#Main-Page)
@@ -81,6 +82,37 @@ Website URL: https://www.daniel0705.com
  <img src="https://i.imgur.com/LrMoqlz.png"
  width="800">
 </p>
+
+## Data Pipeline
+
+<p align="center">
+ <img src="https://i.imgur.com/Jq7hNaF.png"
+ width="800">
+</p>
+
+- Replace Fullwidth
+    - 忠孝東路一段１號 → 忠孝東路一段 1 號 
+    - 遼寧街１９９巷５號 → 遼寧街 199 巷 5 號
+    - 中山北路二段５９巷４５號Ｂ２ → 中山北路二段 59 巷 45 號 B2
+- Convert Characters
+    - 新湖 3 路 270 號 2 樓 → 新湖三路 270 號 2 樓
+    - 凱達格蘭大道一號 → 凱達格蘭大道1號
+    - 忠孝東路1段一號 → 忠孝東路一段1號
+- Check Taipei City
+    - 忠孝東路一段1號 → 臺北市忠孝東路一段 1 號
+    - 台北市中山區長春路 167 號 → 臺北市中山區長春路 167 號
+- Remove Parentheses
+    - 台北市信義區松高路 11 號 4 樓 ( 誠品生活商場內 ) → 台北市信義區松高路 11 號 4 樓
+    - 台北市忠孝東路五段 8 號 7F [ 統一時代百貨 ] → 台北市忠孝東路五段 8 號 7F
+- Remove Zip Code
+    - 105 台北市松山區復興北路 361 巷 7 號 → 臺北市松山區復興北路 361 巷 7 號
+    - 10673 台北市大安區羅斯福路四段 21 號 → 臺北市大安區羅斯福路四段 21 號
+- Check District
+    - 臺北市羅斯福路三段 242 號 → 臺北市中正區羅斯福路三段 242 號
+    - 臺北市福德街 251 巷 33 號 → 臺北市信義區福德街 251 巷 33 號
+
+
+
 
 ## Main Features
 - List Search
